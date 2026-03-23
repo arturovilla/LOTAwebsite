@@ -1,44 +1,65 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { motion, AnimatePresence, LayoutGroup } from "framer-motion";
+
+const R2 = "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev";
+
+const spring = { type: "spring" as const, stiffness: 120, damping: 20 };
 
 export default function VideoDemo() {
   const [showDesktop, setShowDesktop] = useState(false);
   const phoneRef = useRef<HTMLVideoElement>(null);
+  const phoneMobileRef = useRef<HTMLVideoElement>(null);
   const desktopRef = useRef<HTMLVideoElement>(null);
+  const desktopMobileRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout>>(null);
   const sectionRef = useRef<HTMLDivElement>(null);
   const isVisibleRef = useRef(false);
 
   const startCycle = useCallback(() => {
-    // Reset: hide desktop, restart phone video
     setShowDesktop(false);
-    const phone = phoneRef.current;
-    const desktop = desktopRef.current;
-    if (phone) {
-      phone.currentTime = 0;
-      phone.play();
+
+    for (const ref of [phoneRef, phoneMobileRef]) {
+      if (ref.current) {
+        ref.current.currentTime = 0;
+        ref.current.play();
+      }
     }
-    if (desktop) {
-      desktop.pause();
-      desktop.currentTime = 0;
+    for (const ref of [desktopRef, desktopMobileRef]) {
+      if (ref.current) {
+        ref.current.pause();
+        ref.current.currentTime = 0;
+      }
     }
 
-    // After 11s, slide phone left and show desktop
     timerRef.current = setTimeout(() => {
       setShowDesktop(true);
-      if (desktop) desktop.play();
-
-      // When desktop video ends, restart the whole cycle
-      const onEnded = () => {
-        desktop?.removeEventListener("ended", onEnded);
-        if (isVisibleRef.current) {
-          startCycle();
-        }
-      };
-      desktop?.addEventListener("ended", onEnded);
     }, 11000);
   }, []);
+
+  useEffect(() => {
+    if (!showDesktop) return;
+
+    for (const ref of [desktopRef, desktopMobileRef]) {
+      if (ref.current) {
+        ref.current.currentTime = 0;
+        ref.current.play();
+      }
+    }
+
+    // Use whichever desktop video is visible to detect end
+    const desktop = desktopRef.current || desktopMobileRef.current;
+    if (!desktop) return;
+
+    const onEnded = () => {
+      if (isVisibleRef.current) {
+        startCycle();
+      }
+    };
+    desktop.addEventListener("ended", onEnded);
+    return () => desktop.removeEventListener("ended", onEnded);
+  }, [showDesktop, startCycle]);
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -47,16 +68,14 @@ export default function VideoDemo() {
     const observer = new IntersectionObserver(
       ([entry]) => {
         isVisibleRef.current = entry.isIntersecting;
-        const phone = phoneRef.current;
-        const desktop = desktopRef.current;
 
         if (entry.isIntersecting) {
           startCycle();
         } else {
-          // Pause everything when off screen
           if (timerRef.current) clearTimeout(timerRef.current);
-          phone?.pause();
-          desktop?.pause();
+          for (const ref of [phoneRef, phoneMobileRef, desktopRef, desktopMobileRef]) {
+            ref.current?.pause();
+          }
         }
       },
       { threshold: 0.3 }
@@ -87,63 +106,77 @@ export default function VideoDemo() {
         </div>
 
         {/* Desktop: side by side */}
-        <div className="hidden md:flex items-center justify-center gap-8">
-          <div
-            className="shrink-0 transition-all duration-1000 ease-in-out"
-            style={{
-              transform: showDesktop
-                ? "translateX(0)"
-                : "translateX(calc(50vw - 50% - 1rem))",
-            }}
-          >
-            <video
-              ref={phoneRef}
-              muted
-              playsInline
-              className="rounded-[2rem] max-h-[550px] drop-shadow-2xl"
+        <LayoutGroup>
+          <div className="hidden md:flex items-center justify-center gap-6">
+            <motion.div
+              layout
+              transition={spring}
+              className="shrink-0"
             >
-              <source src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/phone.MP4" type="video/mp4" />
-            </video>
-          </div>
+              <video
+                ref={phoneRef}
+                muted
+                playsInline
+                className="rounded-[2rem] h-[500px] w-auto drop-shadow-2xl"
+              >
+                <source src={`${R2}/phone.MP4`} type="video/mp4" />
+              </video>
+            </motion.div>
 
-          <div
-            className="flex-1 min-w-0 transition-all duration-1000 ease-in-out"
-            style={{
-              opacity: showDesktop ? 1 : 0,
-              transform: showDesktop ? "translateX(0)" : "translateX(60px)",
-            }}
-          >
-            <video
-              ref={desktopRef}
-              muted
-              playsInline
-              className="w-full rounded-xl border border-white/[0.06] drop-shadow-2xl"
-            >
-              <source src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/desktop.mp4" type="video/mp4" />
-            </video>
+            <AnimatePresence>
+              {showDesktop && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, x: 40 }}
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, x: 40 }}
+                  transition={spring}
+                  className="flex-1 min-w-0"
+                >
+                  <video
+                    ref={desktopRef}
+                    muted
+                    playsInline
+                    className="w-full rounded-xl border border-white/[0.06] drop-shadow-2xl"
+                  >
+                    <source src={`${R2}/desktop.mp4`} type="video/mp4" />
+                  </video>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-        </div>
+        </LayoutGroup>
 
-        {/* Mobile: stacked */}
+        {/* Mobile: stacked with animation */}
         <div className="md:hidden flex flex-col items-center gap-6">
           <video
-            autoPlay
+            ref={phoneMobileRef}
             muted
-            loop
             playsInline
             className="rounded-[2rem] max-h-[400px] drop-shadow-2xl"
           >
-            <source src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/phone.MP4" type="video/mp4" />
+            <source src={`${R2}/phone.MP4`} type="video/mp4" />
           </video>
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="w-full rounded-xl border border-white/[0.06] drop-shadow-2xl"
-          >
-            <source src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/desktop.mp4" type="video/mp4" />
-          </video>
+
+          <AnimatePresence>
+            {showDesktop && (
+              <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 30 }}
+                transition={spring}
+                className="w-full"
+              >
+                <video
+                  ref={desktopMobileRef}
+                  muted
+                  playsInline
+                  className="w-full rounded-xl border border-white/[0.06] drop-shadow-2xl"
+                >
+                  <source src={`${R2}/desktop.mp4`} type="video/mp4" />
+                </video>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </section>
