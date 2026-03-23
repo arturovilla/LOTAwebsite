@@ -1,11 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #0a0a0a;
+  --background: #000000;
   --foreground: #ededed;
-  --orange: #f97316;
-  --deep-orange: #ea580c;
-  --red: #dc2626;
 }
 
 @theme inline {
@@ -25,24 +22,25 @@ body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
-/* Gradient utilities */
+/* Hero gradient — subtle radial glow */
 .gradient-hero {
-  background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(234, 88, 12, 0.3), rgba(220, 38, 38, 0.1) 50%, transparent 80%),
-    #0a0a0a;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 45%, rgba(120, 80, 220, 0.12), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 30% 50%, rgba(234, 88, 12, 0.08), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 70% 50%, rgba(56, 189, 248, 0.06), transparent 60%),
+    #000000;
 }
 
-.gradient-text {
-  background: linear-gradient(135deg, #f97316, #ea580c, #dc2626);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+/* Section alternate bg */
+.bg-section {
+  background: #09090b;
 }
 
 /* Animations */
 @keyframes fade-in-up {
   from {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(28px);
   }
   to {
     opacity: 1;
@@ -51,30 +49,30 @@ body {
 }
 
 @keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-12px);
-  }
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
 }
 
 .animate-fade-in-up {
-  animation: fade-in-up 0.8s ease-out both;
+  animation: fade-in-up 0.7s ease-out both;
 }
-
 .animate-fade-in-up-delay {
-  animation: fade-in-up 0.8s ease-out 0.2s both;
+  animation: fade-in-up 0.7s ease-out 0.15s both;
 }
-
 .animate-fade-in-up-delay-2 {
-  animation: fade-in-up 0.8s ease-out 0.4s both;
+  animation: fade-in-up 0.7s ease-out 0.3s both;
 }
-
+.animate-fade-in-up-delay-3 {
+  animation: fade-in-up 0.7s ease-out 0.45s both;
+}
 .animate-float {
   animation: float 6s ease-in-out infinite;
 }
-
 .animate-float-delay {
-  animation: float 6s ease-in-out 1.5s infinite;
+  animation: float 6s ease-in-out 2s infinite;
 }

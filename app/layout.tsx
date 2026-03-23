@@ -16,6 +16,10 @@ export const metadata: Metadata = {
   title: "LOTA — LiDAR Over the Air",
   description:
     "Capture, stream, and export 3D spatial data from your iPhone's LiDAR sensor. Stream via TCP, UDP, NDI, and OSC.",
+  icons: {
+    icon: "/LOTA-light.jpg",
+    apple: "/LOTA-light.jpg",
+  },
 };
 
 export default function RootLayout({

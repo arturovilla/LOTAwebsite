@@ -1,11 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 
 const links = [
   { label: "Features", href: "#features" },
-  { label: "Export", href: "#export" },
   { label: "Streaming", href: "#streaming" },
+  { label: "Export", href: "#export" },
 ];
 
 export default function Navbar() {
@@ -22,16 +23,25 @@ export default function Navbar() {
     <nav
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
         scrolled
-          ? "bg-black/90 backdrop-blur-md border-b border-white/5"
+          ? "bg-black/80 backdrop-blur-xl border-b border-white/[0.06]"
           : "bg-transparent"
       }`}
     >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <a href="#hero" className="text-xl font-bold tracking-tight text-white">
-          LOTA
+        <a href="#hero" className="flex items-center gap-2.5">
+          <Image
+            src="/LOTA-dark.jpg"
+            alt="LOTA"
+            width={32}
+            height={32}
+            className="rounded-lg"
+          />
+          <span className="text-lg font-semibold text-white tracking-tight">
+            LOTA
+          </span>
         </a>
 
-        {/* Desktop links */}
+        {/* Desktop */}
         <div className="hidden md:flex items-center gap-8">
           {links.map((link) => (
             <a
@@ -42,12 +52,11 @@ export default function Navbar() {
               {link.label}
             </a>
           ))}
-          <a
-            href="#hero"
-            className="text-sm font-semibold px-5 py-2 rounded-full bg-orange-500 text-white hover:bg-orange-400 transition-colors"
+          <span
+            className="text-sm font-medium px-5 py-2 rounded-full bg-white/10 text-zinc-300 border border-white/[0.1] cursor-default"
           >
-            Download
-          </a>
+            Coming Soon
+          </span>
         </div>
 
         {/* Mobile hamburger */}
@@ -57,17 +66,17 @@ export default function Navbar() {
           aria-label="Toggle menu"
         >
           <span
-            className={`block w-5 h-0.5 bg-white transition-transform ${
+            className={`block w-5 h-0.5 bg-white transition-all duration-200 ${
               menuOpen ? "rotate-45 translate-y-2" : ""
             }`}
           />
           <span
-            className={`block w-5 h-0.5 bg-white transition-opacity ${
+            className={`block w-5 h-0.5 bg-white transition-all duration-200 ${
               menuOpen ? "opacity-0" : ""
             }`}
           />
           <span
-            className={`block w-5 h-0.5 bg-white transition-transform ${
+            className={`block w-5 h-0.5 bg-white transition-all duration-200 ${
               menuOpen ? "-rotate-45 -translate-y-2" : ""
             }`}
           />
@@ -76,7 +85,7 @@ export default function Navbar() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden bg-black/95 backdrop-blur-md border-t border-white/5 px-6 pb-6 pt-4 flex flex-col gap-4">
+        <div className="md:hidden bg-black/95 backdrop-blur-xl border-t border-white/[0.06] px-6 pb-6 pt-4 flex flex-col gap-4">
           {links.map((link) => (
             <a
               key={link.href}
@@ -87,13 +96,11 @@ export default function Navbar() {
               {link.label}
             </a>
           ))}
-          <a
-            href="#hero"
-            onClick={() => setMenuOpen(false)}
-            className="text-sm font-semibold px-5 py-2 rounded-full bg-orange-500 text-white text-center hover:bg-orange-400 transition-colors"
+          <span
+            className="text-sm font-medium px-5 py-2.5 rounded-full bg-white/10 text-zinc-300 border border-white/[0.1] text-center cursor-default"
           >
-            Download
-          </a>
+            Coming Soon
+          </span>
         </div>
       )}
     </nav>
