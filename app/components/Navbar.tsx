@@ -1,7 +1,7 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
 
 const links = [
   { label: "Features", href: "#features" },
@@ -29,8 +29,8 @@ export default function Navbar() {
     >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
         <a href="#hero" className="flex items-center gap-2.5">
-          <Image
-            src="/LOTA-dark.jpg"
+          <img
+            src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/LOTA-dark.jpg"
             alt="LOTA"
             width={32}
             height={32}

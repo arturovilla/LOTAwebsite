@@ -1,4 +1,4 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
 
 export default function GaussianSplat() {
   return (
@@ -7,8 +7,8 @@ export default function GaussianSplat() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           {/* Phone mockup */}
           <div className="flex justify-center">
-            <Image
-              src="/gaussianSplat.webp"
+            <img
+              src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/gaussianSplat.webp"
               alt="LOTA Gaussian Splat export"
               width={300}
               height={640}

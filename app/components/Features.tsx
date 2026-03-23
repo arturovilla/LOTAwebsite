@@ -1,24 +1,24 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
 
 const modes = [
   {
     title: "Color",
-    img: "/colormode.webp",
+    img: "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/colormode.webp",
     desc: "Live RGB camera feed at 60 FPS with real-time LiDAR depth fusion. What you see is what you capture.",
   },
   {
     title: "Monochrome",
-    img: "/monochromemode.webp",
+    img: "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/monochromemode.webp",
     desc: "High-contrast grayscale feed — ideal for low-light environments and precision spatial scanning.",
   },
   {
     title: "Depth",
-    img: "/depthmode.webp",
+    img: "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/depthmode.webp",
     desc: "LiDAR depth visualization with 9 selectable colormaps including thermal, incandescent, and deep sea.",
   },
   {
     title: "Point Cloud",
-    img: "/pointcloudmode.webp",
+    img: "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/pointcloudmode.webp",
     desc: "Real-time 3D point cloud with true RGB colors. Configurable frame window and point density up to 12,500 points per frame.",
   },
 ];
@@ -46,8 +46,8 @@ export default function Features() {
               key={mode.title}
               className="group rounded-2xl overflow-hidden bg-zinc-950 border border-white/[0.06] hover:border-white/[0.12] transition-all duration-300 hover:-translate-y-1"
             >
-              <div className="relative overflow-hidden bg-black flex justify-center pt-6">
-                <Image
+              <div className="relative overflow-hidden flex justify-center pt-6">
+                <img
                   src={mode.img}
                   alt={`LOTA ${mode.title} mode`}
                   width={240}

@@ -1,4 +1,4 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
 
 export default function Footer() {
   return (
@@ -8,8 +8,8 @@ export default function Footer() {
           {/* Logo + tagline */}
           <div>
             <div className="flex items-center gap-2.5 mb-3">
-              <Image
-                src="/LOTA-dark.jpg"
+              <img
+                src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/LOTA-dark.jpg"
                 alt="LOTA"
                 width={28}
                 height={28}

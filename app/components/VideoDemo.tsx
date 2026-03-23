@@ -102,7 +102,7 @@ export default function VideoDemo() {
               playsInline
               className="rounded-[2rem] max-h-[550px] drop-shadow-2xl"
             >
-              <source src="/phone.MP4" type="video/mp4" />
+              <source src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/phone.MP4" type="video/mp4" />
             </video>
           </div>
 
@@ -119,7 +119,7 @@ export default function VideoDemo() {
               playsInline
               className="w-full rounded-xl border border-white/[0.06] drop-shadow-2xl"
             >
-              <source src="/desktop.mp4" type="video/mp4" />
+              <source src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/desktop.mp4" type="video/mp4" />
             </video>
           </div>
         </div>
@@ -133,7 +133,7 @@ export default function VideoDemo() {
             playsInline
             className="rounded-[2rem] max-h-[400px] drop-shadow-2xl"
           >
-            <source src="/phone.MP4" type="video/mp4" />
+            <source src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/phone.MP4" type="video/mp4" />
           </video>
           <video
             autoPlay
@@ -142,7 +142,7 @@ export default function VideoDemo() {
             playsInline
             className="w-full rounded-xl border border-white/[0.06] drop-shadow-2xl"
           >
-            <source src="/desktop.mp4" type="video/mp4" />
+            <source src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/desktop.mp4" type="video/mp4" />
           </video>
         </div>
       </div>

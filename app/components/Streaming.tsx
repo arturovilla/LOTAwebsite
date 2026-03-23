@@ -1,4 +1,4 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
 
 const protocols = [
   {
@@ -57,8 +57,8 @@ export default function Streaming() {
 
           {/* Phone mockup */}
           <div className="flex justify-center order-1 lg:order-2">
-            <Image
-              src="/settings.webp"
+            <img
+              src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/settings.webp"
               alt="LOTA streaming settings"
               width={300}
               height={640}

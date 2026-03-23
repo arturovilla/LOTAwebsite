@@ -1,4 +1,4 @@
-import Image from "next/image";
+/* eslint-disable @next/next/no-img-element */
 
 export default function Hero() {
   return (
@@ -9,13 +9,12 @@ export default function Hero() {
       <div className="relative z-10 text-center px-6 pt-24 pb-48 sm:pb-56 max-w-3xl mx-auto">
         {/* Logo */}
         <div className="flex justify-center mb-8 animate-fade-in-up">
-          <Image
-            src="/LOTA-dark.jpg"
+          <img
+            src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/LOTA-dark.jpg"
             alt="LOTA app icon"
             width={96}
             height={96}
             className="rounded-[22px] shadow-2xl shadow-purple-500/10"
-            preload
           />
         </div>
 
@@ -47,28 +46,26 @@ export default function Hero() {
       {/* Phone mockups */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-end gap-6 md:gap-10 pointer-events-none">
         <div className="animate-float hidden sm:block -mb-20 md:-mb-28">
-          <Image
-            src="/colormode.webp"
+          <img
+            src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/colormode.webp"
             alt="LOTA color capture mode"
             width={200}
             height={430}
             className="rounded-[2rem] drop-shadow-2xl"
-            preload
           />
         </div>
         <div className="animate-float-delay -mb-10 md:-mb-16">
-          <Image
-            src="/depthmode.webp"
+          <img
+            src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/depthmode.webp"
             alt="LOTA depth map visualization"
             width={220}
             height={470}
             className="rounded-[2rem] drop-shadow-2xl"
-            preload
           />
         </div>
         <div className="animate-float hidden md:block -mb-24 md:-mb-32">
-          <Image
-            src="/pointcloudmode.webp"
+          <img
+            src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/pointcloudmode.webp"
             alt="LOTA point cloud mode"
             width={200}
             height={430}
