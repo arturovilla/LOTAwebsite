@@ -24,6 +24,17 @@ export default function Footer() {
               <br />
               Professional spatial capture from your iPhone.
             </p>
+            <p className="text-sm text-zinc-600 mt-3">
+              Created by{" "}
+              <a
+                href="https://www.rtvro.dev"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-zinc-400 hover:text-white transition-colors"
+              >
+                Arturo Villalobos
+              </a>
+            </p>
           </div>
 
           {/* Links */}
