@@ -4,6 +4,8 @@ import Features from "./components/Features";
 import GaussianSplat from "./components/GaussianSplat";
 import Streaming from "./components/Streaming";
 import VideoDemo from "./components/VideoDemo";
+import InUse from "./components/InUse";
+import Signup from "./components/Signup";
 import Footer from "./components/Footer";
 
 export default function Home() {
@@ -14,7 +16,9 @@ export default function Home() {
       <Features />
       <Streaming />
       <VideoDemo />
+      <InUse />
       <GaussianSplat />
+      <Signup />
       <Footer />
     </>
   );
