@@ -7,6 +7,8 @@ const links = [
   { label: "Features", href: "#features" },
   { label: "Streaming", href: "#streaming" },
   { label: "Export", href: "#export" },
+  { label: "Docs", href: "/docs" },
+  { label: "Changelog", href: "/changelog" },
 ];
 
 export default function Navbar() {
