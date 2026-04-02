@@ -51,6 +51,9 @@ export default function Footer() {
             <a href="#export" className="text-sm text-zinc-500 hover:text-white transition-colors">
               Export
             </a>
+            <a href="/privacy" className="text-sm text-zinc-500 hover:text-white transition-colors">
+              Privacy Policy
+            </a>
           </div>
 
           {/* CTA */}

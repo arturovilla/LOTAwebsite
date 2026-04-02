@@ -3,7 +3,17 @@
     "allow": [
       "WebFetch(domain:support.apple.com)",
       "WebFetch(domain:www.applevis.com)",
-      "WebFetch(domain:www.shadcn.io)"
+      "WebFetch(domain:www.shadcn.io)",
+      "WebSearch",
+      "WebFetch(domain:resend.com)",
+      "Bash(curl -s -L \"https://ndi.video/privacy-policy/\")",
+      "Bash(curl -s -L \"https://ndi.video/sdk/eula/\")",
+      "Bash(curl -s -L \"https://ndi.video/sdk/\")",
+      "WebFetch(domain:ndi.video)",
+      "WebFetch(domain:downloads.ndi.tv)",
+      "WebFetch(domain:docs.ndi.video)",
+      "Bash(python3 -c ':*)",
+      "WebFetch(domain:forum.vizrt.com)"
     ]
   }
 }
