@@ -43,6 +43,7 @@ Thanks again for testing LOTA and helping us make it better. More updates coming
 [Instagram](https://instagram.com/YOUR_HANDLE) · [Patreon](https://patreon.com/YOUR_HANDLE) · [Reddit](https://reddit.com/r/YOUR_SUBREDDIT)
 
 ---
+
 ---
 
 Subject: LOTA 1.0.4 — GPU point clouds, binary streaming & full App Store release coming mid-April
@@ -95,4 +96,5 @@ Thanks for being part of this.
 
 — Arturo
 
+[Instagram](https://instagram.com/hyprtexture) · [Patreon](https://patreon.com/hyprtexture) · [Reddit](https://www.reddit.com/user/lpyonderboy/) ·
 [lidarota.app](https://lidarota.app) · [Docs](https://lidarota.app/docs) · [Changelog](https://lidarota.app/changelog)
