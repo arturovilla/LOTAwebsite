@@ -4,6 +4,37 @@ All notable changes to the LOTA project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.4] - 2026-04-03
+
+### Added
+- **Metal compute shader for depth unprojection**: Replaced CPU-side nested loop with a GPU compute kernel (`unprojectDepth`) that processes every depth pixel in parallel. Dispatches over actual depth texture dimensions — no hardcoded resolution assumptions
+- **Dynamic ring buffer allocation**: Point cloud ring buffer is lazy-allocated on first depth frame using the actual depth map resolution (`CVPixelBufferGetWidth * Height`). Automatically adapts to any LiDAR hardware without code changes
+- **Full depth map sampling**: Every pixel of the 256x192 depth map is now unprojected (previously sampled every 2nd pixel in both axes, discarding ~75% of depth data). ~4x spatial density increase
+- **Max Depth setting**: User-configurable maximum LiDAR depth range (1–10m, default 5m) replaces the hardcoded 5.0m filter. Gen 2 devices (iPhone 15/16 Pro, IMX591) can extend to ~10m. Applies to both live point cloud and Gaussian capture
+- **Binary PLY encoding**: Optional packed binary wire format for PLY streaming — 4-byte LE count header + 15 bytes/point (3 floats + 3 uint8 RGB). ~40% smaller than CSV text format. Toggle in Settings → Point Cloud Stream → Binary Format (default off)
+- **Compute Quality setting**: Segmented picker (Full / Balanced / Efficient) controlling GPU compute frame skip. Full = every frame, Balanced = every 2nd, Efficient = every 3rd. Defaults to Balanced to reduce thermal load
+- **Adaptive thermal throttle**: Automatically increases compute frame skip (max 4) when measured FPS drops below 50, recovers when FPS exceeds 55. Hysteresis gap prevents oscillation. Only active in Point Cloud mode
+- **Depth change detection**: Compares `CVPixelBuffer` identity between frames to skip redundant compute dispatches. LiDAR hardware runs at 30fps but ARKit interpolates to 60fps — half the frames reuse the same depth buffer. Zero-cost check, zero quality loss
+- **TouchDesigner binary receiver**: `tools/td_pointcloud_receiver.py` — high-performance binary point cloud receiver using numpy bulk parsing + Script TOP textures + GPU instancing. Handles 49K+ points at 60fps with ~1–2ms Python overhead
+
+### Changed
+- Point cloud unprojection moved from CPU (`writePointsToSlot`) to Metal compute shader (`computePointsGPU`), enabling full depth map sampling at interactive frame rates
+- Frame throttle removed from both `MetalRenderer` (was every 3rd frame) and `GaussianRecorder` (was every 3rd frame) — every ARKit frame is now processed
+- `GaussianRecorder.extractPoints` now samples every depth pixel (step=1, was step=2)
+- `pointCloudMaxPoints` setting removed (was 500–12,500 slider) — replaced by full depth map sampling with Max Depth range control
+- Ring buffer slot offset calculation uses dynamic `depthMapPixelCount` instead of hardcoded `pointsPerFrame` constant
+- PLY encoder (`PLYEncoder.swift`) now supports both CSV text (`encode`) and packed binary (`encodeBinary`) formats
+- Settings UI: "Max Points" slider replaced with "Max Depth" slider; added "Compute Quality" segmented picker; added "Binary Format" toggle under Point Cloud Stream
+- Deprecated `td_ply_receiver.py` (CSV/Script SOP) in favor of `td_pointcloud_receiver.py` (binary/GPU instancing)
+
+### Removed
+- `pointsPerFrame` hardcoded constant (12,500) — buffer capacity is now derived from depth map resolution at runtime
+- `activeMaxPoints` property and `setMaxPoints()` — no longer needed with full depth map sampling
+- `pointCloudFrameCounter` — replaced by thermal management frame skip system
+- `recordFrameCounter` in `GaussianRecorder` — frame throttle removed
+
+---
+
 ## [1.0.3] - 2026-04-01
 
 ### Fixed

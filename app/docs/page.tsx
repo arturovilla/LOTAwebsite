@@ -218,7 +218,7 @@ export default function DocsPage() {
 
         {/* ── main content ──────────────────────────────────── */}
         <main className="flex-1 min-w-0 px-6 md:px-12 py-12 space-y-24">
-          <div className="max-w-3xl">
+          <div className="max-w-3xl space-y-24">
             {/* ─── Getting Started ─────────────────────────── */}
             <section
               id="getting-started"
@@ -401,6 +401,35 @@ export default function DocsPage() {
                   </div>
                   <a
                     href="/LOTAPoints.tox"
+                    download
+                    className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full bg-white text-black hover:bg-zinc-200 transition-colors"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M8 2v9m0 0L5 8m3 3 3-3M3 13h10" />
+                    </svg>
+                    Download .tox
+                  </a>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-white mb-2">
+                      LOTABinaryPLYReciever.tox — Binary Point Cloud Receiver
+                    </h3>
+                    <div className="text-sm text-zinc-400 leading-relaxed">
+                      <p>
+                        High-performance binary point cloud receiver for
+                        TouchDesigner. Uses numpy bulk parsing, Script TOP
+                        textures, and GPU instancing to handle 49K+ points
+                        at 60fps. Enable <Kbd>Binary Format</Kbd> in
+                        Settings → Point Cloud Stream to use this receiver.
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href="/LOTABinaryPLYReciever.tox"
                     download
                     className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full bg-white text-black hover:bg-zinc-200 transition-colors"
                   >
