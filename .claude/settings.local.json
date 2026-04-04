@@ -13,7 +13,22 @@
       "WebFetch(domain:downloads.ndi.tv)",
       "WebFetch(domain:docs.ndi.video)",
       "Bash(python3 -c ':*)",
-      "WebFetch(domain:forum.vizrt.com)"
+      "WebFetch(domain:forum.vizrt.com)",
+      "Bash(curl -s \"https://llmstxt.org/\")",
+      "Bash(ls -la /Users/arturo/Development/lotawebsite/*.md)",
+      "Bash(curl -s \"https://llmstxt.org/llms.txt\")",
+      "Bash(curl -s \"https://raw.githubusercontent.com/jxnl/llmstxt/main/README.md\")",
+      "WebFetch(domain:llmstxt.org)",
+      "WebFetch(domain:www.semrush.com)",
+      "WebFetch(domain:searchengineland.com)",
+      "WebFetch(domain:paulcalvano.com)",
+      "WebFetch(domain:www.firebrand.marketing)",
+      "WebFetch(domain:fruition.net)",
+      "WebFetch(domain:witscode.com)",
+      "WebFetch(domain:rye.dev)",
+      "WebFetch(domain:firstpagesage.com)",
+      "WebFetch(domain:humanstxt.org)",
+      "WebFetch(domain:securitytxt.org)"
     ]
   }
 }

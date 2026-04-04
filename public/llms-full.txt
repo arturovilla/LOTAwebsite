@@ -1,0 +1,222 @@
+# LOTA — LiDAR Over The Air
+
+> LOTA is an iOS app that transforms iPhones with LiDAR sensors into professional spatial capture tools. Stream real-time depth, color, and point cloud data over NDI, TCP/UDP, OSC, and PLY. Export COLMAP-compatible datasets for Gaussian Splat and NeRF training. Built for creative professionals using TouchDesigner, OBS, vMix, Resolume, Max/MSP, and other live visual tools.
+
+- Requires iPhone 12 Pro or later (any model with LiDAR sensor), iOS 17.0+
+- Four capture modes: Color (60 FPS RGB), Monochrome, Depth (9 colormaps), Point Cloud (real-time 3D)
+- GPU-accelerated via Metal compute shaders — full depth map sampling at interactive frame rates
+- All processing on-device, no analytics, no data collection
+- Fully accessible: VoiceOver, Voice Control, Dynamic Type, Switch Control, Reduce Motion
+
+---
+
+## Getting Started
+
+LOTA turns your iPhone's LiDAR sensor into a professional spatial capture tool. Stream depth, color, and point cloud data over the network in real time — no extra hardware required.
+
+### Requirements
+
+- iPhone 12 Pro or later (any model with a LiDAR sensor)
+- iOS 17.0 or later
+- Wi-Fi network (for streaming features)
+
+### Quick Start
+
+1. **Install LOTA**: Download LOTA from the App Store. Open the app and grant camera and local network permissions when prompted.
+2. **Choose a capture mode**: Tap the mode selector at the bottom of the screen to switch between Color, Monochrome, Depth, or Point Cloud. Each mode activates instantly — no restart required.
+3. **Start streaming or recording**: Tap the stream button to broadcast over the network, or tap record to save a capture locally. Both can run simultaneously.
+
+---
+
+## Capture Modes
+
+LOTA provides four distinct capture modes. Switch between them in real time — every mode leverages the LiDAR sensor and full camera array.
+
+### Color
+
+Live RGB camera feed at 60 FPS with real-time LiDAR depth fusion. What you see on screen is exactly what gets streamed or recorded.
+
+### Monochrome
+
+High-contrast grayscale feed optimized for low-light environments and precision spatial scanning.
+
+### Depth
+
+LiDAR depth visualization with 9 selectable colormaps including thermal, incandescent, and deep sea. Tap the colormap picker to cycle through them in real time.
+
+### Point Cloud
+
+Real-time 3D point cloud rendered with true RGB colors. Configure the frame window and point density. Full depth map sampling of the 256x192 LiDAR sensor — every pixel unprojected via Metal compute shader. Pinch to zoom and drag to orbit the cloud.
+
+### Switching Modes
+
+Use the mode selector at the bottom of the screen, or say "switch to Depth" with Voice Control enabled. Switching is instant and does not interrupt an active stream.
+
+---
+
+## Streaming Protocols
+
+Send LiDAR depth, color, point cloud, and camera tracking data over the network in real time. Four protocols, all independently configurable, all running simultaneously.
+
+### NDI
+
+Industry-standard video-over-IP. LOTA appears as an NDI source on your network and is auto-discovered by TouchDesigner, OBS, vMix, Resolume, and any other NDI-compatible receiver. No IP configuration needed.
+
+### TCP / UDP
+
+Streams H.264-encoded video for Color and Monochrome modes, and raw Float32 depth maps for Depth and Point Cloud modes. Set the destination host and port in Settings → Streaming.
+
+### OSC
+
+Streams real-time camera position, rotation, and euler angles at 30 Hz over UDP. Point any OSC-capable tool (TouchDesigner, Max/MSP, Ableton) at LOTA's IP and port to receive tracking data.
+
+### PLY (live)
+
+Sends live point cloud frames over a TCP/IP connection. Available in both CSV text format and packed binary format (4-byte LE count header + 15 bytes/point). Binary format is ~40% smaller than CSV. Designed for TouchDesigner's TCP/IP DAT.
+
+### How to Start Streaming
+
+1. Open Settings → Streaming. Enable the protocols you need and set the destination IP and port for TCP, UDP, and OSC. NDI requires no configuration.
+2. Connect to the same Wi-Fi network. LOTA and your receiving machine must be on the same local network. A 5 GHz network is recommended for lowest latency.
+3. Tap Stream. All enabled protocols start simultaneously. The status bar shows a live indicator for each active protocol.
+
+---
+
+## TouchDesigner Integration
+
+LOTA is built with TouchDesigner workflows in mind. Stream live depth, color, and point cloud data directly into your TD project with no capture cards or expensive rigs.
+
+### LOTAPoints.tox — Drop-in Component
+
+A ready-made TouchDesigner component that receives live PLY point cloud data from LOTA. Drop it into any project and it works out of the box — defaults to port 9848. No scripting or manual DAT wiring required. Available for download at https://lidarota.app/LOTAPoints.tox
+
+### LOTABinaryPLYReciever.tox — Binary Point Cloud Receiver
+
+High-performance binary point cloud receiver for TouchDesigner. Uses numpy bulk parsing, Script TOP textures, and GPU instancing to handle 49K+ points at 60fps. Enable Binary Format in Settings → Point Cloud Stream to use this receiver. Available for download at https://lidarota.app/LOTABinaryPLYReciever.tox
+
+### NDI Input (Easiest)
+
+Drop an NDI In TOP into your project. LOTA appears in the source list automatically. Select it, and you're receiving live video.
+
+### Point Cloud via TCP/IP DAT
+
+1. Add a TCP/IP DAT to your network.
+2. Set the mode to Connect, enter LOTA's IP and the PLY port from Settings.
+3. LOTA sends point cloud frames as CSV rows — parse them with a DAT to SOP or a Script SOP to get live 3D geometry.
+
+### Camera Tracking via OSC
+
+Add an OSC In CHOP. Set the port to match LOTA's OSC port. You'll receive camera position (x, y, z), rotation (quaternion), and euler angles at 30 Hz — perfect for driving a virtual camera or triggering effects based on device movement.
+
+---
+
+## Export & 3D Pipelines
+
+Capture posed camera frames with ARKit intrinsics, extrinsics, and LiDAR point clouds. Export data ready for training, viewing, or post-production.
+
+### COLMAP-Compatible Export
+
+Exports cameras.bin, images.bin, and points3D.bin in COLMAP binary format. Compatible with OpenSplat, Nerfstudio, and gsplat for training Gaussian Splats and NeRFs directly from your iPhone captures.
+
+### PLY Point Cloud Export
+
+Standalone PLY files with unlimited point accumulation across your entire session. Open in Blender, CloudCompare, MeshLab, or any tool that reads PLY.
+
+### iCloud Sync
+
+Choose an export folder in Settings and captures sync automatically to iCloud. Access your captures from any device.
+
+### Export Workflow
+
+1. Record a capture session. Tap record while in any capture mode. Move slowly around the subject for best coverage — LOTA tracks camera pose automatically via ARKit.
+2. Open the export panel. Stop recording and open the export panel. Choose between COLMAP dataset or standalone PLY.
+3. Export and share. Exported files are saved to your chosen folder (or the Files app). If iCloud sync is enabled, they appear on your Mac automatically.
+
+---
+
+## ARKit Tracking
+
+### Body Tracking
+
+Real-time 3D skeleton detection with 91 joints via rear camera using ARBodyTrackingConfiguration. Streams 18 key joints over OSC at /lota/body/skeleton, /lota/body/root, /lota/body/detected. Includes real-time bone and joint dot visualization overlay.
+
+### Face Tracking
+
+Real-time facial motion capture with 52 blend shapes via front camera using ARFaceTrackingConfiguration. Each blend shape sent as its own named OSC address (e.g., /lota/face/browDown_L, /lota/face/eyeSquint_R). Includes live bar graph display of the top 8 most active blend shapes.
+
+---
+
+## Accessibility
+
+LOTA is designed to meet Apple's App Store accessibility standards. Every feature works for every user.
+
+### VoiceOver
+
+Every control is labeled and announced. Mode switches, streaming state, and recording status are all spoken aloud.
+
+### Voice Control
+
+Say "stream", "record", or "switch to Depth" and LOTA responds. Every button is discoverable by voice.
+
+### Dynamic Type
+
+Text scales up to 200%+. The UI reflows to a single-column layout at extreme sizes so nothing gets cut off.
+
+### Dark Interface
+
+Designed dark from the start. Every screen, menu, and control uses a true dark color scheme for comfortable use in any environment.
+
+### Differentiate Without Color
+
+Status indicators swap to distinct symbols when this setting is enabled. Shapes, icons, and text labels replace color as the sole differentiator.
+
+### Increase Contrast
+
+Swaps blur materials for solid backgrounds and boosts status colors for guaranteed readability over any camera feed.
+
+### Reduce Motion
+
+All transitions respect the system Reduce Motion setting. Visual feedback stays, decorative animation goes.
+
+---
+
+## Frequently Asked Questions
+
+### Which iPhones support LOTA?
+
+Any iPhone with a LiDAR sensor — iPhone 12 Pro, 13 Pro, 14 Pro, 15 Pro, 16 Pro, and their Max variants. iPad Pro models with LiDAR are also supported.
+
+### Do the receiving machine and iPhone need to be on the same network?
+
+Yes. For TCP, UDP, OSC, and PLY streaming, both devices must be on the same local network. NDI also uses the local network but handles discovery automatically. A 5 GHz Wi-Fi connection is recommended.
+
+### Can I stream and record at the same time?
+
+Yes. Streaming and recording are independent — you can run both simultaneously without any performance impact.
+
+### What software can receive LOTA streams?
+
+Any NDI-compatible software (TouchDesigner, OBS, vMix, Resolume), any tool that reads TCP/UDP sockets, and any OSC-capable application (Max/MSP, Ableton, Unreal Engine).
+
+### How do I use the COLMAP export with Gaussian Splat training?
+
+Export a COLMAP dataset from LOTA, transfer it to your training machine, and point OpenSplat, Nerfstudio, or gsplat at the exported folder. The binary files are in the exact format these tools expect.
+
+### Is there a latency cost to streaming?
+
+NDI and TCP/UDP streams typically add 1–3 frames of latency depending on your network. OSC tracking data arrives at 30 Hz with sub-frame latency. A wired connection or 5 GHz Wi-Fi keeps things as fast as possible.
+
+---
+
+## Privacy
+
+LOTA does not collect, store, or transmit any personal data to remote servers. All sensor data is processed entirely on your device. Data only leaves your iPhone when you choose to stream it over your own local network or export it to your own iCloud storage.
+
+- No analytics, crash reporting, or usage tracking in the app
+- No user accounts
+- Face and body tracking data processed entirely on-device by ARKit, never sent to any remote server
+- NDI SDK does not contain telemetry or make connections to external servers
+- Website uses Vercel Analytics (anonymous, aggregated, no cookies)
+- Newsletter emails stored by Resend, not shared with third parties
+
+Contact: privacy@lidarota.app

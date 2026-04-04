@@ -1,7 +1,20 @@
 /* eslint-disable @next/next/no-img-element */
+import type { Metadata } from "next";
 import fs from "fs";
 import path from "path";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Changelog",
+  description:
+    "Version history and release notes for the LOTA iOS app. New features, improvements, and fixes for every release.",
+  openGraph: {
+    title: "Changelog — LOTA",
+    description:
+      "Version history and release notes for the LOTA iOS app.",
+    url: "https://lidarota.app/changelog",
+  },
+};
 
 /* ── markdown parser ──────────────────────────────────────────── */
 

@@ -1,0 +1,24 @@
+# LOTA — LiDAR Over The Air
+
+> LOTA is an iOS app that transforms iPhones with LiDAR sensors into professional spatial capture tools. Stream real-time depth, color, and point cloud data over NDI, TCP/UDP, OSC, and PLY. Export COLMAP-compatible datasets for Gaussian Splat and NeRF training. Built for creative professionals using TouchDesigner, OBS, vMix, Resolume, Max/MSP, and other live visual tools.
+
+- Requires iPhone 12 Pro or later (any model with LiDAR sensor), iOS 17.0+
+- Four capture modes: Color (60 FPS RGB), Monochrome, Depth (9 colormaps), Point Cloud (real-time 3D)
+- GPU-accelerated via Metal compute shaders — full depth map sampling at interactive frame rates
+- All processing on-device, no analytics, no data collection
+- Fully accessible: VoiceOver, Voice Control, Dynamic Type, Switch Control, Reduce Motion
+
+## Documentation
+
+- [Getting Started](https://lidarota.app/docs): Device requirements, installation, capture mode overview, and quick-start guide
+- [Capture Modes](https://lidarota.app/docs): Color, Monochrome, Depth, and Point Cloud mode specifications and usage
+- [Streaming Protocols](https://lidarota.app/docs): NDI auto-discovery, TCP/UDP H.264 and Float32 streaming, OSC camera tracking at 30 Hz, live PLY point cloud streaming
+- [TouchDesigner Integration](https://lidarota.app/docs): NDI In TOP setup, LOTAPoints.tox drop-in component, binary PLY receiver, OSC In CHOP for camera tracking
+- [Export & 3D Pipelines](https://lidarota.app/docs): COLMAP binary export (cameras.bin, images.bin, points3D.bin), PLY point cloud export, iCloud sync, compatibility with OpenSplat, Nerfstudio, and gsplat
+- [Accessibility](https://lidarota.app/docs): VoiceOver, Voice Control, Dynamic Type, Dark Interface, Differentiate Without Color, Increase Contrast, Reduce Motion
+- [FAQ](https://lidarota.app/docs): Supported devices, network requirements, latency, compatible software
+
+## Product
+
+- [Changelog](https://lidarota.app/changelog): Version history from v0.0.1 to v1.0.4 with detailed release notes
+- [Privacy Policy](https://lidarota.app/privacy): On-device processing, no analytics, no data collection, local network streaming only

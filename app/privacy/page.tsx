@@ -1,5 +1,18 @@
 /* eslint-disable @next/next/no-img-element */
+import type { Metadata } from "next";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description:
+    "Privacy policy for the LOTA iOS app. All processing on-device, no analytics, no data collection, no user accounts.",
+  openGraph: {
+    title: "Privacy Policy — LOTA",
+    description:
+      "Privacy policy for the LOTA iOS app. All processing on-device, no analytics or tracking.",
+    url: "https://lidarota.app/privacy",
+  },
+};
 
 /* ── reusable pieces ─────────────────────────────────────────── */
 

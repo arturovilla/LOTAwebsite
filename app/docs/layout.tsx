@@ -1,9 +1,15 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Documentation — LOTA",
+  title: "Documentation",
   description:
-    "Learn how to capture, stream, and export 3D spatial data with LOTA.",
+    "Setup guides, capture modes, streaming protocols, TouchDesigner integration, 3D export workflows, and accessibility features for the LOTA iOS app.",
+  openGraph: {
+    title: "Documentation — LOTA",
+    description:
+      "Setup guides, streaming protocols, TouchDesigner integration, and 3D export workflows for LOTA.",
+    url: "https://lidarota.app/docs",
+  },
 };
 
 export default function DocsLayout({
