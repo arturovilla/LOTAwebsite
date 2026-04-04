@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import { FaLinkedinIn, FaInstagram, FaPatreon, FaRedditAlien } from "react-icons/fa";
 
 export default function Footer() {
   return (
@@ -35,6 +36,20 @@ export default function Footer() {
                 Arturo Villalobos
               </a>
             </p>
+            <div className="flex items-center gap-3 mt-4">
+              <a href="https://www.linkedin.com/in/rtvro/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-zinc-600 hover:text-white transition-colors">
+                <FaLinkedinIn size={14} />
+              </a>
+              <a href="https://instagram.com/hyprtexture" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-zinc-600 hover:text-white transition-colors">
+                <FaInstagram size={14} />
+              </a>
+              <a href="https://patreon.com/hyprtexture" target="_blank" rel="noopener noreferrer" aria-label="Patreon" className="text-zinc-600 hover:text-white transition-colors">
+                <FaPatreon size={14} />
+              </a>
+              <a href="https://www.reddit.com/user/lpyonderboy/" target="_blank" rel="noopener noreferrer" aria-label="Reddit" className="text-zinc-600 hover:text-white transition-colors">
+                <FaRedditAlien size={14} />
+              </a>
+            </div>
           </div>
 
           {/* Links */}
