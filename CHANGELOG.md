@@ -4,6 +4,24 @@ All notable changes to the LOTA project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.5] - 2026-04-04
+
+### Added
+- **Depth confidence filtering**: GPU compute kernel now filters depth pixels by ARKit confidence level before unprojection. Three-level segmented picker in Settings (All / Medium+ / High Only). Default Medium+ removes noisy edge pixels with zero performance cost. Also applied to GaussianRecorder's CPU-side point extraction during capture
+- **NDI depth side-by-side streaming**: New toggle in NDI settings sends a 2x-wide frame — left half is the current camera view (any mode), right half is the depth colormap. Standard format expected by TouchDesigner and Notch artists (popularized by iDepth NDI). Uses a separate Metal render pass for the depth visualization, blitted into a double-wide IOSurface
+- **Hand tracking via Vision framework**: New "Hands" mode on the ARKit Tracking page (swipe left). Detects up to 2 hands simultaneously using `VNDetectHumanHandPoseRequest` on the rear camera. 21 landmarks per hand streamed over OSC, organized by finger (`/lota/hand/left/thumb`, `/lota/hand/left/index`, etc.). Color-coded overlay: left hand = teal, right hand = orange
+- **2D/3D hand coordinate toggle**: Default 2D mode streams normalized screen-space coordinates (works on all iPhones). Opt-in 3D mode projects landmarks into world space using LiDAR depth (greyed out on non-LiDAR devices). `is3d` OSC flag tells receivers which coordinate space is active
+- **Hand overlay view**: Real-time bone + joint dot visualization drawn over camera feed using SwiftUI Canvas. Five finger chains from wrist to fingertip per hand, with aspect-fill crop correction for accurate alignment
+
+### Changed
+- Tracking settings sections consolidated from separate "Body Tracking" and "Face Tracking" into unified "Tracking" section with Skeleton Overlay, Face Overlay, Hand Overlay, and 3D Hand Coordinates toggles
+- `TrackingMode` enum extended with `.hands` case, added to visible mode picker alongside Body and Face
+- Hand detection runs on existing Vision dispatch queue (throttled every 2nd frame for ~30fps updates), uses `ARWorldTrackingConfiguration` with `.sceneDepth` to keep LiDAR available
+- Video transports (NDI, TCP, UDP, PLY) disconnected in hand mode for consistency with body/face tracking — OSC only on tracking page
+- Hand OSC data organized by finger: `/lota/hand/{side}/wrist` (3 floats), `/lota/hand/{side}/thumb` (12 floats), `/lota/hand/{side}/index` (12 floats), `/lota/hand/{side}/middle` (12 floats), `/lota/hand/{side}/ring` (12 floats), `/lota/hand/{side}/pinky` (12 floats)
+
+---
+
 ## [1.0.4] - 2026-04-03
 
 ### Added

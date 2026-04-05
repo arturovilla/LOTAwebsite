@@ -95,12 +95,14 @@ export default function ARKitTracking() {
             ARKit Integration
           </p>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white">
-            Body &amp; Face Tracking Over OSC
+            Body, Face &amp; Hand Tracking Over OSC
           </h2>
           <p className="text-zinc-500 mt-5 max-w-2xl mx-auto leading-relaxed">
-            Stream real-time skeleton data and facial blend shapes from ARKit
-            straight into TouchDesigner, Max/MSP, or any OSC receiver. 91 body
-            joints. 52 face blend shapes. Zero extra hardware.
+            Stream real-time skeleton data, facial blend shapes, and hand
+            landmarks from ARKit and Vision straight into TouchDesigner,
+            Max/MSP, or any OSC receiver. 91 body joints. 52 face blend shapes.
+            21 hand landmarks per hand with 2D or 3D coordinates. Zero extra
+            hardware.
           </p>
         </div>
 
@@ -187,10 +189,16 @@ export default function ARKitTracking() {
             Face Capture — 52 blend shapes
           </span>
           <span className="px-4 py-2 text-xs font-mono text-zinc-400 bg-white/[0.03] border border-white/[0.06] rounded-full">
+            Hand Tracking — 21 landmarks × 2 hands
+          </span>
+          <span className="px-4 py-2 text-xs font-mono text-zinc-400 bg-white/[0.03] border border-white/[0.06] rounded-full">
+            2D &amp; 3D Coordinates
+          </span>
+          <span className="px-4 py-2 text-xs font-mono text-zinc-400 bg-white/[0.03] border border-white/[0.06] rounded-full">
             OSC Streaming — 30 Hz
           </span>
           <span className="px-4 py-2 text-xs font-mono text-zinc-400 bg-white/[0.03] border border-white/[0.06] rounded-full">
-            Real-time Skeleton Overlay
+            Real-time Overlays
           </span>
         </div>
       </div>

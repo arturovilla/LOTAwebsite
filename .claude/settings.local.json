@@ -28,7 +28,17 @@
       "WebFetch(domain:rye.dev)",
       "WebFetch(domain:firstpagesage.com)",
       "WebFetch(domain:humanstxt.org)",
-      "WebFetch(domain:securitytxt.org)"
+      "WebFetch(domain:securitytxt.org)",
+      "Bash(curl -s \"https://plausible.io/pricing\")",
+      "Bash(curl -s \"https://usefathom.com/pricing\")",
+      "Bash(curl -s \"https://posthog.com/pricing\")",
+      "Bash(curl -s \"https://mixpanel.com/pricing\")",
+      "WebFetch(domain:plausible.io)",
+      "WebFetch(domain:umami.is)",
+      "WebFetch(domain:pirsch.io)",
+      "WebFetch(domain:posthog.com)",
+      "WebFetch(domain:www.hotjar.com)",
+      "WebFetch(domain:contentsquare.com)"
     ]
   }
 }

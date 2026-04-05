@@ -98,3 +98,48 @@ Thanks for being part of this.
 
 [Instagram](https://instagram.com/hyprtexture) · [Patreon](https://patreon.com/hyprtexture) · [Reddit](https://www.reddit.com/user/lpyonderboy/) ·
 [lidarota.app](https://lidarota.app) · [Docs](https://lidarota.app/docs) · [Changelog](https://lidarota.app/changelog)
+
+---
+
+---
+
+Subject: LOTA 1.0.5 — Hand tracking, depth confidence filtering & NDI side-by-side
+
+---
+
+Hey there,
+
+LOTA 1.0.5 just dropped — this one adds a whole new tracking mode and two features that a few of you have been asking about.
+
+Here's what's new:
+
+### Hand Tracking
+
+New **"Hands" mode** on the ARKit Tracking page. Uses the Vision framework to detect up to **2 hands simultaneously** — 21 landmarks per hand, streamed over OSC organized by finger (`/lota/hand/left/thumb`, `/lota/hand/right/index`, etc.). Left hand renders in teal, right in orange.
+
+By default landmarks stream in **2D screen-space coordinates** (works on every iPhone). If you're on a LiDAR device, flip on **3D mode** in Settings to project landmarks into world space using depth data. An `is3d` flag in the OSC stream tells your receiver which coordinate space is active.
+
+### Depth Confidence Filtering
+
+The GPU compute kernel now checks **ARKit's per-pixel confidence level** before unprojecting depth data. Three-level picker in Settings: All / Medium+ / High Only. Default is Medium+, which strips out noisy edge pixels with zero performance cost. Also applies during Gaussian Splat capture.
+
+If you've been getting messy edges on your point clouds — this is the fix.
+
+### NDI Depth Side-by-Side
+
+New toggle in NDI settings that sends a **2x-wide frame** — left half is your current camera view (any mode), right half is the depth colormap. This is the standard side-by-side format used by iDepth NDI and expected by TouchDesigner and Notch. Uses a separate Metal render pass blitted into a double-wide IOSurface.
+
+[Full changelog →](https://lidarota.app/changelog)
+
+---
+
+**In the beta?** 1.0.5 should hit TestFlight shortly. As always — feedback is what drives these releases.
+
+**Not in the beta yet?** DM me for a TestFlight link. Especially looking for people doing live visuals, interactive installations, or mocap work who'd use the hand tracking.
+
+Thanks for being part of this.
+
+— Arturo
+
+[Instagram](https://instagram.com/hyprtexture) · [Patreon](https://patreon.com/hyprtexture) · [Reddit](https://www.reddit.com/user/lpyonderboy/) ·
+[lidarota.app](https://lidarota.app) · [Docs](https://lidarota.app/docs) · [Changelog](https://lidarota.app/changelog)
