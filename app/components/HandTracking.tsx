@@ -35,7 +35,7 @@ export default function HandTracking() {
 
     timerRef.current = setTimeout(() => {
       setShowDesktop(true);
-    }, 3000);
+    }, 4000);
   }, []);
 
   useEffect(() => {
