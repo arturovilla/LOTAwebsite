@@ -6,6 +6,7 @@ import Streaming from "./components/Streaming";
 import VideoDemo from "./components/VideoDemo";
 import InUse from "./components/InUse";
 import ARKitTracking from "./components/ARKitTracking";
+import HandTracking from "./components/HandTracking";
 import AccessibilitySection from "./components/Accessibility";
 import Signup from "./components/Signup";
 import Footer from "./components/Footer";
@@ -20,6 +21,7 @@ export default function Home() {
       <VideoDemo />
       <InUse />
       <ARKitTracking />
+      <HandTracking />
       <GaussianSplat />
       <AccessibilitySection />
       <Signup />
