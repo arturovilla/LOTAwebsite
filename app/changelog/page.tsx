@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import fs from "fs";
 import path from "path";
 import Link from "next/link";
+import Signup from "../components/Signup";
+import Footer from "../components/Footer";
 
 export const metadata: Metadata = {
   title: "Changelog",
@@ -233,6 +235,8 @@ export default function ChangelogPage() {
           ))}
         </div>
       </main>
+      <Signup />
+      <Footer />
     </div>
   );
 }

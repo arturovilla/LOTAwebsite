@@ -1,6 +1,6 @@
 LOTA 1.0.5: Hand tracking.
 
-Detect both hands in real time using Apple's Vision framework. 21 landmarks per hand — every finger joint, knuckle, and wrist — streamed over OSC at 30 Hz. Just point your iPhone's rear camera at your hands.
+Detect both hands in real time using Apple's Vision framework. 21 landmarks per hand, every finger joint, knuckle, and wrist, streamed over OSC at 30 Hz. Just point your iPhone's rear camera at your hands.
 
 What's new:
 - Hand tracking — 2 hands, 21 landmarks each, organized by finger (/lota/hand/left/thumb, /index, etc.)

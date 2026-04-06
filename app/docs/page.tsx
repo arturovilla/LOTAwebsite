@@ -3,6 +3,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import Signup from "../components/Signup";
+import Footer from "../components/Footer";
 
 const sections = [
   { id: "getting-started", label: "Getting Started" },
@@ -634,6 +636,8 @@ export default function DocsPage() {
           </div>
         </main>
       </div>
+      <Signup />
+      <Footer />
     </div>
   );
 }
