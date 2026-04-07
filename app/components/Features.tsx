@@ -4,7 +4,7 @@ const modes = [
   {
     title: "Color",
     img: "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/colormode.webp",
-    desc: "Live RGB camera feed at 60 FPS with real-time LiDAR depth fusion. What you see is what you capture.",
+    desc: "Live RGB camera feed at 60 FPS with real-time LiDAR depth fusion. What you see is what you stream.",
   },
   {
     title: "Monochrome",

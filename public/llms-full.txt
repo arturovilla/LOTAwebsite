@@ -24,7 +24,7 @@ LOTA turns your iPhone's LiDAR sensor into a professional spatial capture tool. 
 
 1. **Install LOTA**: Download LOTA from the App Store. Open the app and grant camera and local network permissions when prompted.
 2. **Choose a capture mode**: Tap the mode selector at the bottom of the screen to switch between Color, Monochrome, Depth, or Point Cloud. Each mode activates instantly — no restart required.
-3. **Start streaming or recording**: Tap the stream button to broadcast over the network, or tap record to save a capture locally. Both can run simultaneously.
+3. **Start streaming**: Tap the stream button to broadcast over the network. For Gaussian Splat capture, swipe right to the capture page and tap record to save a training-ready dataset.
 
 ---
 
@@ -34,7 +34,7 @@ LOTA provides four distinct capture modes. Switch between them in real time — 
 
 ### Color
 
-Live RGB camera feed at 60 FPS with real-time LiDAR depth fusion. What you see on screen is exactly what gets streamed or recorded.
+Live RGB camera feed at 60 FPS with real-time LiDAR depth fusion. What you see on screen is exactly what gets streamed.
 
 ### Monochrome
 
