@@ -8,10 +8,13 @@ import Footer from "../components/Footer";
 
 const sections = [
   { id: "getting-started", label: "Getting Started" },
+  { id: "navigation", label: "Navigation" },
   { id: "capture-modes", label: "Capture Modes" },
   { id: "streaming", label: "Streaming" },
+  { id: "tracking", label: "ARKit Tracking" },
   { id: "touchdesigner", label: "TouchDesigner" },
   { id: "export", label: "Export & 3D" },
+  { id: "settings", label: "Settings" },
   { id: "accessibility", label: "Accessibility" },
   { id: "faq", label: "FAQ" },
 ];
@@ -97,6 +100,43 @@ function Kbd({ children }: { children: React.ReactNode }) {
     <code className="text-xs font-mono text-zinc-300 bg-white/[0.06] px-1.5 py-0.5 rounded">
       {children}
     </code>
+  );
+}
+
+function SettingsGroup({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
+      <h3 className="text-sm font-semibold text-white mb-4">{title}</h3>
+      <div className="space-y-3">{children}</div>
+    </div>
+  );
+}
+
+function Setting({
+  name,
+  defaultValue,
+  children,
+}: {
+  name: string;
+  defaultValue?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="border-b border-white/[0.04] pb-3 last:border-0 last:pb-0">
+      <div className="flex items-baseline gap-2 mb-0.5">
+        <Kbd>{name}</Kbd>
+        {defaultValue && (
+          <span className="text-xs text-zinc-600">— {defaultValue}</span>
+        )}
+      </div>
+      <p className="text-sm text-zinc-500 leading-relaxed">{children}</p>
+    </div>
   );
 }
 
@@ -228,8 +268,10 @@ export default function DocsPage() {
             >
               <SectionHeading tag="Introduction" title="Getting Started">
                 LOTA turns your iPhone&apos;s LiDAR sensor into a professional
-                spatial capture tool. Stream depth, color, and point cloud data
-                over the network in real time — no extra hardware required.
+                spatial capture and streaming tool. Stream depth, color, and
+                point cloud data over the network in real time, capture datasets
+                for 3D reconstruction, and stream motion capture data — no extra
+                hardware required.
               </SectionHeading>
 
               <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-8">
@@ -237,8 +279,9 @@ export default function DocsPage() {
                   Requirements
                 </h3>
                 <ul className="text-sm text-zinc-400 space-y-1.5">
-                  <li>• iPhone 12 Pro or later (any model with a LiDAR sensor)</li>
-                  <li>• iOS 17.0 or later</li>
+                  <li>• iPhone 12 Pro or later (LiDAR required for Depth, Point Cloud, and Gaussian Capture)</li>
+                  <li>• Color and Monochrome modes work on all iPhones</li>
+                  <li>• iOS 26.2 or later</li>
                   <li>• Wi-Fi network (for streaming features)</li>
                 </ul>
               </div>
@@ -249,14 +292,47 @@ export default function DocsPage() {
                   and local network permissions when prompted.
                 </Step>
                 <Step n={2} title="Choose a capture mode">
-                  Tap the mode selector at the bottom of the screen to switch
-                  between Color, Monochrome, Depth, or Point Cloud. Each mode
+                  Tap the mode dropdown at the top of the screen to switch
+                  between Color, Mono, Depth, or Point Cloud. Each mode
                   activates instantly — no restart required.
                 </Step>
                 <Step n={3} title="Start streaming or recording">
-                  Tap the stream button to broadcast over the network, or tap
-                  record to save a capture locally. Both can run simultaneously.
+                  Tap the stream button (bottom right) to broadcast over the
+                  network. Configure transports via the Settings gear icon
+                  (bottom left). Swipe right to access Gaussian Capture for
+                  recording 3D datasets.
                 </Step>
+              </div>
+            </section>
+
+            {/* ─── Navigation ─────────────────────────────── */}
+            <section
+              id="navigation"
+              ref={(el) => { sectionRefs.current["navigation"] = el; }}
+            >
+              <SectionHeading tag="App Layout" title="Navigation">
+                LOTA uses a three-page swipeable layout. Swipe left and right
+                to move between pages.
+              </SectionHeading>
+
+              <div className="space-y-4">
+                <Card title="ARKit Tracking — Swipe Left">
+                  Body, face, and hand motion capture via ARKit. Stream skeleton,
+                  blend shape, and hand landmark data over OSC to TouchDesigner,
+                  Max/MSP, Ableton, and more.
+                </Card>
+                <Card title="Camera / Streaming — Center (default)">
+                  The main page. Live camera feed with four capture modes (Color,
+                  Mono, Depth, Point Cloud) and streaming controls. Tap the mode
+                  dropdown at the top to switch modes. Settings gear icon is bottom
+                  left, streaming toggle is bottom right.
+                </Card>
+                <Card title="Gaussian Capture — Swipe Right">
+                  Record datasets for Gaussian Splatting and 3D reconstruction.
+                  Choose an export format, pick an iCloud folder, and tap record.
+                  A mesh wireframe overlay shows scanned surfaces building up in
+                  real time.
+                </Card>
               </div>
             </section>
 
@@ -266,35 +342,35 @@ export default function DocsPage() {
               ref={(el) => { sectionRefs.current["capture-modes"] = el; }}
             >
               <SectionHeading tag="Capture" title="Capture Modes">
-                LOTA provides four distinct capture modes. Switch between them in
-                real time — every mode leverages the LiDAR sensor and full camera
-                array.
+                LOTA provides four distinct capture modes on the Camera /
+                Streaming page. Tap the mode dropdown at the top of the screen
+                to switch — each mode shows an icon and description.
               </SectionHeading>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <Card title="Color">
-                  Live RGB camera feed at 60&nbsp;FPS with real-time LiDAR depth
-                  fusion. What you see on screen is exactly what gets streamed or
-                  recorded.
+                  Live RGB camera feed at 60&nbsp;FPS. What you see on screen
+                  is exactly what gets streamed or recorded. Works on all
+                  iPhones — no LiDAR required.
                 </Card>
-                <Card title="Monochrome">
+                <Card title="Mono">
                   High-contrast grayscale feed optimized for low-light
-                  environments and precision spatial scanning.
+                  environments and precision spatial scanning. Works on all
+                  iPhones — no LiDAR required.
                 </Card>
                 <Card title="Depth">
                   <>
                     LiDAR depth visualization with <strong className="text-white">9 selectable
-                    colormaps</strong> including thermal, incandescent, and deep
-                    sea. Tap the colormap picker to cycle through them in real
-                    time.
+                    colormaps</strong> including thermal, incandescent, deep sea,
+                    and visible spectrum. Requires a LiDAR-equipped iPhone.
                   </>
                 </Card>
                 <Card title="Point Cloud">
                   <>
-                    Real-time 3D point cloud rendered with true RGB colors.
-                    Configure the frame window and point density up
-                    to <strong className="text-white">12,500 points per frame</strong>.
-                    Pinch to zoom and drag to orbit the cloud.
+                    Real-time 3D point cloud rendered with true RGB colors. Every
+                    pixel of the 256&times;192 depth map is unprojected into 3D
+                    space. Configure frame window, max depth, and compute quality
+                    in Settings. Requires LiDAR.
                   </>
                 </Card>
               </div>
@@ -304,7 +380,7 @@ export default function DocsPage() {
                   Switching modes
                 </h3>
                 <p className="text-sm text-zinc-400 leading-relaxed">
-                  Use the mode selector at the bottom of the screen, or
+                  Use the mode dropdown at the top of the screen, or
                   say <Kbd>switch to Depth</Kbd> with Voice Control enabled.
                   Switching is instant and does not interrupt an active stream.
                 </p>
@@ -317,40 +393,54 @@ export default function DocsPage() {
               ref={(el) => { sectionRefs.current["streaming"] = el; }}
             >
               <SectionHeading tag="Network" title="Streaming">
-                Send LiDAR depth, color, point cloud, and camera tracking data
-                over the network in real time. Four protocols, all independently
-                configurable, all running simultaneously.
+                Tap the transmit button (bottom right) to start streaming. All
+                enabled transports send simultaneously. Configure transports in
+                Settings (gear icon, bottom left).
               </SectionHeading>
 
               <div className="space-y-4 mb-8">
                 <Card title="NDI">
-                  Industry-standard video-over-IP. LOTA appears as an NDI source
-                  on your network and is auto-discovered by TouchDesigner, OBS,
-                  vMix, Resolume, and any other NDI-compatible receiver. No IP
-                  configuration needed.
+                  <>
+                    Industry-standard video-over-IP. LOTA appears as{" "}
+                    <Kbd>LOTA (iPhone)</Kbd> on your network and is
+                    auto-discovered by TouchDesigner, OBS, vMix, Resolume, and
+                    any other NDI-compatible receiver. No IP configuration
+                    needed. Optional side-by-side mode sends a 2x-wide frame
+                    with camera view on the left and depth colormap on the right.
+                  </>
                 </Card>
                 <Card title="TCP / UDP">
                   <>
-                    Streams H.264-encoded video for Color and Monochrome modes,
+                    Streams H.264-encoded video for Color and Mono modes,
                     and raw <Kbd>Float32</Kbd> depth maps for Depth and Point
-                    Cloud modes. Set the destination host and port in Settings
-                    → Streaming.
+                    Cloud modes. TCP reconnects automatically; UDP is
+                    fire-and-forget. Set the destination IP and port in Settings.
                   </>
                 </Card>
                 <Card title="OSC">
                   <>
-                    Streams real-time camera position, rotation, and euler angles
-                    at <strong className="text-white">30&nbsp;Hz</strong> over
-                    UDP. Point any OSC-capable tool (TouchDesigner, Max/MSP,
-                    Ableton) at LOTA&apos;s IP and port to receive tracking data.
+                    <p className="mb-2">
+                      Streams real-time camera tracking data
+                      at <strong className="text-white">~30&nbsp;Hz</strong> over
+                      UDP. Point any OSC-capable tool at LOTA&apos;s IP and port
+                      to receive:
+                    </p>
+                    <ul className="space-y-1 text-zinc-500">
+                      <li><Kbd>/lota/camera/position</Kbd> — x, y, z (3 floats)</li>
+                      <li><Kbd>/lota/camera/rotation</Kbd> — quaternion x, y, z, w (4 floats)</li>
+                      <li><Kbd>/lota/camera/euler</Kbd> — pitch, yaw, roll (3 floats)</li>
+                      <li><Kbd>/lota/mode</Kbd> — current capture mode (1&nbsp;Hz)</li>
+                      <li><Kbd>/lota/fps</Kbd> — current frame rate (1&nbsp;Hz)</li>
+                    </ul>
                   </>
                 </Card>
-                <Card title="PLY (live)">
+                <Card title="PLY (live point cloud)">
                   <>
-                    Sends live point cloud frames as CSV data over a TCP/IP
-                    connection. Designed for TouchDesigner&apos;s <Kbd>TCP/IP
-                    DAT</Kbd> — connect, and point cloud data starts flowing
-                    frame by frame.
+                    Sends live point cloud frames over TCP. Available in CSV text
+                    format (works with TouchDesigner&apos;s <Kbd>TCP/IP
+                    DAT</Kbd> in &quot;One Per Line&quot; mode) or packed binary
+                    format (~40% smaller, requires a byte-parsing receiver).
+                    Default port <Kbd>9848</Kbd>.
                   </>
                 </Card>
               </div>
@@ -359,18 +449,94 @@ export default function DocsPage() {
                 <h3 className="text-sm font-semibold text-white">
                   How to start streaming
                 </h3>
-                <Step n={1} title="Open Settings → Streaming">
-                  Enable the protocols you need and set the destination IP and
-                  port for TCP, UDP, and OSC. NDI requires no configuration.
+                <Step n={1} title="Open Settings (gear icon, bottom left)">
+                  Enable the protocols you need and set the destination IP
+                  (shared across all transports) and port for each. NDI requires
+                  no configuration.
                 </Step>
                 <Step n={2} title="Connect to the same Wi-Fi network">
                   LOTA and your receiving machine must be on the same local
                   network. A 5&nbsp;GHz network is recommended for lowest latency.
                 </Step>
-                <Step n={3} title="Tap Stream">
+                <Step n={3} title="Tap the stream button (bottom right)">
                   All enabled protocols start simultaneously. The status bar
                   shows a live indicator for each active protocol.
                 </Step>
+              </div>
+            </section>
+
+            {/* ─── ARKit Tracking ─────────────────────────── */}
+            <section
+              id="tracking"
+              ref={(el) => { sectionRefs.current["tracking"] = el; }}
+            >
+              <SectionHeading tag="Motion Capture" title="ARKit Tracking">
+                Swipe left from the main camera page to access ARKit motion
+                capture. Three tracking modes stream data over OSC in real time.
+              </SectionHeading>
+
+              <div className="space-y-4 mb-8">
+                <Card title="Body Tracking">
+                  <>
+                    <p className="mb-2">
+                      3D skeleton detection via the rear camera. Tracks 91 ARKit
+                      joints, streams 18 key joints over OSC. Visual overlay shows
+                      white bones with green joint dots. Requires A12 chip or later.
+                    </p>
+                    <ul className="space-y-1 text-zinc-500">
+                      <li><Kbd>/lota/body/skeleton</Kbd> — 18 joint positions</li>
+                      <li><Kbd>/lota/body/root</Kbd> — root transform</li>
+                      <li><Kbd>/lota/body/detected</Kbd> — detection state</li>
+                    </ul>
+                  </>
+                </Card>
+                <Card title="Face Tracking">
+                  <>
+                    <p className="mb-2">
+                      52 facial blend shapes captured via the front-facing TrueDepth
+                      camera. Overlay shows a bar graph of the top 8 most active
+                      blend shapes. Requires TrueDepth camera (iPhone X or later).
+                    </p>
+                    <p className="text-zinc-500">
+                      Each blend shape is sent as its own named OSC address
+                      (e.g. <Kbd>/lota/face/browDown_L</Kbd>,{" "}
+                      <Kbd>/lota/face/eyeSquint_R</Kbd>) bundled in a single UDP
+                      datagram.
+                    </p>
+                  </>
+                </Card>
+                <Card title="Hand Tracking">
+                  <>
+                    <p className="mb-2">
+                      Detects up to 2 hands simultaneously via the rear camera
+                      using the Vision framework. 21 landmarks per hand, streamed
+                      over OSC organized by finger. Overlay shows bone chains with
+                      joint dots — teal for left hand, orange for right.
+                    </p>
+                    <ul className="space-y-1 text-zinc-500">
+                      <li><Kbd>/lota/hand/&#123;left|right&#125;/wrist</Kbd> — 3 floats</li>
+                      <li><Kbd>/lota/hand/&#123;left|right&#125;/thumb</Kbd> — 12 floats</li>
+                      <li><Kbd>/lota/hand/&#123;left|right&#125;/index</Kbd> — 12 floats</li>
+                      <li><Kbd>/lota/hand/&#123;left|right&#125;/middle</Kbd> — 12 floats</li>
+                      <li><Kbd>/lota/hand/&#123;left|right&#125;/ring</Kbd> — 12 floats</li>
+                      <li><Kbd>/lota/hand/&#123;left|right&#125;/pinky</Kbd> — 12 floats</li>
+                    </ul>
+                  </>
+                </Card>
+              </div>
+
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
+                <h3 className="text-sm font-semibold text-white mb-2">
+                  Hand coordinate modes
+                </h3>
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  <strong className="text-white">2D (default)</strong> —
+                  normalized screen-space coordinates. Works on all
+                  iPhones. <strong className="text-white">3D
+                  (opt-in)</strong> — world-space coordinates projected via
+                  LiDAR depth. Requires a LiDAR device. Toggle
+                  in Settings &rarr; Tracking &rarr; 3D Hand Coordinates.
+                </p>
               </div>
             </section>
 
@@ -426,7 +592,7 @@ export default function DocsPage() {
                         TouchDesigner. Uses numpy bulk parsing, Script TOP
                         textures, and GPU instancing to handle 49K+ points
                         at 60fps. Enable <Kbd>Binary Format</Kbd> in
-                        Settings → Point Cloud Stream to use this receiver.
+                        Settings &rarr; Point Cloud Stream to use this receiver.
                       </p>
                     </div>
                   </div>
@@ -495,52 +661,231 @@ export default function DocsPage() {
               ref={(el) => { sectionRefs.current["export"] = el; }}
             >
               <SectionHeading tag="3D Export" title="Export & 3D Pipelines">
-                Capture posed camera frames with ARKit intrinsics, extrinsics,
-                and LiDAR point clouds. Export data ready for training, viewing,
-                or post-production.
+                Swipe right to the Gaussian Capture page. Record datasets with
+                ARKit intrinsics, extrinsics, and LiDAR point clouds — ready for
+                training, viewing, or post-production.
               </SectionHeading>
 
               <div className="space-y-4 mb-8">
-                <Card title="COLMAP-compatible export">
+                <Card title="COLMAP">
                   <>
                     Exports <Kbd>cameras.bin</Kbd>, <Kbd>images.bin</Kbd>,
                     and <Kbd>points3D.bin</Kbd> in COLMAP binary format.
-                    Compatible with OpenSplat, Nerfstudio, and gsplat for
-                    training Gaussian Splats and NeRFs directly from your
-                    iPhone captures.
+                    Compatible with OpenSplat, gsplat, and Nerfstudio for
+                    training Gaussian Splats directly from your iPhone captures.
                   </>
                 </Card>
-                <Card title="PLY point cloud export">
+                <Card title="Nerfstudio">
                   <>
-                    Standalone PLY files with unlimited point accumulation across
-                    your entire session. Open in Blender, CloudCompare, MeshLab,
-                    or any tool that reads PLY.
+                    Exports <Kbd>transforms.json</Kbd> + <Kbd>images/</Kbd> JPEGs
+                    + <Kbd>points3D.ply</Kbd>. Ready for Nerfstudio, splatfacto,
+                    and Instant-NGP training pipelines.
                   </>
                 </Card>
-                <Card title="iCloud sync">
-                  Choose an export folder in Settings and captures sync
-                  automatically to iCloud. Access your captures from any device.
+                <Card title="Nerfstudio + Depth">
+                  <>
+                    Same as Nerfstudio, plus 16-bit PNG depth maps in
+                    a <Kbd>depth/</Kbd> folder. Best for depth-supervised
+                    training — produces better geometry on flat surfaces and
+                    uniform areas.
+                  </>
                 </Card>
+                <Card title="Point Cloud (PLY)">
+                  <>
+                    Standalone <Kbd>points3D.ply</Kbd> file with accumulated
+                    points from your session. Open in Blender, CloudCompare,
+                    MeshLab, or any tool that reads PLY.
+                  </>
+                </Card>
+              </div>
+
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-8">
+                <h3 className="text-sm font-semibold text-white mb-3">
+                  What happens during recording
+                </h3>
+                <ul className="text-sm text-zinc-400 space-y-2">
+                  <li>
+                    <strong className="text-white">Mesh overlay</strong> — A
+                    semi-transparent wireframe shows scanned surfaces building up
+                    in real time (cyan near, purple far)
+                  </li>
+                  <li>
+                    <strong className="text-white">Keyframe selection</strong> —
+                    Only frames where the camera moved at least 5cm or
+                    rotated ~5&deg; are saved, producing a well-distributed set of
+                    training views
+                  </li>
+                  <li>
+                    <strong className="text-white">Blur detection</strong> —
+                    Motion-blurred frames are automatically rejected via Laplacian
+                    variance analysis
+                  </li>
+                  <li>
+                    <strong className="text-white">Focus lock</strong> —
+                    Autofocus is disabled during recording to keep camera
+                    intrinsics consistent across all frames
+                  </li>
+                  <li>
+                    <strong className="text-white">Haptic feedback</strong> — A
+                    subtle tap each time a keyframe is captured
+                  </li>
+                  <li>
+                    <strong className="text-white">Counters</strong> — Elapsed
+                    time, keyframe count, and total point count shown on screen
+                  </li>
+                </ul>
+              </div>
+
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-8">
+                <h3 className="text-sm font-semibold text-white mb-3">
+                  When you stop recording
+                </h3>
+                <ul className="text-sm text-zinc-400 space-y-1.5">
+                  <li>1. Dataset files are written (metadata, point cloud, images)</li>
+                  <li>2. Everything is compressed into a single <Kbd>.zip</Kbd> file</li>
+                  <li>3. A summary shows format, keyframes, points, file size, and filename</li>
+                  <li>4. The zip syncs to iCloud automatically if you chose an iCloud folder</li>
+                </ul>
               </div>
 
               <div className="space-y-5">
                 <h3 className="text-sm font-semibold text-white">
-                  Export workflow
+                  Tips for best results
                 </h3>
-                <Step n={1} title="Record a capture session">
-                  Tap record while in any capture mode. Move slowly around the
-                  subject for best coverage — LOTA tracks camera pose
-                  automatically via ARKit.
+                <Step n={1} title="Move slowly">
+                  Walk around the subject at a steady pace. A typical 30-second
+                  scan produces ~80 keyframes and a 10–20 MB zip.
                 </Step>
-                <Step n={2} title="Open the export panel">
-                  Stop recording and open the export panel. Choose between
-                  COLMAP dataset or standalone PLY.
+                <Step n={2} title="Capture from multiple angles">
+                  Shoot from low, mid, and high heights. Ensure adjacent
+                  viewpoints have 70–80% overlap for best reconstruction.
                 </Step>
-                <Step n={3} title="Export and share">
-                  Exported files are saved to your chosen folder (or the Files
-                  app). If iCloud sync is enabled, they appear on your Mac
-                  automatically.
+                <Step n={3} title="Use good lighting">
+                  Consistent, well-lit environments produce better results. Avoid
+                  reflective and transparent surfaces — LiDAR struggles with
+                  glass and mirrors.
                 </Step>
+              </div>
+            </section>
+
+            {/* ─── Settings ───────────────────────────────── */}
+            <section
+              id="settings"
+              ref={(el) => { sectionRefs.current["settings"] = el; }}
+            >
+              <SectionHeading tag="Configuration" title="Settings Reference">
+                Access settings via the gear icon on the Camera / Streaming page
+                (bottom left). The receiver IP is shared across all transports.
+              </SectionHeading>
+
+              <div className="space-y-4">
+                <SettingsGroup title="Receiver">
+                  <Setting name="Receiver IP" defaultValue="192.168.1.100">
+                    IP address of the computer receiving streams. Shared across
+                    all transports (TCP, UDP, OSC, PLY).
+                  </Setting>
+                </SettingsGroup>
+
+                <SettingsGroup title="Transport (TCP/UDP)">
+                  <Setting name="TCP/UDP Output" defaultValue="On">
+                    Enable or disable the video transport.
+                  </Setting>
+                  <Setting name="Protocol" defaultValue="TCP">
+                    TCP (reliable, auto-reconnects) or UDP (fire-and-forget). TCP
+                    sends H.264 video for Color/Mono, raw Float32 depth for
+                    Depth/Point Cloud modes.
+                  </Setting>
+                  <Setting name="Port" defaultValue="9847">
+                    Destination port for TCP/UDP streams.
+                  </Setting>
+                </SettingsGroup>
+
+                <SettingsGroup title="NDI">
+                  <Setting name="NDI Video Output" defaultValue="Off">
+                    Enable or disable NDI streaming. Auto-broadcasts
+                    as &quot;LOTA (iPhone)&quot; on the local network.
+                  </Setting>
+                  <Setting name="Side-by-Side" defaultValue="Off">
+                    Sends a 2x-wide frame: left half is the camera view, right
+                    half is the depth colormap. Standard format for TouchDesigner
+                    and Notch workflows.
+                  </Setting>
+                </SettingsGroup>
+
+                <SettingsGroup title="OSC">
+                  <Setting name="OSC Output" defaultValue="Off">
+                    Enable or disable OSC messages.
+                  </Setting>
+                  <Setting name="Port" defaultValue="9000">
+                    OSC destination port.
+                  </Setting>
+                </SettingsGroup>
+
+                <SettingsGroup title="Depth">
+                  <Setting name="Color Map" defaultValue="Visible Spectrum">
+                    Colormap for depth visualization. Options: Black &amp; White,
+                    Black Aqua White, Blue Red, Deep Sea, Color Spectrum,
+                    Incandescent, Heated Metal, Sunrise, Visible Spectrum.
+                  </Setting>
+                </SettingsGroup>
+
+                <SettingsGroup title="Point Cloud">
+                  <Setting name="Frame Window" defaultValue="30 (range 5–60)">
+                    Number of accumulated LiDAR frames in the live point cloud
+                    sliding window. Higher values show more spatial coverage but
+                    use more GPU memory. Only affects the live view, not Gaussian
+                    Capture.
+                  </Setting>
+                  <Setting name="Max Depth" defaultValue="5.0m (range 1–10m)">
+                    Maximum LiDAR range. Points beyond this are discarded. Gen 1
+                    LiDAR (iPhone 12–14 Pro) is reliable to ~5m. Gen 2
+                    (iPhone 15–16 Pro) can reach ~10m. Affects both live view and
+                    Gaussian Capture exports.
+                  </Setting>
+                  <Setting name="Compute Quality" defaultValue="Balanced">
+                    GPU compute frame skip for thermal management. Full = every
+                    frame, Balanced = every 2nd, Efficient = every 3rd. Only
+                    affects live Point Cloud mode.
+                  </Setting>
+                  <Setting name="Min Confidence" defaultValue="Medium+">
+                    LiDAR depth confidence filter. All = no filtering, maximum
+                    density. Medium+ = removes low-confidence noisy edge pixels.
+                    High Only = fewest points, highest accuracy. Affects both live
+                    view and Gaussian Capture exports.
+                  </Setting>
+                </SettingsGroup>
+
+                <SettingsGroup title="Point Cloud Stream (PLY)">
+                  <Setting name="PLY Streaming" defaultValue="Off">
+                    Enable or disable live point cloud TCP stream.
+                  </Setting>
+                  <Setting name="Port" defaultValue="9848">
+                    PLY stream destination port.
+                  </Setting>
+                  <Setting name="Binary Format" defaultValue="Off">
+                    Packed binary (15 bytes/point) vs CSV text. Binary is ~40%
+                    smaller but requires a byte-parsing receiver. CSV text works
+                    with TouchDesigner&apos;s TCP/IP DAT in &quot;One Per
+                    Line&quot; mode.
+                  </Setting>
+                </SettingsGroup>
+
+                <SettingsGroup title="Tracking">
+                  <Setting name="Skeleton Overlay" defaultValue="On">
+                    Show or hide body skeleton visualization on the tracking page.
+                  </Setting>
+                  <Setting name="Face Overlay" defaultValue="On">
+                    Show or hide face blend shape bar graph on the tracking page.
+                  </Setting>
+                  <Setting name="Hand Overlay" defaultValue="On">
+                    Show or hide hand bone and joint visualization on the tracking
+                    page.
+                  </Setting>
+                  <Setting name="3D Hand Coordinates" defaultValue="Off">
+                    Use LiDAR-projected world-space hand coordinates instead of
+                    normalized screen-space. Requires a LiDAR-equipped device.
+                  </Setting>
+                </SettingsGroup>
               </div>
             </section>
 
@@ -600,9 +945,13 @@ export default function DocsPage() {
 
               <div className="space-y-6">
                 <Faq q="Which iPhones support LOTA?">
-                  Any iPhone with a LiDAR sensor — iPhone 12 Pro, 13 Pro,
-                  14 Pro, 15 Pro, 16 Pro, and their Max variants. iPad Pro models
-                  with LiDAR are also supported.
+                  Any iPhone running iOS 26.2 or later. LiDAR features (Depth,
+                  Point Cloud, Gaussian Capture, 3D hand coordinates) require
+                  iPhone 12 Pro or later. Color and Mono modes, NDI streaming,
+                  and TCP/UDP streaming work on all iPhones without LiDAR. Face
+                  tracking requires TrueDepth camera (iPhone X or later). Body
+                  tracking requires A12 chip or later. iPad Pro models with
+                  LiDAR are also supported.
                 </Faq>
                 <Faq q="Do the receiving machine and iPhone need to be on the same network?">
                   Yes. For TCP, UDP, OSC, and PLY streaming, both devices must be
@@ -619,17 +968,23 @@ export default function DocsPage() {
                   Resolume), any tool that reads TCP/UDP sockets, and any
                   OSC-capable application (Max/MSP, Ableton, Unreal Engine).
                 </Faq>
-                <Faq q="How do I use the COLMAP export with Gaussian Splat training?">
-                  Export a COLMAP dataset from LOTA, transfer it to your
-                  training machine, and point OpenSplat, Nerfstudio, or gsplat at
-                  the exported folder. The binary files are in the exact format
-                  these tools expect.
+                <Faq q="How do I use the export data for Gaussian Splat training?">
+                  Export a COLMAP or Nerfstudio dataset from the Gaussian Capture
+                  page, transfer the zip to your training machine, and point
+                  OpenSplat, Nerfstudio, or gsplat at the extracted folder. The
+                  files are in the exact format these tools expect.
                 </Faq>
                 <Faq q="Is there a latency cost to streaming?">
                   NDI and TCP/UDP streams typically add 1–3 frames of latency
                   depending on your network. OSC tracking data arrives at
                   30&nbsp;Hz with sub-frame latency. A wired connection or
                   5&nbsp;GHz Wi-Fi keeps things as fast as possible.
+                </Faq>
+                <Faq q="What export format should I use?">
+                  COLMAP for OpenSplat and gsplat. Nerfstudio for splatfacto and
+                  Instant-NGP. Nerfstudio + Depth for best geometry on flat or
+                  featureless surfaces. Point Cloud (PLY) for quick visualization
+                  in Blender or CloudCompare.
                 </Faq>
               </div>
             </section>

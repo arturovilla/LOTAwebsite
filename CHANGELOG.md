@@ -4,6 +4,43 @@ All notable changes to the LOTA project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.7] - 2026-04-07
+
+### Changed
+- **Unified mode selector**: Camera/Streaming page mode picker replaced with a top dropdown menu matching the Gaussian Capture and ARKit Tracking pages. All three pages now use the same dropdown pattern — icon, label, chevron, description per option
+- Camera page bottom bar simplified to Settings (left) and Streaming toggle (right)
+
+### Removed
+- `ModePickerView.swift` — replaced by inline dropdown in CameraView
+
+---
+
+## [1.0.6] - 2026-04-07
+
+### Added
+- **ARKit mesh wireframe overlay**: During Gaussian Splatting and Point Cloud capture, ARKit scene reconstruction renders a semi-transparent mesh overlay on the camera feed showing scanned surfaces building up in real time. Mesh triangles are colored by depth (cyan near, purple far). Uses `ARMeshAnchor` geometry rendered via a dedicated Metal pipeline with alpha blending
+- **Keyframe selection**: Intelligent frame filtering during capture — only saves frames where the camera has moved at least 5cm or rotated ~5 degrees since the last saved frame. Reduces dataset size by ~90% while maintaining spatial coverage. A typical 30-second capture produces ~80 well-distributed keyframes instead of ~900 redundant frames
+- **Blur detection**: Laplacian variance sharpness filter rejects motion-blurred frames before JPEG encoding. Runs on the Y (luminance) plane at 1/4 resolution for minimal overhead (<1ms). Blurry frames from fast camera movement are automatically discarded
+- **Auto focus lock**: Autofocus is automatically disabled when recording starts and restored when recording stops. Prevents focal length drift that would invalidate the single-intrinsics assumption in COLMAP/Nerfstudio datasets. Uses ARKit's official `isAutoFocusEnabled` API — no tracking interruption
+- **ZIP export**: Capture sessions are compressed into a single `.zip` file after recording. The original folder is deleted after successful compression. File size is shown in the save summary (e.g. "12.4 MB"). Uses ZIPFoundation (SPM)
+- **Recording timer**: Live elapsed time display (mm:ss format) shown during capture alongside frame and point counters
+- **Haptic feedback on keyframe capture**: Subtle tap via `UIImpactFeedbackGenerator` each time a frame passes the keyframe + blur gates and is saved to the dataset
+- **Rolling accumulation buffer**: When the Metal accumulation buffer reaches 5M points, the oldest 25% are evicted via `memmove` and new points continue accumulating. Prevents the visual stall that occurred in 1.0.5 during long recordings
+
+### Changed
+- Gaussian Capture page now shows live camera feed (was point cloud) with mesh wireframe overlay during recording, replacing the previous point cloud accumulation view. Dramatically reduces GPU load (~1ms vs ~5-8ms per frame)
+- Frame counter label changed from "frames" to "keyframes" to reflect the filtering behavior
+- `GaussianRecorder.recordFrame()` restructured: points are only accumulated from frames that pass both keyframe and blur gates (was: all frames accumulated, causing memory exhaustion on long recordings)
+- `stopRecording()` return type changed from `URL?` to `(URL, Int64)?` to include zip file size
+- `SaveSummaryView` now shows file size and updated iCloud message ("Your capture is ready to transfer via iCloud or AirDrop")
+- Save progress indicator shows two phases: "Saving..." then "Compressing..."
+
+### Removed
+- Point cloud accumulation as the default capture visualization — replaced by camera + mesh overlay
+- Depth overlay / coverage painting system (depthOverlayFragment shader, updateCoverage compute kernel, coverage texture) — replaced by ARKit mesh wireframe
+
+---
+
 ## [1.0.5] - 2026-04-04
 
 ### Added

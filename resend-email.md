@@ -18,7 +18,7 @@ The site now has a full **docs page** covering capture modes, streaming setup, T
 
 We built a custom TouchDesigner component called **LOTAPoints.tox** that handles PLY point cloud streaming out of the box. Drop it into any project — it defaults to port **9848** and just works. No scripting, no manual DAT wiring.
 
-Available for download on the docs page under the TouchDesigner section.
+Available for download on the docs page under the TouchDePsigner section.
 
 [Download LOTAPoints.tox →](https://lidarota.app/docs#touchdesigner)
 
