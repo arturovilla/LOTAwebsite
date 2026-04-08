@@ -1190,10 +1190,6 @@ export default function DocsPage() {
                   handles discovery automatically. A 5&nbsp;GHz Wi-Fi connection
                   is recommended.
                 </Faq>
-                <Faq q="Can I stream and record at the same time?">
-                  Yes. Streaming and recording are independent — you can run both
-                  simultaneously without any performance impact.
-                </Faq>
                 <Faq q="What software can receive LOTA streams?">
                   Any NDI-compatible software (TouchDesigner, OBS, vMix,
                   Resolume), any tool that reads TCP/UDP sockets, and any

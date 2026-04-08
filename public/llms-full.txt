@@ -190,10 +190,6 @@ Any iPhone with a LiDAR sensor — iPhone 12 Pro, 13 Pro, 14 Pro, 15 Pro, 16 Pro
 
 Yes. For TCP, UDP, OSC, and PLY streaming, both devices must be on the same local network. NDI also uses the local network but handles discovery automatically. A 5 GHz Wi-Fi connection is recommended.
 
-### Can I stream and record at the same time?
-
-Yes. Streaming and recording are independent — you can run both simultaneously without any performance impact.
-
 ### What software can receive LOTA streams?
 
 Any NDI-compatible software (TouchDesigner, OBS, vMix, Resolume), any tool that reads TCP/UDP sockets, and any OSC-capable application (Max/MSP, Ableton, Unreal Engine).
