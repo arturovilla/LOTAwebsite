@@ -4,6 +4,41 @@ All notable changes to the LOTA project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.8] - 2026-04-08
+
+### Added
+- **Live Transcription capture mode**: New `.transcription` mode in the capture dropdown. Uses iOS 26's `SpeechAnalyzer` + `SpeechTranscriber` framework for fully on-device, real-time speech-to-text. No internet required. Does not require LiDAR — works on every iPhone. New `TranscriptionEngine` class wraps `AVAudioEngine` microphone capture + SpeechAnalyzer pipeline with Swift concurrency (`AsyncStream<AnalyzerInput>`)
+- **Mirrored bar waveform visualization**: When transcription mode is active, the camera view is replaced with a black canvas and a 200-bar white mirrored waveform driven by live microphone RMS amplitude. Rendered in Metal (new `waveformVertex`/`waveformFragment` shaders) so it streams through NDI automatically
+- **Live transcript SwiftUI overlay**: Recognized words appear on-screen as large centered captions while speaking. Updates on partial results (as words arrive) and finalized sentences
+- **Speech model auto-download**: First-time use downloads the language model via `AssetInventory.assetInstallationRequest` in the background. User sees a brief delay on first recognition session per language
+- **Microphone + Speech Recognition permission flow**: Requests both permissions on first entry to transcription mode. If denied, shows a clear "Enable in Settings" message with a deep-link button to the app's settings page
+- **Transcription OSC output**: Streams recognized speech as OSC messages when OSC streaming is enabled:
+  - `/lota/speech/word` (string) — each recognized word
+  - `/lota/speech/word_count` (int) — incrementing counter, visible in OSC In CHOP
+  - `/lota/speech/partial` (string) — running partial transcript
+  - `/lota/speech/final` (string) — finalized sentence
+  - Sent via existing OSC transport, same pattern as face blend shapes
+- **Transcription TCP/UDP streaming**: New `FrameType.speechText = 4` wire format. `FrameEncoder.encodeSpeechText(_:kind:wordIndex:timestamp:)` builds a 24-byte `FrameHeader` + UTF-8 payload. Header's `width` field repurposed for speech kind (0=word, 1=partial, 2=final), `height` for word index. Uses the existing TCP/UDP transports — no new networking code. Dedicated `transcriptionStartTime` / `transcriptionRelativeTimestamp()` helper since transcription mode doesn't have an `ARFrame.timestamp` source
+- **Drag-and-drop TouchDesigner components**: Two custom TD components are now available on the [LOTA docs page](https://lidarota.app) for receiving speech data:
+  - **LOTASpeechTCP** — TCP/IP DAT + callback script that parses LOTA's binary frame format and writes parsed words/partials/finals to a `speech_log` Table DAT. Handles stream buffering for partial frame arrivals
+  - **LOTASpeechUDP** — UDP In DAT + callback script using "One Per Message" mode. Simpler than TCP (no buffering needed — each datagram is a complete frame)
+  - OSC and NDI continue to work as before for users who prefer those transports
+- **Per-channel OSC output toggles**: New "Transcription" section in Settings with three toggles (Send Per-Word, Send Partial, Send Final). Users can pick which transcription OSC addresses to send. Defaults to all on. Toggles apply to both OSC and TCP/UDP paths
+- **Listening indicator in status bar**: Pulsing `mic.fill` icon + "LISTENING" label appears next to the FPS counter when the transcription engine is actively capturing audio. Uses SwiftUI `animation(.repeatForever)` for the pulse
+
+### Changed
+- **Camera position OSC suppressed in transcription mode**: `/lota/camera/position`, `/lota/camera/rotation`, and `/lota/camera/euler` are no longer sent when the capture mode is `.transcription` — prevents the high-rate pose data from drowning out speech messages in OSC In DAT
+- `StatusOverlayView` gained an `isListening: Bool` parameter (default false) and an animated microphone indicator
+- `CaptureMode` enum extended with `.transcription` case — `mic.fill` icon, "Live speech-to-text" description, `requiresLiDAR = false`
+- `CaptureManager.setMode()` starts/stops the transcription engine on mode enter/exit — engine never runs in the background
+- `StreamingProtocol.FrameType` extended with `speechText = 4` for the new text wire format
+- `StreamingSettings` gained three persisted toggles: `transcriptionSendWords`, `transcriptionSendPartial`, `transcriptionSendFinal`
+
+### Fixed
+- Waveform amplitude ring buffer sized to 200 samples (was 128) for finer horizontal resolution without performance cost
+
+---
+
 ## [1.0.7] - 2026-04-07
 
 ### Changed

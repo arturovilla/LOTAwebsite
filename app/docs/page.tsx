@@ -280,7 +280,7 @@ export default function DocsPage() {
                 </h3>
                 <ul className="text-sm text-zinc-400 space-y-1.5">
                   <li>• iPhone 12 Pro or later (LiDAR required for Depth, Point Cloud, and Gaussian Capture)</li>
-                  <li>• Color and Monochrome modes work on all iPhones</li>
+                  <li>• Color, Mono, and Transcription modes work on all iPhones</li>
                   <li>• iOS 26.2 or later</li>
                   <li>• Wi-Fi network (for streaming features)</li>
                 </ul>
@@ -293,8 +293,8 @@ export default function DocsPage() {
                 </Step>
                 <Step n={2} title="Choose a capture mode">
                   Tap the mode dropdown at the top of the screen to switch
-                  between Color, Mono, Depth, or Point Cloud. Each mode
-                  activates instantly — no restart required.
+                  between Color, Mono, Depth, Point Cloud, or Transcription.
+                  Each mode activates instantly — no restart required.
                 </Step>
                 <Step n={3} title="Start streaming or recording">
                   Tap the stream button (bottom right) to broadcast over the
@@ -322,10 +322,10 @@ export default function DocsPage() {
                   Max/MSP, Ableton, and more.
                 </Card>
                 <Card title="Camera / Streaming — Center (default)">
-                  The main page. Live camera feed with four capture modes (Color,
-                  Mono, Depth, Point Cloud) and streaming controls. Tap the mode
-                  dropdown at the top to switch modes. Settings gear icon is bottom
-                  left, streaming toggle is bottom right.
+                  The main page. Live camera feed with five capture modes (Color,
+                  Mono, Depth, Point Cloud, Transcription) and streaming controls.
+                  Tap the mode dropdown at the top to switch modes. Settings gear
+                  icon is bottom left, streaming toggle is bottom right.
                 </Card>
                 <Card title="Gaussian Capture — Swipe Right">
                   Record datasets for Gaussian Splatting and 3D reconstruction.
@@ -342,7 +342,7 @@ export default function DocsPage() {
               ref={(el) => { sectionRefs.current["capture-modes"] = el; }}
             >
               <SectionHeading tag="Capture" title="Capture Modes">
-                LOTA provides four distinct capture modes on the Camera /
+                LOTA provides five distinct capture modes on the Camera /
                 Streaming page. Tap the mode dropdown at the top of the screen
                 to switch — each mode shows an icon and description.
               </SectionHeading>
@@ -350,8 +350,8 @@ export default function DocsPage() {
               <div className="grid gap-4 sm:grid-cols-2">
                 <Card title="Color">
                   Live RGB camera feed at 60&nbsp;FPS. What you see on screen
-                  is exactly what gets streamed or recorded. Works on all
-                  iPhones — no LiDAR required.
+                  is exactly what gets streamed. Works on all iPhones — no
+                  LiDAR required.
                 </Card>
                 <Card title="Mono">
                   High-contrast grayscale feed optimized for low-light
@@ -373,6 +373,14 @@ export default function DocsPage() {
                     in Settings. Requires LiDAR.
                   </>
                 </Card>
+                <Card title="Transcription">
+                  <>
+                    Live on-device speech-to-text with a mirrored bar waveform
+                    visualization. Recognized words stream out over OSC, TCP,
+                    UDP, and appear on screen as captions. Works on every
+                    iPhone — <strong className="text-white">no LiDAR required</strong>.
+                  </>
+                </Card>
               </div>
 
               <div className="mt-6 rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
@@ -384,6 +392,137 @@ export default function DocsPage() {
                   say <Kbd>switch to Depth</Kbd> with Voice Control enabled.
                   Switching is instant and does not interrupt an active stream.
                 </p>
+              </div>
+
+              {/* ─── Transcription details ─────────────────── */}
+              <div className="mt-10">
+                <h3 className="text-xl font-bold text-white mb-2">
+                  Transcription mode
+                </h3>
+                <p className="text-sm text-zinc-400 leading-relaxed mb-6">
+                  Select <Kbd>Transcription</Kbd> from the mode dropdown to
+                  turn your iPhone into a wireless live speech-to-text source
+                  for creative tools. The camera view is replaced with a black
+                  canvas and a 200-bar mirrored waveform driven by the
+                  microphone. Recognized words appear on screen as live
+                  captions. Uses iOS 26&apos;s on-device
+                  <Kbd>SpeechAnalyzer</Kbd> framework — fast, private, offline.
+                </p>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    First-time setup
+                  </h4>
+                  <p className="text-sm text-zinc-400 leading-relaxed">
+                    On first use, iOS prompts for Microphone and Speech
+                    Recognition permissions. Both are required. If denied, the
+                    mode displays a message with a shortcut to the Settings app
+                    to grant access. iOS may also briefly download the speech
+                    model for your device&apos;s language on the first
+                    recognition session — on-device from that point on, no
+                    internet needed.
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    While active
+                  </h4>
+                  <ul className="text-sm text-zinc-400 space-y-2">
+                    <li>
+                      <strong className="text-white">Listening indicator</strong>{" "}
+                      — A pulsing microphone icon and &quot;LISTENING&quot;
+                      label appear in the status bar
+                    </li>
+                    <li>
+                      <strong className="text-white">Waveform</strong> — 200
+                      mirrored bars pulse with your voice in real time and
+                      stream through NDI as a black-and-white video source
+                    </li>
+                    <li>
+                      <strong className="text-white">Live captions</strong> —
+                      Recognized words appear on screen as large centered
+                      text as they arrive
+                    </li>
+                    <li>
+                      <strong className="text-white">Camera tracking OSC
+                      suppressed</strong> — Camera position messages are
+                      automatically paused so speech data stands out in
+                      your OSC receiver
+                    </li>
+                    <li>
+                      <strong className="text-white">Clean exit</strong> —
+                      Leaving transcription mode stops the audio engine
+                      completely. No background microphone access.
+                    </li>
+                  </ul>
+                </div>
+
+                <Card title="OSC addresses">
+                  <>
+                    <p className="mb-2">
+                      When OSC streaming is enabled, transcription sends these
+                      addresses:
+                    </p>
+                    <ul className="space-y-1 text-zinc-500">
+                      <li><Kbd>/lota/speech/word</Kbd> — each recognized word (string)</li>
+                      <li><Kbd>/lota/speech/word_count</Kbd> — incrementing counter (int, visible in OSC In CHOP)</li>
+                      <li><Kbd>/lota/speech/partial</Kbd> — running partial transcript (string)</li>
+                      <li><Kbd>/lota/speech/final</Kbd> — finalized sentences (string)</li>
+                    </ul>
+                    <p className="mt-3 text-zinc-500">
+                      String messages arrive in TouchDesigner&apos;s{" "}
+                      <Kbd>OSC In DAT</Kbd> (not OSC In CHOP — CHOP only handles
+                      numeric channels). The <Kbd>word_count</Kbd> integer is
+                      the only speech message visible in OSC In CHOP, useful for
+                      signal-flow monitoring.
+                    </p>
+                  </>
+                </Card>
+
+                <div className="mt-4">
+                  <Card title="TCP / UDP binary wire format">
+                    <>
+                      <p>
+                        For custom integrations, LOTA also sends recognized
+                        speech as binary frames over TCP and UDP:
+                        <Kbd>FrameType.speechText = 4</Kbd>, a 24-byte{" "}
+                        <Kbd>FrameHeader</Kbd> + UTF-8 payload. The
+                        header&apos;s <Kbd>width</Kbd> field is repurposed
+                        for speech kind (0 = word, 1 = partial, 2 = final),{" "}
+                        <Kbd>height</Kbd> for word index. Use the drag-and-drop
+                        TD components below to parse this format automatically.
+                      </p>
+                    </>
+                  </Card>
+                </div>
+
+                <div className="mt-4">
+                  <Card title="Which transport should you use?">
+                    <>
+                      <ul className="space-y-1.5 mt-1">
+                        <li>
+                          <strong className="text-white">OSC</strong> —
+                          Easiest for TouchDesigner, Max/MSP, Resolume. Drop
+                          in an OSC In DAT, set the port, done.
+                        </li>
+                        <li>
+                          <strong className="text-white">TCP / UDP</strong> —
+                          Use the LOTASpeechTCP / LOTASpeechUDP components
+                          (downloads in the TouchDesigner section below) for
+                          plug-and-play binary parsing, or integrate into
+                          custom apps, game engines, and scripts that
+                          don&apos;t have OSC parsers.
+                        </li>
+                        <li>
+                          <strong className="text-white">NDI</strong> — When
+                          you want the waveform visual as a live video
+                          source for reactive effects or broadcast overlays.
+                        </li>
+                      </ul>
+                    </>
+                  </Card>
+                </div>
               </div>
             </section>
 
@@ -598,6 +737,67 @@ export default function DocsPage() {
                   </div>
                   <a
                     href="/LOTABinaryPLYReciever.tox"
+                    download
+                    className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full bg-white text-black hover:bg-zinc-200 transition-colors"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M8 2v9m0 0L5 8m3 3 3-3M3 13h10" />
+                    </svg>
+                    Download .tox
+                  </a>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-white mb-2">
+                      LOTASpeechTCP.tox — Speech TCP Receiver
+                    </h3>
+                    <div className="text-sm text-zinc-400 leading-relaxed">
+                      <p>
+                        TCP/IP DAT with a callback script that parses
+                        LOTA&apos;s binary speech frame format and writes
+                        recognized words, partials, and finals to
+                        a <Kbd>speech_log</Kbd> Table DAT. Handles stream
+                        buffering for frames split across TCP packets. Drop
+                        into your network and recognized speech starts
+                        populating rows — no manual parsing required.
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href="/LOTASpeechTCP.tox"
+                    download
+                    className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full bg-white text-black hover:bg-zinc-200 transition-colors"
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M8 2v9m0 0L5 8m3 3 3-3M3 13h10" />
+                    </svg>
+                    Download .tox
+                  </a>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                  <div>
+                    <h3 className="text-sm font-semibold text-white mb-2">
+                      LOTASpeechUDP.tox — Speech UDP Receiver
+                    </h3>
+                    <div className="text-sm text-zinc-400 leading-relaxed">
+                      <p>
+                        UDP In DAT configured for &quot;One Per Message&quot;
+                        mode with a callback script that parses the same
+                        binary speech frame format as the TCP receiver.
+                        Simpler than TCP — each datagram is a complete frame,
+                        so no buffering is needed. Use this for low-latency
+                        fire-and-forget speech delivery on a local network.
+                      </p>
+                    </div>
+                  </div>
+                  <a
+                    href="/LOTASpeechUDP.tox"
                     download
                     className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full bg-white text-black hover:bg-zinc-200 transition-colors"
                   >
@@ -886,6 +1086,29 @@ export default function DocsPage() {
                     normalized screen-space. Requires a LiDAR-equipped device.
                   </Setting>
                 </SettingsGroup>
+
+                <SettingsGroup title="Transcription">
+                  <Setting name="Send Per-Word OSC" defaultValue="On">
+                    Send each recognized word as it arrives
+                    (<Kbd>/lota/speech/word</Kbd> + TCP/UDP word frames).
+                    The <Kbd>/lota/speech/word_count</Kbd> integer always
+                    fires alongside per-word messages as a numeric CHOP-visible
+                    signal.
+                  </Setting>
+                  <Setting name="Send Partial Transcript" defaultValue="On">
+                    Send running partial transcript updates as words arrive
+                    (<Kbd>/lota/speech/partial</Kbd> + TCP/UDP partial frames).
+                  </Setting>
+                  <Setting name="Send Final Transcript" defaultValue="On">
+                    Send finalized sentences when the recognizer commits
+                    (<Kbd>/lota/speech/final</Kbd> + TCP/UDP final frames).
+                  </Setting>
+                  <div className="pt-2 text-xs text-zinc-500 leading-relaxed">
+                    These toggles apply to both OSC and TCP/UDP transports
+                    simultaneously. Turn off anything you don&apos;t need to
+                    reduce noise in your receiver.
+                  </div>
+                </SettingsGroup>
               </div>
             </section>
 
@@ -947,11 +1170,19 @@ export default function DocsPage() {
                 <Faq q="Which iPhones support LOTA?">
                   Any iPhone running iOS 26.2 or later. LiDAR features (Depth,
                   Point Cloud, Gaussian Capture, 3D hand coordinates) require
-                  iPhone 12 Pro or later. Color and Mono modes, NDI streaming,
-                  and TCP/UDP streaming work on all iPhones without LiDAR. Face
-                  tracking requires TrueDepth camera (iPhone X or later). Body
-                  tracking requires A12 chip or later. iPad Pro models with
-                  LiDAR are also supported.
+                  iPhone 12 Pro or later. Color, Mono, and Transcription modes,
+                  NDI streaming, and TCP/UDP streaming all work on iPhones
+                  without LiDAR. Face tracking requires TrueDepth camera
+                  (iPhone X or later). Body tracking requires A12 chip or
+                  later. iPad Pro models with LiDAR are also supported.
+                </Faq>
+                <Faq q="Does Transcription mode need internet access?">
+                  No. Transcription uses iOS 26&apos;s on-device
+                  {" "}<Kbd>SpeechAnalyzer</Kbd> framework and runs entirely
+                  offline. The first time you use it in a given language, iOS
+                  briefly downloads the speech model for that language in the
+                  background — after that, recognition works fully offline.
+                  Audio never leaves your device.
                 </Faq>
                 <Faq q="Do the receiving machine and iPhone need to be on the same network?">
                   Yes. For TCP, UDP, OSC, and PLY streaming, both devices must be
