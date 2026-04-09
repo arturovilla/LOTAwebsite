@@ -1,9 +1,10 @@
 # LOTA — LiDAR Over The Air
 
-> LOTA is an iOS app that transforms iPhones with LiDAR sensors into professional spatial capture tools. Stream real-time depth, color, and point cloud data over NDI, TCP/UDP, OSC, and PLY. Export COLMAP-compatible datasets for Gaussian Splat and NeRF training. Built for creative professionals using TouchDesigner, OBS, vMix, Resolume, Max/MSP, and other live visual tools.
+> LOTA is an iOS app that transforms iPhones into professional spatial capture and streaming tools. Stream real-time depth, color, point cloud, motion capture, and live transcription data over NDI, TCP/UDP, OSC, and PLY. Export COLMAP-compatible datasets for Gaussian Splat and NeRF training. Built for creative professionals using TouchDesigner, OBS, vMix, Resolume, Max/MSP, and other live visual tools.
 
-- Requires iPhone 12 Pro or later (any model with LiDAR sensor), iOS 17.0+
-- Four capture modes: Color (60 FPS RGB), Monochrome, Depth (9 colormaps), Point Cloud (real-time 3D)
+- Requires iOS 26.2+. LiDAR (iPhone 12 Pro or later) needed for Depth, Point Cloud, Blob Tracking, and Gaussian Capture. Color, Mono, and Transcription modes work on every iPhone
+- Six capture modes: Color (60 FPS RGB), Mono, Depth (9 colormaps), Point Cloud (real-time 3D), Blob Track (TouchDesigner-compatible), Transcription (on-device speech-to-text)
+- ARKit tracking page: body (91 joints), face (52 blend shapes), and hand tracking (21 landmarks per hand) streamed over OSC
 - GPU-accelerated via Metal compute shaders — full depth map sampling at interactive frame rates
 - All processing on-device, no analytics, no data collection
 - Fully accessible: VoiceOver, Voice Control, Dynamic Type, Switch Control, Reduce Motion
@@ -12,45 +13,138 @@
 
 ## Getting Started
 
-LOTA turns your iPhone's LiDAR sensor into a professional spatial capture tool. Stream depth, color, and point cloud data over the network in real time — no extra hardware required.
+LOTA turns your iPhone into a professional spatial capture and streaming tool. Stream depth, color, point cloud, motion capture, and live transcription data over the network in real time — no extra hardware required.
 
 ### Requirements
 
-- iPhone 12 Pro or later (any model with a LiDAR sensor)
-- iOS 17.0 or later
+- iOS 26.2 or later
+- LiDAR-equipped iPhone (12 Pro or later) required for Depth, Point Cloud, Blob Tracking, and Gaussian Capture
+- Color, Mono, and Transcription modes work on every iPhone — no LiDAR needed
 - Wi-Fi network (for streaming features)
 
 ### Quick Start
 
 1. **Install LOTA**: Download LOTA from the App Store. Open the app and grant camera and local network permissions when prompted.
-2. **Choose a capture mode**: Tap the mode selector at the bottom of the screen to switch between Color, Monochrome, Depth, or Point Cloud. Each mode activates instantly — no restart required.
-3. **Start streaming**: Tap the stream button to broadcast over the network. For Gaussian Splat capture, swipe right to the capture page and tap record to save a training-ready dataset.
+2. **Choose a capture mode**: Tap the mode dropdown at the top of the screen to switch between Color, Mono, Depth, Point Cloud, Blob Track, or Transcription. Each mode activates instantly — no restart required.
+3. **Start streaming**: Tap the stream button (bottom right) to broadcast over the network. For Gaussian Splat capture, swipe right to the capture page and tap record to save a training-ready dataset.
 
 ---
 
 ## Capture Modes
 
-LOTA provides four distinct capture modes. Switch between them in real time — every mode leverages the LiDAR sensor and full camera array.
+LOTA provides six distinct capture modes on the Camera / Streaming page. Tap the mode dropdown at the top of the screen to switch — each mode shows an icon and description.
 
 ### Color
 
-Live RGB camera feed at 60 FPS with real-time LiDAR depth fusion. What you see on screen is exactly what gets streamed.
+Live RGB camera feed at 60 FPS with real-time LiDAR depth fusion. What you see on screen is exactly what gets streamed. Works on every iPhone — no LiDAR required.
 
-### Monochrome
+### Mono
 
-High-contrast grayscale feed optimized for low-light environments and precision spatial scanning.
+High-contrast grayscale feed optimized for low-light environments and precision spatial scanning. Works on every iPhone — no LiDAR required.
 
 ### Depth
 
-LiDAR depth visualization with 9 selectable colormaps including thermal, incandescent, and deep sea. Tap the colormap picker to cycle through them in real time.
+LiDAR depth visualization with 9 selectable colormaps including thermal, incandescent, and deep sea. Tap the colormap picker to cycle through them in real time. Requires LiDAR.
 
 ### Point Cloud
 
-Real-time 3D point cloud rendered with true RGB colors. Configure the frame window and point density. Full depth map sampling of the 256x192 LiDAR sensor — every pixel unprojected via Metal compute shader. Pinch to zoom and drag to orbit the cloud.
+Real-time 3D point cloud rendered with true RGB colors. Configure the frame window and max depth. Full depth map sampling of the 256x192 LiDAR sensor — every pixel unprojected via Metal compute shader. Pinch to zoom and drag to orbit the cloud. Requires LiDAR.
+
+### Blob Track
+
+TouchDesigner-compatible blob tracker. Carves a configurable depth slab out of the LiDAR scan, finds connected regions of in-range pixels, assigns each one a stable ID across frames, and streams per-blob metadata over OSC. Replaces a Kinect + Blob Track TOP chain with a single iPhone — no background plate, no lighting calibration, works on a moving camera. Requires LiDAR. See the Blob Tracking section below for full details.
+
+### Transcription
+
+Live on-device speech-to-text powered by iOS 26's `SpeechAnalyzer` framework. Camera view is replaced with a 200-bar mirrored waveform driven by the microphone, recognized words appear on screen as captions, and the transcript streams out over OSC, TCP, UDP, and NDI. Fully offline — no internet required. Works on every iPhone — no LiDAR required. See the Transcription section below for full details.
 
 ### Switching Modes
 
-Use the mode selector at the bottom of the screen, or say "switch to Depth" with Voice Control enabled. Switching is instant and does not interrupt an active stream.
+Use the mode dropdown at the top of the screen, or say "switch to Depth" with Voice Control enabled. Switching is instant and does not interrupt an active stream.
+
+---
+
+## Blob Tracking
+
+Select Blob Track from the mode dropdown to turn the iPhone into a wireless TouchDesigner-compatible blob tracker. LOTA carves a configurable depth slab out of the LiDAR scan, finds connected regions of in-range pixels, assigns each one a stable ID across frames, and streams the result as both a video (NDI) and per-blob metadata (OSC).
+
+### While Active
+
+- A `N blob(s)` count appears in the status bar with a hex-grid icon
+- The current depth range (e.g. `0.5m – 3.0m`) is shown under the mode dropdown
+- Each detected blob gets a 1-pixel hairline rectangle drawn over the camera feed
+- The full composition (camera + outlines + optional ID labels) is captured by NDI so receivers see exactly what the phone shows
+- Connected-components labeling runs off the ARKit delegate thread so the main thread stays responsive
+
+### Base Styles
+
+Set in Settings → Blob Tracking → Detection. Controls what the underlying camera layer looks like behind the rectangles.
+
+- **Color** (default) — Live color camera feed. Operator-friendly view, see what you're filming
+- **Mono** — Grayscale camera feed. Cleaner look, no color distractions
+- **Mask** — Grayscale subject silhouette on black. Verifies what's being detected, hides background
+- **Binary** — Pure white silhouette on black. Authentic TouchDesigner Blob Track TOP look — maximum contrast
+
+Toggle `Draw Blob Bounds` off to see only the base layer. Toggle `Show ID Labels` on to draw `#1`, `#7`, etc. labels just outside the top-right corner of each bbox. Both rectangles and labels use the `Blob Color` picker.
+
+### OSC Addresses (TD-Compatible)
+
+Field names match TouchDesigner's `blobtrackTOP_Class` verbatim. Every message is padded to 10 slots so CHOP channel counts stay stable as blobs come and go — empty slots have `id == 0` for filtering via a Select CHOP.
+
+- `/lota/blob/count` — active blob count (int)
+- `/lota/blob/ids` — 10 stable tracker IDs
+- `/lota/blob/u`, `/lota/blob/v` — normalized centroid (10 floats each)
+- `/lota/blob/width`, `/lota/blob/height` — normalized bbox size (10 floats each)
+- `/lota/blob/tx`, `/lota/blob/ty` — pixel centroid in 256×192 depth space (10 ints each)
+- `/lota/blob/age` — seconds tracked (10 floats)
+- `/lota/blob/state` — `0=new, 1=revived, 2=lost, 3=expired` (10 ints)
+
+### Lifecycle States
+
+A blob fires `state = 0 (new)` on first detection, then is silent while it's actively tracked. If it disappears, it transitions to `lost` and is held in the revival window for `Revive Time` seconds. If it reappears within `Revive Distance` of where it was last seen, it gets the same ID back and fires `revived`. Otherwise it transitions to `expired` and is permanently dropped. Matches TouchDesigner's blob lifecycle exactly.
+
+### TCP/UDP Fallback
+
+In blob mode, TCP/UDP carries raw `Float32` depth maps (the same format as the Depth capture mode), so receivers that want to do their own client-side analysis get the raw data. The structured per-blob metadata is OSC-only.
+
+---
+
+## Transcription
+
+Select Transcription from the mode dropdown to turn the iPhone into a wireless live speech-to-text source for creative tools. The camera view is replaced with a black canvas and a 200-bar mirrored waveform driven by the microphone. Recognized words appear on screen as live captions. Uses iOS 26's on-device `SpeechAnalyzer` framework — fast, private, offline. Works on every iPhone — no LiDAR required.
+
+### First-Time Setup
+
+On first use, iOS prompts for Microphone and Speech Recognition permissions. Both are required. If denied, the mode displays a message with a shortcut to the Settings app to grant access. iOS may also briefly download the speech model for your device's language on the first recognition session — on-device from that point on, no internet needed.
+
+### While Active
+
+- A pulsing microphone icon and "LISTENING" label appear in the status bar
+- The 200-bar waveform pulses with your voice in real time and streams through NDI as a black-and-white video source
+- Recognized words appear on screen as large centered captions as they arrive
+- Camera position OSC is automatically suppressed so speech messages stand out
+- Leaving transcription mode stops the audio engine completely — no background microphone access
+
+### OSC Addresses
+
+When OSC streaming is enabled, transcription sends these addresses:
+
+- `/lota/speech/word` (string) — each recognized word as it arrives
+- `/lota/speech/word_count` (int) — incrementing counter, visible in OSC In CHOP for signal flow monitoring
+- `/lota/speech/partial` (string) — running partial transcript, updated continuously
+- `/lota/speech/final` (string) — finalized sentences when the recognizer commits
+
+String messages arrive in TouchDesigner's OSC In DAT (not OSC In CHOP — CHOP only handles numeric channels). The `word_count` integer is the only speech message visible in OSC In CHOP.
+
+### TCP/UDP Binary Wire Format
+
+For custom integrations, recognized speech is also sent as binary frames over TCP and UDP — `FrameType.speechText = 4`, a 24-byte FrameHeader + UTF-8 payload. The header's `width` field is repurposed for speech kind (0=word, 1=partial, 2=final), `height` for word index. Use the LOTASpeechTCP / LOTASpeechUDP TouchDesigner components below to parse this format automatically.
+
+### Which Transport Should You Use?
+
+- **OSC** — Easiest for TouchDesigner workflows. Drop in an OSC In DAT, set the port, done
+- **TCP/UDP** — Use the drag-and-drop LOTASpeechTCP / LOTASpeechUDP components below for plug-and-play binary parsing, or integrate into custom apps, game engines, and scripts that don't have OSC parsers
+- **NDI** — When you want the waveform visual as a live video source for reactive effects or broadcast overlays
 
 ---
 
@@ -94,6 +188,14 @@ A ready-made TouchDesigner component that receives live PLY point cloud data fro
 
 High-performance binary point cloud receiver for TouchDesigner. Uses numpy bulk parsing, Script TOP textures, and GPU instancing to handle 49K+ points at 60fps. Enable Binary Format in Settings → Point Cloud Stream to use this receiver. Available for download at https://lidarota.app/LOTABinaryPLYReciever.tox
 
+### LOTASpeechTCP.tox — Speech TCP Receiver
+
+TCP/IP DAT with a callback script that parses LOTA's binary speech frame format and writes recognized words, partials, and finals to a `speech_log` Table DAT. Handles stream buffering for frames split across TCP packets. Drop into your network and recognized speech starts populating rows — no manual parsing required. Available for download at https://lidarota.app/LOTASpeechTCP.tox
+
+### LOTASpeechUDP.tox — Speech UDP Receiver
+
+UDP In DAT configured for "One Per Message" mode with a callback script that parses the same binary speech frame format as the TCP receiver. Simpler than TCP — each datagram is a complete frame, so no buffering is needed. Use this for low-latency fire-and-forget speech delivery on a local network. Available for download at https://lidarota.app/LOTASpeechUDP.tox
+
 ### NDI Input (Easiest)
 
 Drop an NDI In TOP into your project. LOTA appears in the source list automatically. Select it, and you're receiving live video.
@@ -136,13 +238,28 @@ Choose an export folder in Settings and captures sync automatically to iCloud. A
 
 ## ARKit Tracking
 
+Swipe left from the main camera page to access ARKit motion capture. Three tracking modes stream data over OSC in real time.
+
 ### Body Tracking
 
-Real-time 3D skeleton detection with 91 joints via rear camera using ARBodyTrackingConfiguration. Streams 18 key joints over OSC at /lota/body/skeleton, /lota/body/root, /lota/body/detected. Includes real-time bone and joint dot visualization overlay.
+Real-time 3D skeleton detection with 91 joints via rear camera using ARBodyTrackingConfiguration. Streams 18 key joints over OSC at /lota/body/skeleton, /lota/body/root, /lota/body/detected. Includes real-time bone and joint dot visualization overlay. Requires A12 chip or later.
 
 ### Face Tracking
 
-Real-time facial motion capture with 52 blend shapes via front camera using ARFaceTrackingConfiguration. Each blend shape sent as its own named OSC address (e.g., /lota/face/browDown_L, /lota/face/eyeSquint_R). Includes live bar graph display of the top 8 most active blend shapes.
+Real-time facial motion capture with 52 blend shapes via front camera using ARFaceTrackingConfiguration. Each blend shape sent as its own named OSC address (e.g., /lota/face/browDown_L, /lota/face/eyeSquint_R) bundled in a single UDP datagram. Includes live bar graph display of the top 8 most active blend shapes. Requires TrueDepth camera (iPhone X or later).
+
+### Hand Tracking
+
+Detects up to 2 hands simultaneously via the rear camera using the Vision framework. 21 landmarks per hand, streamed over OSC organized by finger. Color-coded overlay: left hand = teal, right hand = orange. Works on every iPhone.
+
+- `/lota/hand/{left|right}/wrist` — 3 floats
+- `/lota/hand/{left|right}/thumb` — 12 floats
+- `/lota/hand/{left|right}/index` — 12 floats
+- `/lota/hand/{left|right}/middle` — 12 floats
+- `/lota/hand/{left|right}/ring` — 12 floats
+- `/lota/hand/{left|right}/pinky` — 12 floats
+
+**2D mode (default)**: normalized screen-space coordinates, works on every iPhone. **3D mode (opt-in)**: world-space coordinates projected via LiDAR depth, requires a LiDAR device. Toggle in Settings → Tracking → 3D Hand Coordinates.
 
 ---
 
@@ -184,11 +301,15 @@ All transitions respect the system Reduce Motion setting. Visual feedback stays,
 
 ### Which iPhones support LOTA?
 
-Any iPhone with a LiDAR sensor — iPhone 12 Pro, 13 Pro, 14 Pro, 15 Pro, 16 Pro, and their Max variants. iPad Pro models with LiDAR are also supported.
+Any iPhone running iOS 26.2 or later. LiDAR features (Depth, Point Cloud, Blob Tracking, Gaussian Capture, 3D hand coordinates) require iPhone 12 Pro or later. Color, Mono, and Transcription modes, NDI streaming, and TCP/UDP streaming all work on iPhones without LiDAR. Face tracking requires TrueDepth camera (iPhone X or later). Body tracking requires A12 chip or later. iPad Pro models with LiDAR are also supported.
 
 ### Do the receiving machine and iPhone need to be on the same network?
 
 Yes. For TCP, UDP, OSC, and PLY streaming, both devices must be on the same local network. NDI also uses the local network but handles discovery automatically. A 5 GHz Wi-Fi connection is recommended.
+
+### Does Transcription mode need internet access?
+
+No. Transcription uses iOS 26's on-device `SpeechAnalyzer` framework and runs entirely offline. The first time you use it in a given language, iOS briefly downloads the speech model for that language in the background — after that, recognition works fully offline. Audio never leaves your device.
 
 ### What software can receive LOTA streams?
 
