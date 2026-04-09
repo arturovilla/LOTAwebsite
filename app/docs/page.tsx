@@ -293,8 +293,9 @@ export default function DocsPage() {
                 </Step>
                 <Step n={2} title="Choose a capture mode">
                   Tap the mode dropdown at the top of the screen to switch
-                  between Color, Mono, Depth, Point Cloud, or Transcription.
-                  Each mode activates instantly — no restart required.
+                  between Color, Mono, Depth, Point Cloud, Blob Track, or
+                  Transcription. Each mode activates instantly — no restart
+                  required.
                 </Step>
                 <Step n={3} title="Start streaming or recording">
                   Tap the stream button (bottom right) to broadcast over the
@@ -322,10 +323,11 @@ export default function DocsPage() {
                   Max/MSP, Ableton, and more.
                 </Card>
                 <Card title="Camera / Streaming — Center (default)">
-                  The main page. Live camera feed with five capture modes (Color,
-                  Mono, Depth, Point Cloud, Transcription) and streaming controls.
-                  Tap the mode dropdown at the top to switch modes. Settings gear
-                  icon is bottom left, streaming toggle is bottom right.
+                  The main page. Live camera feed with six capture modes (Color,
+                  Mono, Depth, Point Cloud, Blob Track, Transcription) and
+                  streaming controls. Tap the mode dropdown at the top to switch
+                  modes. Settings gear icon is bottom left, streaming toggle is
+                  bottom right.
                 </Card>
                 <Card title="Gaussian Capture — Swipe Right">
                   Record datasets for Gaussian Splatting and 3D reconstruction.
@@ -342,7 +344,7 @@ export default function DocsPage() {
               ref={(el) => { sectionRefs.current["capture-modes"] = el; }}
             >
               <SectionHeading tag="Capture" title="Capture Modes">
-                LOTA provides five distinct capture modes on the Camera /
+                LOTA provides six distinct capture modes on the Camera /
                 Streaming page. Tap the mode dropdown at the top of the screen
                 to switch — each mode shows an icon and description.
               </SectionHeading>
@@ -373,6 +375,16 @@ export default function DocsPage() {
                     in Settings. Requires LiDAR.
                   </>
                 </Card>
+                <Card title="Blob Track">
+                  <>
+                    TouchDesigner-compatible blob tracker. Carves a configurable
+                    depth slab out of the LiDAR scan, finds connected regions,
+                    assigns each one a stable ID across frames, and streams
+                    per-blob metadata over OSC at TD-matching addresses. The
+                    full visualization (camera + outlines + ID labels) is
+                    captured by NDI. Requires LiDAR.
+                  </>
+                </Card>
                 <Card title="Transcription">
                   <>
                     Live on-device speech-to-text with a mirrored bar waveform
@@ -392,6 +404,153 @@ export default function DocsPage() {
                   say <Kbd>switch to Depth</Kbd> with Voice Control enabled.
                   Switching is instant and does not interrupt an active stream.
                 </p>
+              </div>
+
+              {/* ─── Blob Track details ────────────────────── */}
+              <div className="mt-10">
+                <h3 className="text-xl font-bold text-white mb-2">
+                  Blob Track mode
+                </h3>
+                <p className="text-sm text-zinc-400 leading-relaxed mb-6">
+                  Select <Kbd>Blob Track</Kbd> from the mode dropdown to turn
+                  the iPhone into a wireless TouchDesigner-compatible blob
+                  tracker. LOTA carves a configurable depth slab out of the
+                  LiDAR scan, finds connected regions of in-range pixels,
+                  assigns each one a stable ID across frames, and streams the
+                  result as both a video (NDI) and per-blob metadata (OSC).
+                  Replaces a Kinect + <Kbd>Blob Track TOP</Kbd> chain with a
+                  single iPhone — no background plate, no lighting calibration,
+                  works on a moving camera.
+                </p>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    While active
+                  </h4>
+                  <ul className="text-sm text-zinc-400 space-y-2">
+                    <li>
+                      <strong className="text-white">Blob count HUD</strong>{" "}
+                      — A <Kbd>N blob(s)</Kbd> count appears in the status
+                      bar with a hex-grid icon
+                    </li>
+                    <li>
+                      <strong className="text-white">Live depth range</strong>{" "}
+                      — The current slab (e.g. <Kbd>0.5m – 3.0m</Kbd>) is
+                      shown under the mode dropdown so operators can verify
+                      the active range without opening Settings
+                    </li>
+                    <li>
+                      <strong className="text-white">Hairline outlines</strong>{" "}
+                      — Each detected blob gets a 1-pixel rectangle drawn
+                      over the camera feed in your chosen color
+                    </li>
+                    <li>
+                      <strong className="text-white">NDI captures
+                      everything</strong> — The full composition (base layer
+                      + rectangles + optional ID labels) is captured by NDI
+                      so receivers see exactly what the phone shows
+                    </li>
+                    <li>
+                      <strong className="text-white">Background
+                      detection</strong> — Connected-components labeling runs
+                      off the ARKit delegate thread so the main thread stays
+                      responsive for touch and UI
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    Base styles
+                  </h4>
+                  <p className="text-sm text-zinc-400 leading-relaxed mb-3">
+                    Set in Settings &rarr; Blob Tracking &rarr; Detection.
+                    Controls what the underlying camera layer looks like
+                    behind the rectangles.
+                  </p>
+                  <ul className="text-sm text-zinc-400 space-y-2">
+                    <li>
+                      <strong className="text-white">Color</strong>{" "}
+                      (default) — Live color camera feed. Operator-friendly
+                      view, see what you&apos;re filming
+                    </li>
+                    <li>
+                      <strong className="text-white">Mono</strong> — Grayscale
+                      camera feed. Cleaner look, no color distractions
+                    </li>
+                    <li>
+                      <strong className="text-white">Mask</strong> — Grayscale
+                      subject silhouette on black. Verifies what&apos;s being
+                      detected and hides the background
+                    </li>
+                    <li>
+                      <strong className="text-white">Binary</strong> — Pure
+                      white silhouette on black. Authentic TouchDesigner
+                      Blob Track TOP look — maximum contrast
+                    </li>
+                  </ul>
+                  <p className="text-sm text-zinc-500 leading-relaxed mt-3">
+                    Toggle <Kbd>Draw Blob Bounds</Kbd> off to see only the
+                    base layer. Toggle <Kbd>Show ID Labels</Kbd> on to draw
+                    <Kbd>#1</Kbd>, <Kbd>#7</Kbd>, etc. labels just outside the
+                    top-right corner of each bbox. Both rectangles and labels
+                    use the <Kbd>Blob Color</Kbd> picker.
+                  </p>
+                </div>
+
+                <Card title="OSC addresses (TD-compatible)">
+                  <>
+                    <p className="mb-2">
+                      Field names match TouchDesigner&apos;s
+                      <Kbd>blobtrackTOP_Class</Kbd> verbatim. Every message is
+                      padded to 10 slots so CHOP channel counts stay stable as
+                      blobs come and go — empty slots have <Kbd>id == 0</Kbd>{" "}
+                      for filtering via a Select CHOP.
+                    </p>
+                    <ul className="space-y-1 text-zinc-500">
+                      <li><Kbd>/lota/blob/count</Kbd> — active blob count (int)</li>
+                      <li><Kbd>/lota/blob/ids</Kbd> — 10 stable tracker IDs</li>
+                      <li><Kbd>/lota/blob/u</Kbd>, <Kbd>/lota/blob/v</Kbd> — normalized centroid (10 floats each)</li>
+                      <li><Kbd>/lota/blob/width</Kbd>, <Kbd>/lota/blob/height</Kbd> — normalized bbox size (10 floats each)</li>
+                      <li><Kbd>/lota/blob/tx</Kbd>, <Kbd>/lota/blob/ty</Kbd> — pixel centroid in 256&times;192 depth space (10 ints each)</li>
+                      <li><Kbd>/lota/blob/age</Kbd> — seconds tracked (10 floats)</li>
+                      <li><Kbd>/lota/blob/state</Kbd> — <Kbd>0=new, 1=revived, 2=lost, 3=expired</Kbd> (10 ints)</li>
+                    </ul>
+                  </>
+                </Card>
+
+                <div className="mt-4">
+                  <Card title="Lifecycle states">
+                    <>
+                      <p>
+                        A blob fires <Kbd>state = 0 (new)</Kbd> on first
+                        detection, then is silent while it&apos;s actively
+                        tracked. If it disappears, it transitions to{" "}
+                        <Kbd>lost</Kbd> and is held in the revival window for{" "}
+                        <Kbd>Revive Time</Kbd> seconds. If it reappears within{" "}
+                        <Kbd>Revive Distance</Kbd> of where it was last seen,
+                        it gets the same ID back and fires <Kbd>revived</Kbd>.
+                        Otherwise it transitions to <Kbd>expired</Kbd> and is
+                        permanently dropped. This matches TouchDesigner&apos;s
+                        blob lifecycle exactly.
+                      </p>
+                    </>
+                  </Card>
+                </div>
+
+                <div className="mt-4">
+                  <Card title="TCP / UDP fallback">
+                    <>
+                      <p>
+                        In blob mode, TCP/UDP carries raw <Kbd>Float32</Kbd>{" "}
+                        depth maps (the same format as the <Kbd>Depth</Kbd>{" "}
+                        capture mode), so receivers that want to do their own
+                        client-side analysis get the raw data. The structured
+                        per-blob metadata is OSC-only.
+                      </p>
+                    </>
+                  </Card>
+                </div>
               </div>
 
               {/* ─── Transcription details ─────────────────── */}
@@ -1052,6 +1211,82 @@ export default function DocsPage() {
                     density. Medium+ = removes low-confidence noisy edge pixels.
                     High Only = fewest points, highest accuracy. Affects both live
                     view and Gaussian Capture exports.
+                  </Setting>
+                </SettingsGroup>
+
+                <SettingsGroup title="Blob Tracking — Detection">
+                  <Setting name="Base Style" defaultValue="Color">
+                    What the underlying camera layer looks like behind the
+                    rectangle outlines. Color (live RGB), Mono (grayscale),
+                    Mask (grayscale subject silhouette on black), or Binary
+                    (white-on-black silhouette — authentic TouchDesigner Blob
+                    Track TOP look).
+                  </Setting>
+                  <Setting name="Draw Blob Bounds" defaultValue="On">
+                    Draw 1-pixel hairline rectangle outlines around detected
+                    blobs. Turn off to see only the base layer.
+                  </Setting>
+                  <Setting name="Show ID Labels" defaultValue="Off">
+                    Draw <Kbd>#id</Kbd> text labels just outside the top-right
+                    corner of each blob bounding box.
+                  </Setting>
+                  <Setting name="Blob Color" defaultValue="Pure green">
+                    RGB color used for both rectangle outlines and ID labels.
+                  </Setting>
+                </SettingsGroup>
+
+                <SettingsGroup title="Blob Tracking — Depth">
+                  <Setting name="Min Depth" defaultValue="0.5 m (range 0.1–5.0 m)">
+                    Near edge of the depth slab. Pixels closer than this are
+                    excluded from blob detection.
+                  </Setting>
+                  <Setting name="Max Depth" defaultValue="3.0 m (range 0.5–10.0 m)">
+                    Far edge of the depth slab. Pixels farther than this are
+                    excluded from blob detection.
+                  </Setting>
+                  <Setting name="Min Confidence" defaultValue="Medium+">
+                    LiDAR depth confidence filter (same semantics as Point
+                    Cloud). All / Medium+ / High Only. Pixels below the
+                    threshold are excluded from detection.
+                  </Setting>
+                </SettingsGroup>
+
+                <SettingsGroup title="Blob Tracking — Constraints">
+                  <Setting name="Min Blob Size" defaultValue="50 px (range 10–500)">
+                    Minimum pixel area to count as a blob. Filters out single
+                    noise pixels and tiny artifacts.
+                  </Setting>
+                  <Setting name="Max Blob Size" defaultValue="30000 px (range 100–49152)">
+                    Maximum pixel area. Rejects the &quot;everything is one
+                    blob&quot; failure mode where the entire scene merges
+                    together.
+                  </Setting>
+                  <Setting name="Max Move Distance" defaultValue="0.15 (range 0.01–0.5)">
+                    Maximum normalized distance a blob can travel between
+                    frames and keep its ID. Increase for fast-moving subjects
+                    or higher-FPS scenes.
+                  </Setting>
+                </SettingsGroup>
+
+                <SettingsGroup title="Blob Tracking — Revival">
+                  <Setting name="Revive Blobs" defaultValue="On">
+                    Re-identify lost blobs with the same ID if they reappear
+                    inside the revival window. Mirrors TouchDesigner&apos;s
+                    blob lifecycle exactly.
+                  </Setting>
+                  <Setting name="Revive Time" defaultValue="0.5 s">
+                    Seconds a lost blob is kept alive for revival before it
+                    transitions to expired and is permanently dropped.
+                  </Setting>
+                  <Setting name="Revive Distance" defaultValue="0.2">
+                    Maximum normalized distance for the revival match. A lost
+                    blob must reappear within this radius to recover its ID.
+                  </Setting>
+                  <Setting name="Include Lost in OSC" defaultValue="Off">
+                    Emit lost blobs in the OSC bundle with <Kbd>state = 2</Kbd>.
+                  </Setting>
+                  <Setting name="Include Expired in OSC" defaultValue="Off">
+                    Emit expired blobs in the OSC bundle with <Kbd>state = 3</Kbd>.
                   </Setting>
                 </SettingsGroup>
 

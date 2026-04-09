@@ -4,6 +4,49 @@ All notable changes to the LOTA project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.0.9] - 2026-04-09
+
+### Added
+- **Blob Tracking capture mode**: New `.blobTracking` mode recreates the TouchDesigner Blob Track TOP look — single-color hairline rectangle outlines around connected regions of LiDAR depth pixels within a configurable depth slab, all rendered in Metal so the **NDI feed carries the complete visualization**. Depth-based detection means no background plate required, no lighting sensitivity, works on a moving camera. Requires LiDAR
+- **Four base styles** for the underlying camera layer:
+  - **Color** (default) — full live color camera feed; rectangles drawn over the natural scene
+  - **Mono** — full grayscale camera feed
+  - **Mask** — grayscale subject silhouette on black; everything outside the depth slab hidden
+  - **Binary** — pure white-on-black silhouette (matches TD's Blob Track TOP authentic look)
+- **`BlobTracker` with TD-matching lifecycle**: Connected-components labeling with union-find, 4-connectivity, confidence filtering, and owned scratch buffers (zero per-frame allocation). Full lifecycle state machine matching TD's `onBlobStateChange`: `new → lost → revived → expired`. Nearest-centroid ID assignment with configurable `maxMoveDistance`. Lost blobs are kept for `reviveTime` seconds and revived with the same ID if they reappear within `reviveDistance`. Age tracked in seconds via `CFAbsoluteTimeGetCurrent()`
+- **Detection runs off the ARKit delegate thread** on a dedicated `blobQueue` with drop-on-busy semantics. The delegate callback only captures depth `CVPixelBuffer` references and dispatches — never blocked by CCL or texture upload. At most one ARFrame is pinned in-flight via the dispatch closure, eliminating ARKit's "delegate retaining N ARFrames" backpressure warning. LiDAR duplicate-frame skip via unretained pointer comparison halves CPU work at 30 Hz
+- **Three-pass Metal rendering pipeline** in `drawBlobTracking`:
+  - **Pass A**: base layer (Color/Mono/Mask/Binary) via `blobBaseFragment`, reusing `cameraVertex` for portrait rotation + aspect-fill
+  - **Pass B**: instanced 1-pixel hairline rectangle outlines via `rectVertex`/`rectFragment` — single user-set RGB color, axis-aligned, integer pixel snap
+  - **Pass C** (optional): instanced glyph quads sampled from a baked CoreText atlas via `glyphVertex`/`glyphFragment` — `#id` labels positioned just outside each bbox at the top-right corner
+  - All three passes encode in a single `MTLRenderCommandEncoder` and are captured by `captureForNDI` so the NDI receiver sees the complete composition
+- **`GlyphAtlas`**: New `LOTA/Capture/GlyphAtlas.swift` — bakes a small `r8Unorm` atlas containing `#0123456789` once at startup using `CoreText` + `CGContext`. Stores per-glyph metrics (UV rect, advance, bearing) for runtime cursor-walk layout. Sized at `11pt × screenScale` so labels render crisp at 1:1 on retina displays. Per-frame cost is just the cursor walk (~0.1 ms CPU); GPU draws the labels in a single instanced call
+- **TD-matching OSC output**: Field names match `blobtrackTOP_Class` verbatim. One `OSCBundle` per frame, padded to 10 slots for stable TouchDesigner CHOP channel counts:
+  - `/lota/blob/count` (int) — active blob count
+  - `/lota/blob/ids` (10 ints) — stable tracker IDs, 0 for empty slots
+  - `/lota/blob/u`, `/lota/blob/v` (10 floats each) — normalized centroid position
+  - `/lota/blob/width`, `/lota/blob/height` (10 floats each) — normalized bbox size
+  - `/lota/blob/tx`, `/lota/blob/ty` (10 ints each) — pixel centroid in depth-map space
+  - `/lota/blob/age` (10 floats) — seconds the blob has been tracked
+  - `/lota/blob/state` (10 ints) — `0=new, 1=revived, 2=lost, 3=expired`
+- **Blob tracking settings** organized into subsections mirroring TD's parameter pages:
+  - **Detection** — Base Style picker (Color/Mono/Mask/Binary), Draw Blob Bounds toggle, Show ID Labels toggle, Color picker for rectangle outlines
+  - **Depth** — Min/Max Depth sliders, Min Confidence picker
+  - **Constraints** — Min/Max Blob Size sliders, Max Move Distance slider
+  - **Revival** — Revive Blobs toggle, Revive Time, Revive Distance, Include Lost/Expired toggles
+- **Blob count + depth range in status HUD**: `StatusOverlayView` shows `"N blob(s)"` with a hex-grid icon when the mode is active. The current depth range (e.g. `"0.5m – 3.0m"`) appears under the mode dropdown so operators can see the active slab without opening Settings
+- **`@Published blobCount` dedupe**: Only dispatches a main-actor update when the count actually changes, preventing per-frame SwiftUI body re-runs in `CameraView` while the count is stable
+
+### Changed
+- `CaptureMode` enum extended with `.blobTracking` case — `circle.hexagongrid` icon, "Depth-based blob detection and tracking" description, `requiresLiDAR = true`
+- `MetalRenderer` gained three new pipeline states (`blobBasePipeline`, `rectPipeline`, `glyphPipeline`), `glyphAtlas` reference, rect instance buffer, glyph instance buffer, and the 3-pass `drawBlobTracking` method. Exposes `metalDevice` computed property and a `makeBlobLabelTexture(width:height:)` factory
+- `StreamingSettings` gained blob-tracking properties across detection, constraints, revival, and visual categories
+- `SettingsView` blob section restructured into four subsections (Detection, Depth, Constraints, Revival) mirroring TD's Blob Track TOP parameter pages. `ColorPicker` for rectangle outline color. Protocol Info row updated to `"Blob OSC: /lota/blob/* (TD-compat, 10 slots)"`
+- `FrameEncoder.encode` routes `.blobTracking` to `encodeDepth` — TCP/UDP receivers get raw `Float32` depth frames in blob mode (identical to `.depth` mode), and the structured blob metadata is OSC-only
+- `ContentView` restructured: `CameraPreviewView` is now applied as a `.background` modifier on the `TabView` instead of being a `ZStack` sibling, reducing SwiftUI hosting-controller hierarchy conflicts when popovers (Menus) are presented inside the page-style TabView
+
+---
+
 ## [1.0.8] - 2026-04-08
 
 ### Added
