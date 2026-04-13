@@ -10,13 +10,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       url: "https://lidarota.app/docs",
-      lastModified: new Date("2026-03-31"),
+      lastModified: new Date("2026-04-12"),
       changeFrequency: "weekly",
       priority: 0.9,
     },
     {
       url: "https://lidarota.app/changelog",
-      lastModified: new Date("2026-04-03"),
+      lastModified: new Date("2026-04-12"),
       changeFrequency: "weekly",
       priority: 0.7,
     },

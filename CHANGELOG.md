@@ -4,6 +4,53 @@ All notable changes to the LOTA project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.1.0] - 2026-04-12
+
+### Added
+
+- **Device Motion capture mode**: New `.deviceMotion` mode streams iPhone sensor data over OSC. Four individually-toggleable sensors, **Acceleration enabled by default** — Gyroscope, Compass Heading, and Barometric Pressure off by default. Update rate picker (30/60/100 Hz). All values stream as per-axis OSC addresses so each maps 1:1 to a TouchDesigner OSC In CHOP channel. Does not require LiDAR — works on every iPhone
+- **Motion OSC channels** (all per-axis for clean TD CHOP mapping):
+  - `/lota/motion/accel/x`, `/y`, `/z` — gravity-removed acceleration in G-force
+  - `/lota/motion/gyro/x`, `/y`, `/z` — rotation rate in rad/s
+  - `/lota/motion/heading` — compass heading in degrees (0–360)
+  - `/lota/motion/pressure` — atmospheric pressure in kPa
+  - `/lota/motion/altitude` — relative altitude in meters
+- **Audio Analysis capture mode**: New `.audio` mode taps the microphone via `AVAudioEngine` and runs real-time DSP analysis using Apple's Accelerate/vDSP framework — no third-party dependencies. Streams analysis results over OSC for sound-reactive visuals. Four channel groups individually toggleable, **Levels (bass/mid/high) enabled by default**
+- **Audio Levels** — continuous frequency-band energy normalized 0–1 with rolling auto-gain:
+  - `/lota/audio/bass` — 20–200 Hz (kick, sub-bass, bass guitar fundamentals)
+  - `/lota/audio/mid` — 200–2000 Hz (vocals, snare body, guitars, most instruments)
+  - `/lota/audio/high` — 2000–8000 Hz (snare attack, hi-hats, vocal consonants, cymbals)
+- **Audio Beat Detection** — per-band onset detection with log-magnitude spectral flux + one-pole smoothing (~15Hz cutoff) + peak-picking + variance-adaptive threshold + 20th-percentile noise-floor tracking + silence energy gate + 50ms minimum inter-onset time. Output is a **binary switch (0 or 1)** that holds at 1.0 for 50ms after each hit — TouchDesigner-friendly for Trigger CHOP routing:
+  - `/lota/audio/drums/low` — low-band beat trigger (kicks, bass hits)
+  - `/lota/audio/drums/mid` — mid-band beat trigger (snares, claps, vocals)
+  - `/lota/audio/drums/high` — high-band beat trigger (hi-hats, cymbals)
+- **Audio Dynamics** — `/lota/audio/burst` — fast-vs-slow envelope difference, normalized 0–1, pulse-shaped output (rises instantly on transient, decays over ~200ms)
+- **Audio FFT Spectrum** — 20 log-spaced frequency bands across 20–20,000 Hz, each normalized 0–1 via per-bin rolling max. `/lota/audio/fft/0` through `/lota/audio/fft/19`
+- **Scrolling line graph visualization** for both Motion and Audio modes — TouchDesigner CHOP viewer aesthetic. One lane per active value, stacked vertically with dynamic sizing. Colored lines scroll left as new samples arrive. Each lane has a dim center line, separator line, and colored glyph label at the right edge following the line's current Y position. Metal-rendered, captured by NDI
+- **Smooth sub-sample scroll animation**: classic oscilloscope trick — between sample arrivals, the graph slides left by a fractional sample-width based on elapsed time. Eliminates the "choppy steps" visible at 30Hz data + 60fps render. Works identically for Motion and Audio modes
+- **Thread-safe ring buffer access** in Motion + Audio engines and renderer — `NSLock`-protected snapshots with generation counters so stale handler callbacks after mode switches or sensor toggles become no-ops (prevents data race crashes)
+- **Debounced sensor toggle restarts** — when a user flips a sensor/channel toggle while in Motion or Audio mode, the engine restarts 50ms later so multiple rapid toggles produce a single restart (prevents crash-loop from rapid TCC requests)
+- **Upfront permissions flow** — when the user selects Motion mode, location permission (for compass heading) is requested immediately via a system dialog. When the user selects Audio mode, microphone permission is requested immediately. If denied, a clear overlay with "Open Settings" deep-link appears
+- **`NSMotionUsageDescription`** and **`NSLocationWhenInUseUsageDescription`** added to `Info.plist` — fixes TCC-enforcement crash on direct `CMMotionManager.startDeviceMotionUpdates()` use
+- **`GlyphAtlas` character set expansion** — baked glyph set expanded from `#0123456789` to `#0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ` so graph lane labels (`BASS`, `MID`, `HIGH`, `DL`, `DM`, `DH`, `BURST`, `F0`–`F19`, `AX`, `AY`, `AZ`, `GX`, `GY`, `GZ`, `HD`, `PR`, `AL`) render correctly
+- **`GlyphAtlas` UV bleed fix** — expanded the per-glyph bounding rect by 1px in each direction so anti-aliasing fringe pixels aren't clipped. Labels render crisply
+- **FFT band gradient colors** — F0 (lowest freq) through F19 (highest freq) use HSV hue sweep from red → blue so operators can visually track which band is which
+
+### Changed
+
+- `CaptureMode` enum extended with `.deviceMotion` (`gyroscope` icon) and `.audio` (`waveform.and.magnifyingglass` icon) cases — both `requiresLiDAR = false`
+- `ContentView` TabView restructured to handle the new modes' permission flows without breaking existing mode switching
+- `MetalRenderer` extended with `motionGraphPipeline` + `motionCenterLinePipeline` (shared between motion and audio modes) and new `motionGraphTopInset` / `motionGraphBottomInset` properties so graph lanes don't draw behind SwiftUI overlays
+- `StreamingSettings` gained 10 new persisted properties across motion and audio mode toggles
+- `FrameEncoder.encode` routes `.deviceMotion` and `.audio` to `break` — both modes are OSC-only (no TCP/UDP video frames)
+- Camera pose OSC (`/lota/camera/position`, `/rotation`, `/euler`) suppressed in Motion and Audio modes so the high-rate pose data doesn't drown out sensor/audio messages in OSC In CHOP
+
+### Removed
+
+- Early prototype `global_dynamic` audio channel — replaced by the cleaner `burst`-only Dynamics output after discovering the normalization math produced confusing stuck-at-0.67 values in most audio
+
+---
+
 ## [1.0.9] - 2026-04-09
 
 ### Added

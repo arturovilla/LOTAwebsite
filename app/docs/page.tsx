@@ -279,8 +279,8 @@ export default function DocsPage() {
                   Requirements
                 </h3>
                 <ul className="text-sm text-zinc-400 space-y-1.5">
-                  <li>• iPhone 12 Pro or later (LiDAR required for Depth, Point Cloud, and Gaussian Capture)</li>
-                  <li>• Color, Mono, and Transcription modes work on all iPhones</li>
+                  <li>• iPhone 12 Pro or later (LiDAR required for Depth, Point Cloud, Blob Track, and Gaussian Capture)</li>
+                  <li>• Color, Mono, Transcription, Motion, and Audio modes work on all iPhones</li>
                   <li>• iOS 26.2 or later</li>
                   <li>• Wi-Fi network (for streaming features)</li>
                 </ul>
@@ -293,9 +293,9 @@ export default function DocsPage() {
                 </Step>
                 <Step n={2} title="Choose a capture mode">
                   Tap the mode dropdown at the top of the screen to switch
-                  between Color, Mono, Depth, Point Cloud, Blob Track, or
-                  Transcription. Each mode activates instantly — no restart
-                  required.
+                  between Color, Mono, Depth, Point Cloud, Blob Track,
+                  Transcription, Motion, or Audio. Each mode activates instantly
+                  — no restart required.
                 </Step>
                 <Step n={3} title="Start streaming or recording">
                   Tap the stream button (bottom right) to broadcast over the
@@ -323,11 +323,11 @@ export default function DocsPage() {
                   Max/MSP, Ableton, and more.
                 </Card>
                 <Card title="Camera / Streaming — Center (default)">
-                  The main page. Live camera feed with six capture modes (Color,
-                  Mono, Depth, Point Cloud, Blob Track, Transcription) and
-                  streaming controls. Tap the mode dropdown at the top to switch
-                  modes. Settings gear icon is bottom left, streaming toggle is
-                  bottom right.
+                  The main page. Live camera feed with eight capture modes
+                  (Color, Mono, Depth, Point Cloud, Blob Track, Transcription,
+                  Motion, Audio) and streaming controls. Tap the mode dropdown
+                  at the top to switch modes. Settings gear icon is bottom left,
+                  streaming toggle is bottom right.
                 </Card>
                 <Card title="Gaussian Capture — Swipe Right">
                   Record datasets for Gaussian Splatting and 3D reconstruction.
@@ -344,7 +344,7 @@ export default function DocsPage() {
               ref={(el) => { sectionRefs.current["capture-modes"] = el; }}
             >
               <SectionHeading tag="Capture" title="Capture Modes">
-                LOTA provides six distinct capture modes on the Camera /
+                LOTA provides eight distinct capture modes on the Camera /
                 Streaming page. Tap the mode dropdown at the top of the screen
                 to switch — each mode shows an icon and description.
               </SectionHeading>
@@ -391,6 +391,26 @@ export default function DocsPage() {
                     visualization. Recognized words stream out over OSC, TCP,
                     UDP, and appear on screen as captions. Works on every
                     iPhone — <strong className="text-white">no LiDAR required</strong>.
+                  </>
+                </Card>
+                <Card title="Motion">
+                  <>
+                    Turns the iPhone into a wireless motion-sensor OSC source.
+                    Streams accelerometer, gyroscope, compass heading, and
+                    barometric pressure as per-axis OSC channels. Each active
+                    value draws its own scrolling line graph on screen
+                    (TouchDesigner CHOP viewer aesthetic), captured by NDI.
+                    Works on every iPhone — <strong className="text-white">no LiDAR required</strong>.
+                  </>
+                </Card>
+                <Card title="Audio">
+                  <>
+                    Real-time microphone audio analysis using Apple&apos;s
+                    Accelerate/vDSP framework. Streams frequency-band Levels,
+                    per-band Beat Detection triggers, Dynamics bursts, and a
+                    20-band FFT spectrum as OSC channels. Each active channel
+                    renders as a scrolling graph lane, captured by NDI. Works
+                    on every iPhone — <strong className="text-white">no LiDAR required</strong>.
                   </>
                 </Card>
               </div>
@@ -679,6 +699,288 @@ export default function DocsPage() {
                           source for reactive effects or broadcast overlays.
                         </li>
                       </ul>
+                    </>
+                  </Card>
+                </div>
+              </div>
+
+              {/* ─── Motion details ────────────────────────── */}
+              <div className="mt-10">
+                <h3 className="text-xl font-bold text-white mb-2">
+                  Motion mode
+                </h3>
+                <p className="text-sm text-zinc-400 leading-relaxed mb-6">
+                  Select <Kbd>Motion</Kbd> from the mode dropdown to turn the
+                  iPhone into a wireless motion-sensor OSC source. LOTA reads
+                  the device motion sensors and streams them as OSC. Each
+                  active sensor value also renders as its own scrolling line
+                  graph lane on screen so operators can see the data in real
+                  time — the full graph composition is captured by NDI.
+                  <strong className="text-white"> Works on every iPhone — no LiDAR required.</strong>
+                </p>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    Sensors (individually toggleable in Settings)
+                  </h4>
+                  <ul className="text-sm text-zinc-400 space-y-2">
+                    <li>
+                      <strong className="text-white">Acceleration</strong>{" "}
+                      <span className="text-emerald-400 text-xs">(ON by default)</span> —
+                      Gravity-removed, G-force units. Addresses{" "}
+                      <Kbd>/lota/motion/accel/x</Kbd>, <Kbd>/y</Kbd>, <Kbd>/z</Kbd>
+                    </li>
+                    <li>
+                      <strong className="text-white">Gyroscope</strong> —
+                      Rotation rate in rad/s. Addresses{" "}
+                      <Kbd>/lota/motion/gyro/x</Kbd>, <Kbd>/y</Kbd>, <Kbd>/z</Kbd>
+                    </li>
+                    <li>
+                      <strong className="text-white">Compass Heading</strong> —
+                      Degrees 0–360 (requires Location permission). Address{" "}
+                      <Kbd>/lota/motion/heading</Kbd>
+                    </li>
+                    <li>
+                      <strong className="text-white">Barometric Pressure</strong> —
+                      kPa plus relative altitude in meters from session start.
+                      Addresses <Kbd>/lota/motion/pressure</Kbd> and{" "}
+                      <Kbd>/lota/motion/altitude</Kbd>
+                    </li>
+                  </ul>
+                  <p className="text-sm text-zinc-500 leading-relaxed mt-3">
+                    Update rate picker: <Kbd>30</Kbd> / <Kbd>60</Kbd> /{" "}
+                    <Kbd>100 Hz</Kbd>. 30 Hz matches ARKit. 100 Hz is useful
+                    for latency-critical controllers.
+                  </p>
+                </div>
+
+                <Card title="Permissions">
+                  <>
+                    On first entry to Motion mode, iOS prompts for Motion &amp;
+                    Fitness access. If Compass is toggled on, an additional
+                    Location-When-In-Use prompt appears. CoreMotion data uses
+                    <Kbd>NSMotionUsageDescription</Kbd>; heading uses{" "}
+                    <Kbd>NSLocationWhenInUseUsageDescription</Kbd>. If denied,
+                    the relevant sensors silently skip (compass stays at −1,
+                    etc.) — no crash. Permissions are requested{" "}
+                    <strong className="text-white">upfront</strong> when
+                    entering the mode, not mid-session.
+                  </>
+                </Card>
+
+                <div className="mt-4">
+                  <Card title="Scrolling graph aesthetic">
+                    <>
+                      Each active sensor value gets its own horizontally
+                      stacked lane with a dim center line, a separator line,
+                      and a colored 2-character glyph label (<Kbd>AX</Kbd>,
+                      <Kbd>AY</Kbd>, <Kbd>AZ</Kbd>, <Kbd>GX</Kbd>, <Kbd>GY</Kbd>,
+                      <Kbd>GZ</Kbd>, <Kbd>HD</Kbd>, <Kbd>PR</Kbd>, <Kbd>AL</Kbd>)
+                      that follows the line&apos;s current Y position. Between
+                      sample arrivals, the graph slides left by a fractional
+                      sample-width (sub-sample scroll) so the visual feels
+                      continuous even at 30 Hz data rates. Rendered in Metal
+                      and captured by NDI.
+                    </>
+                  </Card>
+                </div>
+
+                <div className="mt-4">
+                  <Card title="Use cases">
+                    <>
+                      <ul className="space-y-1.5 mt-1">
+                        <li>
+                          Phone as a wireless tilt / shake / toss controller
+                          for reactive visuals in TouchDesigner, Resolume, or
+                          Max/MSP
+                        </li>
+                        <li>
+                          Environmental sensing — barometric pressure drift
+                          and altitude tracking for installations
+                        </li>
+                        <li>
+                          AirPods-free head-tracking alternative using the
+                          phone clipped to a performer
+                        </li>
+                        <li>
+                          Camera pose OSC is automatically suppressed in
+                          Motion mode so sensor channels stand out cleanly in
+                          an OSC In CHOP
+                        </li>
+                      </ul>
+                    </>
+                  </Card>
+                </div>
+              </div>
+
+              {/* ─── Audio details ─────────────────────────── */}
+              <div className="mt-10">
+                <h3 className="text-xl font-bold text-white mb-2">
+                  Audio mode
+                </h3>
+                <p className="text-sm text-zinc-400 leading-relaxed mb-6">
+                  Select <Kbd>Audio</Kbd> from the mode dropdown to turn the
+                  iPhone into a wireless real-time audio analysis source. LOTA
+                  taps the microphone via <Kbd>AVAudioEngine</Kbd> and extracts
+                  musically relevant features using Apple&apos;s{" "}
+                  <Kbd>Accelerate/vDSP</Kbd> framework — zero third-party
+                  dependencies, fully on-device. Each active channel renders as
+                  a scrolling graph lane and is captured by NDI.
+                  <strong className="text-white"> Works on every iPhone — no LiDAR required.</strong>
+                </p>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    Four channel groups (individually toggleable)
+                  </h4>
+                  <ul className="text-sm text-zinc-400 space-y-2">
+                    <li>
+                      <strong className="text-white">Levels</strong>{" "}
+                      <span className="text-emerald-400 text-xs">(ON by default)</span> —
+                      Continuous 0–1 energy per frequency band with rolling
+                      auto-gain. <Kbd>/lota/audio/bass</Kbd>,{" "}
+                      <Kbd>/lota/audio/mid</Kbd>, <Kbd>/lota/audio/high</Kbd>
+                    </li>
+                    <li>
+                      <strong className="text-white">Beat Detection</strong> —
+                      Binary 0/1 switch per band on detected onset (holds at
+                      1.0 for 50 ms after each hit).{" "}
+                      <Kbd>/lota/audio/drums/low</Kbd>,{" "}
+                      <Kbd>/lota/audio/drums/mid</Kbd>,{" "}
+                      <Kbd>/lota/audio/drums/high</Kbd>
+                    </li>
+                    <li>
+                      <strong className="text-white">Dynamics</strong> —
+                      Fast-vs-slow envelope difference, pulse-shaped 0–1
+                      (rises instantly on transient, decays over ~200 ms).{" "}
+                      <Kbd>/lota/audio/burst</Kbd>
+                    </li>
+                    <li>
+                      <strong className="text-white">FFT Spectrum</strong> —
+                      20 log-spaced frequency bands across 20–20,000 Hz, each
+                      normalized 0–1 via per-bin rolling max.{" "}
+                      <Kbd>/lota/audio/fft/0</Kbd> through{" "}
+                      <Kbd>/lota/audio/fft/19</Kbd>
+                    </li>
+                  </ul>
+                  <p className="text-sm text-zinc-500 leading-relaxed mt-3">
+                    Update rate: <Kbd>30</Kbd> / <Kbd>60 Hz</Kbd>. FFT and
+                    analysis run internally at ~86 Hz and decimate to the
+                    user&apos;s output rate.
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    Frequency bands
+                  </h4>
+                  <ul className="text-sm text-zinc-400 space-y-2">
+                    <li>
+                      <strong className="text-white">BASS</strong> (20–200 Hz)
+                      — kick, sub-bass, bass guitar fundamentals
+                    </li>
+                    <li>
+                      <strong className="text-white">MID</strong> (200–2000 Hz)
+                      — vocals, snare body, guitars, most instruments
+                    </li>
+                    <li>
+                      <strong className="text-white">HIGH</strong> (2000–8000 Hz)
+                      — snare attack, hi-hats, vocal consonants, cymbals
+                    </li>
+                  </ul>
+                </div>
+
+                <Card title="Beat detection algorithm">
+                  <>
+                    <p className="mb-2">
+                      Multi-stage onset detection designed to be accurate on
+                      dense, dynamic music without false-triggering on silence:
+                    </p>
+                    <ul className="space-y-1 text-zinc-500">
+                      <li>
+                        <strong className="text-white">1.</strong> Log-magnitude
+                        spectral flux per band (more perceptually aligned than
+                        raw flux)
+                      </li>
+                      <li>
+                        <strong className="text-white">2.</strong> One-pole
+                        lowpass smoothing (~15 Hz cutoff)
+                      </li>
+                      <li>
+                        <strong className="text-white">3.</strong> Peak-picking
+                        on local maxima — catches rapid drum fills that
+                        threshold-only methods miss
+                      </li>
+                      <li>
+                        <strong className="text-white">4.</strong> Adaptive
+                        threshold <Kbd>noise_floor + k·stddev</Kbd> where{" "}
+                        <Kbd>k</Kbd> is inversely modulated by coefficient of
+                        variation (dense music gets lower k, steady signals get
+                        higher k)
+                      </li>
+                      <li>
+                        <strong className="text-white">5.</strong> 20th-percentile
+                        noise-floor tracking over ~3 s (robust to sustained
+                        beats)
+                      </li>
+                      <li>
+                        <strong className="text-white">6.</strong> Silence
+                        energy gate per band — no beats when the band itself
+                        is quiet
+                      </li>
+                      <li>
+                        <strong className="text-white">7.</strong> 50 ms minimum
+                        inter-onset time — supports up to ~1200 BPM / 32nd
+                        notes
+                      </li>
+                    </ul>
+                    <p className="mt-3 text-zinc-500">
+                      Drum channels are{" "}
+                      <strong className="text-white">binary (0 or 1)</strong> —
+                      trivial to route into a TouchDesigner{" "}
+                      <Kbd>Trigger CHOP</Kbd> or <Kbd>Logic CHOP</Kbd> without
+                      thresholding.
+                    </p>
+                  </>
+                </Card>
+
+                <div className="mt-4">
+                  <Card title="Permissions & limitations">
+                    <>
+                      <p className="mb-2">
+                        On first entry to Audio mode, iOS prompts for
+                        Microphone access. If denied, a clear overlay with an
+                        &quot;Open Settings&quot; deep-link appears and no
+                        audio engine starts.
+                      </p>
+                      <p className="mb-2">
+                        <strong className="text-white">System audio
+                        limitation:</strong> LOTA analyzes the microphone input
+                        only. It cannot capture system audio (Spotify, Apple
+                        Music, YouTube) because iOS sandboxing doesn&apos;t
+                        expose system audio to third-party apps. To analyze
+                        music playing on the iPhone, play it through the
+                        speakers — LOTA&apos;s mic picks it up naturally. For
+                        high-fidelity analysis, play audio from a separate
+                        source into the iPhone&apos;s mic.
+                      </p>
+                    </>
+                  </Card>
+                </div>
+
+                <div className="mt-4">
+                  <Card title="TouchDesigner pattern">
+                    <>
+                      Drop an <Kbd>OSC In CHOP</Kbd>, point it at the
+                      phone&apos;s IP + port 9000. Enable Levels (default).
+                      Channels <Kbd>bass</Kbd>, <Kbd>mid</Kbd>, <Kbd>high</Kbd>{" "}
+                      appear and start pulsing. Toggle Beat Detection on →{" "}
+                      <Kbd>drums_low</Kbd>, <Kbd>drums_mid</Kbd>,{" "}
+                      <Kbd>drums_high</Kbd> appear as clean 0/1 signals you
+                      can route into a Trigger CHOP for beat-synced effects.
+                      FFT bands render with a red → blue color gradient (F0 =
+                      lowest, F19 = highest) so you can see where energy is on
+                      the spectrum at a glance.
                     </>
                   </Card>
                 </div>
@@ -1342,6 +1644,75 @@ export default function DocsPage() {
                     These toggles apply to both OSC and TCP/UDP transports
                     simultaneously. Turn off anything you don&apos;t need to
                     reduce noise in your receiver.
+                  </div>
+                </SettingsGroup>
+
+                <SettingsGroup title="Device Motion">
+                  <Setting name="Acceleration (X, Y, Z)" defaultValue="On">
+                    Gravity-removed acceleration in G-force, sent as three OSC
+                    floats per update (<Kbd>/lota/motion/accel/x</Kbd>,{" "}
+                    <Kbd>/y</Kbd>, <Kbd>/z</Kbd>).
+                  </Setting>
+                  <Setting name="Gyroscope (X, Y, Z)" defaultValue="Off">
+                    Rotation rate in rad/s, three OSC floats per update
+                    (<Kbd>/lota/motion/gyro/x</Kbd>, <Kbd>/y</Kbd>,{" "}
+                    <Kbd>/z</Kbd>).
+                  </Setting>
+                  <Setting name="Compass Heading" defaultValue="Off">
+                    Magnetic heading in degrees 0–360 (requires Location
+                    permission). Address <Kbd>/lota/motion/heading</Kbd>.
+                  </Setting>
+                  <Setting name="Barometric Pressure" defaultValue="Off">
+                    Atmospheric pressure in kPa plus relative altitude in
+                    meters (<Kbd>/lota/motion/pressure</Kbd>,{" "}
+                    <Kbd>/lota/motion/altitude</Kbd>).
+                  </Setting>
+                  <Setting name="Update Rate" defaultValue="30 Hz">
+                    30 / 60 / 100 Hz picker. 30 Hz matches ARKit. 100 Hz is
+                    useful for latency-critical controllers.
+                  </Setting>
+                  <div className="pt-2 text-xs text-zinc-500 leading-relaxed">
+                    Each enabled sensor draws a scrolling graph lane on screen
+                    and streams over OSC. Toggling a sensor off mid-session
+                    removes its graph lane and stops its OSC channel within
+                    ~50 ms (debounced to prevent crash loops from rapid
+                    toggles). Permissions are requested upfront when entering
+                    Motion mode.
+                  </div>
+                </SettingsGroup>
+
+                <SettingsGroup title="Audio Analysis">
+                  <Setting name="Levels (Bass / Mid / High)" defaultValue="On">
+                    Continuous 0–1 energy per frequency band with rolling
+                    auto-gain. <Kbd>/lota/audio/bass</Kbd>,{" "}
+                    <Kbd>/lota/audio/mid</Kbd>, <Kbd>/lota/audio/high</Kbd>.
+                  </Setting>
+                  <Setting name="Beat Detection" defaultValue="Off">
+                    Binary 0/1 switch per band on detected onset (50 ms gate
+                    window). <Kbd>/lota/audio/drums/low</Kbd>,{" "}
+                    <Kbd>/lota/audio/drums/mid</Kbd>,{" "}
+                    <Kbd>/lota/audio/drums/high</Kbd>.
+                  </Setting>
+                  <Setting name="Dynamics" defaultValue="Off">
+                    <Kbd>/lota/audio/burst</Kbd> — fast transient detector,
+                    pulse-shaped 0–1 (rises instantly, decays over ~200 ms).
+                  </Setting>
+                  <Setting name="FFT Spectrum (20 bands)" defaultValue="Off">
+                    20 log-spaced FFT bands across 20–20,000 Hz, each
+                    normalized 0–1. <Kbd>/lota/audio/fft/0</Kbd> through{" "}
+                    <Kbd>/lota/audio/fft/19</Kbd>, rendered with a red → blue
+                    color gradient.
+                  </Setting>
+                  <Setting name="Update Rate" defaultValue="30 Hz">
+                    30 / 60 Hz picker. Analysis runs internally at ~86 Hz and
+                    decimates to the chosen output rate.
+                  </Setting>
+                  <div className="pt-2 text-xs text-zinc-500 leading-relaxed">
+                    Microphone permission is requested upfront when entering
+                    Audio mode. Uses the same{" "}
+                    <Kbd>NSMicrophoneUsageDescription</Kbd> as Transcription
+                    mode. LOTA can only analyze the microphone input — iOS
+                    sandboxing prevents capturing system audio from other apps.
                   </div>
                 </SettingsGroup>
               </div>
