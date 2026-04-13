@@ -40,6 +40,12 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local scratchpad — not tracked
+/app/test/
+/app/test2/
+/public/iphone_17_pro_max/
+/public/iphone_17_pro_max.zip
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
