@@ -799,8 +799,9 @@ export default function DocsPage() {
                           and altitude tracking for installations
                         </li>
                         <li>
-                          AirPods-free head-tracking alternative using the
-                          phone clipped to a performer
+                          Wearable motion source — phone clipped or strapped
+                          to a performer streams tilt, rotation rate, and
+                          compass heading as OSC
                         </li>
                         <li>
                           Camera pose OSC is automatically suppressed in
