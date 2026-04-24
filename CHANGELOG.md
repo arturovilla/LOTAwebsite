@@ -4,6 +4,62 @@ All notable changes to the LOTA project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.2.0] - 2026-04-23
+
+### Added
+
+- **Material Capture mode**: New `.material` option in the Gaussian Capture page's format dropdown (sits alongside COLMAP, Nerfstudio, Nerfstudio + Depth, Point Cloud). Captures a flat surface from one flash photo pair + LiDAR depth, runs through Apple's GPU compute pipeline, and exports a complete PBR material set as a single ZIP — ready to drop into Substance Designer/Painter, Blender, Unreal, Unity, TouchDesigner, or any PBR-aware DCC. Requires LiDAR
+- **PBR map set in the export ZIP** (5 PNGs + manifest):
+  - `basecolor.png` — sRGB 8-bit albedo, white-balanced and de-lit via flash-pair specular subtraction
+  - `normal.png` — linear 8-bit tangent-space normal from depth gradient (OpenGL or DirectX convention selectable)
+  - `height.png` — linear 16-bit, plane-relative ±25 mm range mapped to UInt16
+  - `ao.png` — linear 8-bit horizon-based ambient occlusion baked from height
+  - `roughness.png` — linear 8-bit per-texel estimate from flash-pair specular sharpness, with user-adjustable scale slider
+  - `preview.png` — sRGB 8-bit Cook-Torrance BRDF sphere render of the captured material
+  - `material.json` — manifest carrying `planeMeters`, `tilingHintFor1mSquare`, normal convention, roughness method + userScale, metallic uniform value, device hardware identifier, LiDAR generation, capture date, gyro drift between flash pair
+- **Five Metal compute kernels in `Shaders.metal`** (~210 lines): `delightFlashPair` (basecolor + intermediate specular), `roughnessFromSpecular` (local sharpness heuristic), `normalFromDepth` (central-difference depth gradient), `aoBake` (horizon-based AO), `pbrSpherePreview` (Cook-Torrance BRDF sphere via screen-space ray-sphere intersection). Plus `orthoSampleHomography` for orthorectifying the framing patch and a `jointBilateralUpsample` helper. All dispatched in a single command buffer (~220 ms total at 1024² with 64 AO samples on iPhone 15/16 Pro)
+- **Closed-form 4-point homography solver** — `Homography.fromUnitSquare(toQuad:)` in `PBRMapBaker.swift` projects the framing rect's 4 corners into image pixel space and solves the 3×3 mapping in pure Swift, no Accelerate dependency
+- **Plane lock UX**: ARKit raycast detects horizontal and vertical planes; tap **Lock Plane** to snap to the candidate. Auto-installs a 20 cm screen-aligned square patch centered on the camera's look-point (raycast camera-forward → plane intersection), oriented so output "right" = camera's right and output "top" = away from camera
+- **Material Settings sheet** (gear button on the capture page) — output resolution (512/1024/2048), AO sample count (32/64/128), normal convention (OpenGL/DirectX), delight strength slider, roughness scale slider; all persisted via `UserDefaults`
+- **Material Save Summary sheet** — embedded PBR sphere preview on a clear background, metallic toggle (manifest-only in v1.2), file-size estimate, Save button with a phase machine (configuring → saving → saved/failed), 1.5 s auto-dismiss after successful save
+- **Autofocus locked during the flash-pair grab** — `AVCaptureDevice.focusMode = .locked` before the flash-off frame, restored to `.continuousAutoFocus` after the flash-on frame, so the two grabs share the same focal distance and the delight + roughness signals stay registered
+- **Haptic feedback on shutter tap** — `UIImpactFeedbackGenerator(style: .medium)` so the capture feels acknowledged before the bake spinner appears
+- **`MaterialRecorder.swift`** — state machine (searching → detected → locked → framed → capturing → baking), torch sequencing, depth+pose snapshot at the flash-on instant, gyro drift check via quaternion difference between the two camera poses
+- **`PBRMapBaker.swift`** — nonisolated orchestrator that runs the full bake off the main actor (~220 ms at 1024² / 64 AO). Polling-based command-buffer completion (5 ms `cb.status` poll) since `addCompletedHandler` was unreliable in this environment
+- **`PBRMapExporter.swift`** — encodes 6 PNGs (preserving 16-bit depth for the height map), builds the JSON manifest with device + capture metadata, bundles into ZIP via ZIPFoundation
+- **`PBRSphereView.swift`** — lightweight `Image`-based sphere preview that composites onto whatever background it's embedded in (clear by design, so the summary sheet's background shows through)
+- **`MaterialState.swift`** — transient ObservableObject sibling to `GaussianRecorder`. Owned by `CaptureManager`, observed by `GaussianCaptureView`, so plane status / framing rect / baked maps don't leak between `MaterialRecorder` and the view layer
+- **`MaterialCaptureContent.swift`** — material-mode subview of `GaussianCaptureView` with status icon, plane-status-driven action area (Lock Plane / Unlock), Material Settings sheet trigger, baking progress chip
+- **`LOTABinaryPLYReceiverV2.tox`** TouchDesigner component — simpler drop-in receiver for binary PLY streaming. The original `LOTABinaryPLYReceiver` required manual configuration of frame parsing parameters; v2 auto-detects the binary header and exposes only the receiver port and Script TOP target. Available at the [LOTA docs page](https://lidarota.app)
+
+### Changed
+
+- `ExportFormat` enum gains `.material` case + new `isSingleShot: Bool` flag (cleaner than overloading `needsPoses` for capture-mode UX branching — also leaves room for future single-shot formats like SHARP Splat in v1.3)
+- `GaussianRecorder` defensively rejects `.material` in `startRecording` and `stopRecording` — material capture goes through `MaterialRecorder` + `PBRMapBaker`, never `GaussianRecorder`
+- `GaussianCaptureView` body branches on `exportFormat == .material`: format-aware top counter row (keyframe/point counters for 3D-scene formats, plane-status chip + framing dimensions for material), bottom button morphs between red toggle-record and a shutter button keyed on `format.isSingleShot`. `.onChange(of: exportFormat)` resets material state on every format switch
+- ARKit world-tracking config now always enables `[.horizontal, .vertical]` plane detection (used by Material; ignored by other modes — minor CPU cost on modern A-chips)
+- `MetalRenderer` gains 7 new pipeline slots (delight, roughness, normalFromDepth, aoBake, jointBilateralUpsample, orthoHomography, pbrSphere render). Internal access so `PBRMapBaker` can dispatch them
+- `StreamingSettings` gains 6 persisted material-capture properties (resolution, normal convention, AO sample count, delight strength, roughness scale, default metallic) plus a `NormalMapConvention` enum
+- `CaptureManager` holds `materialState` + `materialRecorder` + `pbrMapBaker`. New `setTorch(_:)` and `setAutoFocus(_:)` helpers wire `AVCaptureDevice` configuration to closures injected on `MaterialRecorder`. New `nextFrame()` async helper resolves a continuation from the next session-delegate callback, gated on `hasPendingFrameAwaiter` so we don't dispatch a Task per ARFrame
+- **Binary PLY format is now the recommended path.** The user guide and TouchDesigner companion documentation only document the binary receiver going forward (see Deprecated)
+
+### Fixed
+
+- **Page swipes are now blocked while streaming is active.** Previously, swiping the TabView mid-stream could tear down the active session and leave receivers stuck. Now matches the existing UX where the Settings button is also disabled while streaming
+- **ARFrame retention warnings during Material capture.** The session delegate's per-frame `Task { @MainActor }` dispatches were piling up faster than the main actor could drain them, tripping ARKit's "delegate is retaining N ARFrames" backpressure warning and eventually causing the camera to stop delivering frames (followed by `<<<< FigCaptureSourceRemote >>>>` errors and SIGKILL). Three layered fixes: (1) extract plane info into a value-type `DetectedPlaneInfo` instead of holding `ARPlaneAnchor` refs in pending Tasks; (2) only publish `state.lockedPlaneTransform` / `lockedPlaneExtent` on actual state transitions, not on every frame; (3) `MaterialRecorder.processFrame` early-returns synchronously when the locked plane is still in `frame.anchors` — no Task hop, no main-actor work. The steady state during a Material capture (locked → framed → baking) now does zero per-frame main-actor dispatches
+- **Bake hung at `addCompletedHandler`.** The completion handler reliably failed to fire even after `cb.status` reached `.completed` — verified by polling. Replaced with a 5 ms `cb.status` polling loop in `waitForCompletion`. Bake now reliably completes in ~220 ms
+- **`PBRMapBaker` is nonisolated**, not `@MainActor`. The `CIContext.render` YUV→BGRA conversions (~100–200 ms each at 1920×1440) and command-buffer encoding were blocking the main actor synchronously, causing the ARFrame retention buildup above. New `PBRBakeParams` value struct gets pulled from `StreamingSettings` on the main actor before the nonisolated bake runs
+- **Depth texture is now copied** into a fresh `MTLTexture` instead of CV-wrapped from ARKit's pool. The shared `CVPixelBuffer` caused implicit dependency on ARKit's depth-pool lifecycle, which prevented the GPU completion handler from firing. The ~200 KB copy at upload time decouples our pipeline entirely
+- **Framing rect alignment in baked output.** The rect was previously inheriting ARKit's arbitrary plane-local axes, producing tilted output (wood planks at ~15° angles, etc.). Now the rect's two axes are computed from the camera's right + forward directions projected onto the plane and orthogonalized — so output "top" = away from camera, "right" = camera's right
+- **Edge streaking in baked maps.** The 60% min-extent framing rect could project well beyond the camera's visible image area at oblique angles, causing `clamp_to_edge` sampling to repeat the rightmost/bottommost pixels as horizontal/vertical streaks. Now the rect is centered on the camera's look-point (raycast intersection) and capped at 20 cm side length, keeping the projected corners well inside the camera image
+- **SF Symbol typo** `square.grid.3x3.square.fill` → `square.grid.3x3.square` in `MaterialCaptureContent`
+
+### Deprecated
+
+- **CSV (text) PLY streaming is deprecated and will be removed in a future update.** Binary PLY format is ~40% smaller, parses faster on the receiver, and the new `LOTABinaryPLYReceiverV2.tox` TouchDesigner component makes the binary path easier to integrate than the CSV one. Non-binary PLY remains functional for backwards compatibility but the user guide and TouchDesigner companion components only document the binary path going forward. The "Binary Format" toggle in Settings → Point Cloud Stream is the recommended setting for all new captures
+
+---
+
 ## [1.1.0] - 2026-04-12
 
 ### Added

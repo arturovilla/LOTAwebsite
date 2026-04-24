@@ -330,10 +330,11 @@ export default function DocsPage() {
                   streaming toggle is bottom right.
                 </Card>
                 <Card title="Gaussian Capture — Swipe Right">
-                  Record datasets for Gaussian Splatting and 3D reconstruction.
-                  Choose an export format, pick an iCloud folder, and tap record.
-                  A mesh wireframe overlay shows scanned surfaces building up in
-                  real time.
+                  Record datasets for Gaussian Splatting and 3D reconstruction,
+                  or capture a flat surface as a complete PBR material set
+                  with the Material format. Choose a format, pick an iCloud
+                  folder, then either tap record (3D scene formats) or lock
+                  a plane and tap the shutter (Material).
                 </Card>
               </div>
             </section>
@@ -1037,11 +1038,15 @@ export default function DocsPage() {
                 </Card>
                 <Card title="PLY (live point cloud)">
                   <>
-                    Sends live point cloud frames over TCP. Available in CSV text
-                    format (works with TouchDesigner&apos;s <Kbd>TCP/IP
-                    DAT</Kbd> in &quot;One Per Line&quot; mode) or packed binary
-                    format (~40% smaller, requires a byte-parsing receiver).
-                    Default port <Kbd>9848</Kbd>.
+                    Sends live point cloud frames over TCP as packed binary
+                    (15&nbsp;bytes/point: 3 floats + 3 uint8 RGB) on
+                    port <Kbd>9848</Kbd> by default. Pair it with the{" "}
+                    <Kbd>LOTABinaryPLYRecieverV2.tox</Kbd> drop-in component
+                    (TouchDesigner section below) — it auto-detects the binary
+                    header and only asks for the port and a Script TOP target.
+                    A legacy CSV text mode remains available for custom
+                    receivers but is deprecated and will be removed in a
+                    future update.
                   </>
                 </Card>
               </div>
@@ -1156,49 +1161,22 @@ export default function DocsPage() {
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div>
                     <h3 className="text-sm font-semibold text-white mb-2">
-                      LOTAPoints.tox — Drop-in Component
+                      LOTABinaryPLYRecieverV2.tox — Binary Point Cloud Receiver
                     </h3>
                     <div className="text-sm text-zinc-400 leading-relaxed">
                       <p>
-                        A ready-made TouchDesigner component that receives live
-                        PLY point cloud data from LOTA. Drop it into any project
-                        and it works out of the box — defaults to
-                        port <Kbd>9848</Kbd>. No scripting or manual DAT wiring
-                        required.
+                        Drop-in TouchDesigner receiver for LOTA&apos;s binary
+                        PLY stream. Auto-detects the binary header — only asks
+                        for the receiver port and a Script TOP target. Uses
+                        numpy bulk parsing and GPU instancing to handle 49K+
+                        points at 60&nbsp;fps. Enable <Kbd>Binary Format</Kbd>{" "}
+                        in Settings &rarr; Point Cloud Stream and point this
+                        component at the same port.
                       </p>
                     </div>
                   </div>
                   <a
-                    href="/LOTAPoints.tox"
-                    download
-                    className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full bg-white text-black hover:bg-zinc-200 transition-colors"
-                  >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M8 2v9m0 0L5 8m3 3 3-3M3 13h10" />
-                    </svg>
-                    Download .tox
-                  </a>
-                </div>
-              </div>
-
-              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                  <div>
-                    <h3 className="text-sm font-semibold text-white mb-2">
-                      LOTABinaryPLYReciever.tox — Binary Point Cloud Receiver
-                    </h3>
-                    <div className="text-sm text-zinc-400 leading-relaxed">
-                      <p>
-                        High-performance binary point cloud receiver for
-                        TouchDesigner. Uses numpy bulk parsing, Script TOP
-                        textures, and GPU instancing to handle 49K+ points
-                        at 60fps. Enable <Kbd>Binary Format</Kbd> in
-                        Settings &rarr; Point Cloud Stream to use this receiver.
-                      </p>
-                    </div>
-                  </div>
-                  <a
-                    href="/LOTABinaryPLYReciever.tox"
+                    href="/LOTABinaryPLYRecieverV2.tox"
                     download
                     className="shrink-0 inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-full bg-white text-black hover:bg-zinc-200 transition-colors"
                   >
@@ -1282,20 +1260,22 @@ export default function DocsPage() {
               </Card>
 
               <div className="mt-4">
-                <Card title="Point cloud via TCP/IP DAT">
+                <Card title="Point cloud via LOTABinaryPLYRecieverV2.tox">
                   <>
                     <ol className="list-decimal list-inside space-y-1.5 mt-1">
                       <li>
-                        Add a <Kbd>TCP/IP DAT</Kbd> to your network.
+                        Drop <Kbd>LOTABinaryPLYRecieverV2.tox</Kbd> into your
+                        TouchDesigner network.
                       </li>
                       <li>
-                        Set the mode to <Kbd>Connect</Kbd>, enter LOTA&apos;s IP
-                        and the PLY port from Settings.
+                        In LOTA, enable <Kbd>PLY Streaming</Kbd> and{" "}
+                        <Kbd>Binary Format</Kbd> in Settings &rarr; Point Cloud
+                        Stream and note the port.
                       </li>
                       <li>
-                        LOTA sends point cloud frames as CSV rows — parse them
-                        with a <Kbd>DAT to SOP</Kbd> or a Script SOP to get live
-                        3D geometry.
+                        On the component, set the receiver port to match and
+                        wire its output Script TOP into your render network —
+                        live 3D geometry is ready to instance.
                       </li>
                     </ol>
                   </>
@@ -1357,6 +1337,18 @@ export default function DocsPage() {
                     Standalone <Kbd>points3D.ply</Kbd> file with accumulated
                     points from your session. Open in Blender, CloudCompare,
                     MeshLab, or any tool that reads PLY.
+                  </>
+                </Card>
+                <Card title="Material (PBR)">
+                  <>
+                    Single-shot capture of a flat surface as a complete PBR
+                    material set. ZIP contains <Kbd>basecolor.png</Kbd> (sRGB),{" "}
+                    <Kbd>normal.png</Kbd>, <Kbd>height.png</Kbd> (16-bit),{" "}
+                    <Kbd>ao.png</Kbd>, <Kbd>roughness.png</Kbd>,{" "}
+                    <Kbd>preview.png</Kbd>, and a <Kbd>material.json</Kbd>{" "}
+                    manifest with patch size and tiling hints. Drop into
+                    Substance Designer/Painter, Blender, Unreal, Unity, or
+                    TouchDesigner. Requires LiDAR.
                   </>
                 </Card>
               </div>
@@ -1427,6 +1419,246 @@ export default function DocsPage() {
                   reflective and transparent surfaces — LiDAR struggles with
                   glass and mirrors.
                 </Step>
+              </div>
+
+              {/* ─── Material Capture ──────────────────────── */}
+              <div className="mt-12">
+                <h3 className="text-xl font-bold text-white mb-2">
+                  Material Capture
+                </h3>
+                <p className="text-sm text-zinc-400 leading-relaxed mb-6">
+                  Select <Kbd>Material</Kbd> from the format dropdown to swap
+                  the page from a recording flow to a plane-lock + shutter
+                  flow. One tap, ~½-second bake on iPhone 15/16 Pro at
+                  1024², ZIP saved to your iCloud folder. Requires LiDAR.
+                </p>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    When to use Material vs the other formats
+                  </h4>
+                  <ul className="text-sm text-zinc-400 space-y-2">
+                    <li>
+                      <strong className="text-white">3D scan of an object
+                      or room</strong> you can move around — use COLMAP,
+                      Nerfstudio, or Point Cloud
+                    </li>
+                    <li>
+                      <strong className="text-white">Tileable PBR texture
+                      of a flat surface</strong> (floor, wall, table, fabric,
+                      brick…) — use Material
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="space-y-5 mb-8">
+                  <Step n={1} title="Pick Material from the format dropdown">
+                    The page swaps to the material-capture UI: status icon,
+                    plane-status chip, Lock Plane action, and shutter button.
+                  </Step>
+                  <Step n={2} title="Pick an export folder">
+                    Tap the folder icon (bottom left) to choose an iCloud Files
+                    folder if you haven&apos;t already.
+                  </Step>
+                  <Step n={3} title="(Optional) Open Material Settings">
+                    Adjust output resolution (512 / 1024 / 2048), AO sample
+                    count (32 / 64 / 128), normal convention (OpenGL or
+                    DirectX), delight strength, and roughness scale. All
+                    persist via <Kbd>UserDefaults</Kbd>.
+                  </Step>
+                  <Step n={4} title="Point at a flat surface and tap Lock Plane">
+                    ARKit raycast detects horizontal and vertical planes. Lock
+                    Plane snaps a 20&nbsp;cm screen-aligned square patch
+                    centered on what you&apos;re pointing at — output{" "}
+                    &quot;top&quot; = away from camera, &quot;right&quot; =
+                    camera&apos;s right.
+                  </Step>
+                  <Step n={5} title="Tap the shutter">
+                    The torch fires a brief flash-pair sequence (~200&nbsp;ms),
+                    autofocus locks for both grabs so they share the same
+                    focal distance, then the bake runs (~220&nbsp;ms at 1024²
+                    with 64 AO samples on iPhone 15/16 Pro).
+                  </Step>
+                  <Step n={6} title="Save to Files">
+                    The Material Save Summary sheet shows a live PBR sphere
+                    preview, file-size estimate, and a metallic toggle. Tap
+                    Save — ZIP is written to your iCloud folder, the sheet
+                    auto-dismisses, and the plane lock stays active for the
+                    next shot.
+                  </Step>
+                </div>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    What&apos;s in the ZIP
+                  </h4>
+                  <ul className="text-sm text-zinc-400 space-y-2">
+                    <li>
+                      <Kbd>basecolor.png</Kbd> — sRGB 8-bit albedo,
+                      white-balanced and de-lit via flash-pair specular
+                      subtraction
+                    </li>
+                    <li>
+                      <Kbd>normal.png</Kbd> — linear 8-bit tangent-space
+                      normal from the LiDAR depth gradient (OpenGL +Y up by
+                      default; DirectX selectable in Material Settings)
+                    </li>
+                    <li>
+                      <Kbd>height.png</Kbd> — linear{" "}
+                      <strong className="text-white">16-bit</strong>,
+                      plane-relative ±25&nbsp;mm range mapped to UInt16
+                    </li>
+                    <li>
+                      <Kbd>ao.png</Kbd> — linear 8-bit horizon-based ambient
+                      occlusion baked from the height map
+                    </li>
+                    <li>
+                      <Kbd>roughness.png</Kbd> — linear 8-bit per-texel
+                      estimate from flash-pair specular sharpness, multiplied
+                      by your roughness scale slider
+                    </li>
+                    <li>
+                      <Kbd>preview.png</Kbd> — sRGB 8-bit Cook-Torrance BRDF
+                      sphere render of the captured material
+                    </li>
+                    <li>
+                      <Kbd>material.json</Kbd> — manifest with{" "}
+                      <Kbd>planeMeters</Kbd> (physical patch size),{" "}
+                      <Kbd>tilingHintFor1mSquare</Kbd>, normal convention,
+                      roughness method, metallic value, device hardware
+                      identifier, LiDAR generation, capture date, and gyro
+                      drift between flash pair
+                    </li>
+                  </ul>
+                </div>
+
+                <Card title="Receiver workflows">
+                  <>
+                    <ul className="space-y-1.5 mt-1">
+                      <li>
+                        <strong className="text-white">Substance
+                        Designer</strong> — drop the unzipped folder onto a
+                        new graph; Substance auto-creates a Material node
+                        with all six channels wired
+                      </li>
+                      <li>
+                        <strong className="text-white">Substance
+                        Painter</strong> — drag the folder into Shelf →
+                        Materials, then apply to a mesh
+                      </li>
+                      <li>
+                        <strong className="text-white">Blender</strong> — in
+                        the Shading editor, add an Image Texture per file
+                        and wire to a Principled BSDF; set non-color spaces
+                        on normal, roughness, ao, and height
+                      </li>
+                      <li>
+                        <strong className="text-white">Unreal Engine</strong>{" "}
+                        — drop the folder into the Content Browser → Unreal
+                        auto-creates a Material Instance.{" "}
+                        <em>Switch normal convention to DirectX in Material
+                        Settings before capture</em> so the green channel
+                        reads correctly
+                      </li>
+                      <li>
+                        <strong className="text-white">Unity</strong> —
+                        standard URP / HDRP Lit shader inputs map 1:1
+                      </li>
+                      <li>
+                        <strong className="text-white">TouchDesigner</strong>{" "}
+                        — load each PNG into a Movie File In TOP, wire to a
+                        PBR MAT
+                      </li>
+                    </ul>
+                  </>
+                </Card>
+
+                <div className="mt-4">
+                  <Card title="Tips for best results">
+                    <>
+                      <ul className="space-y-1.5 mt-1">
+                        <li>
+                          <strong className="text-white">Hold the phone
+                          still</strong> during the shutter tap — the
+                          flash-pair takes ~200&nbsp;ms; the manifest&apos;s{" "}
+                          <Kbd>gyroDriftRadians</Kbd> field surfaces how
+                          much drift the bake saw (below 0.5&deg; / ~0.009 rad
+                          is fine)
+                        </li>
+                        <li>
+                          <strong className="text-white">Capture
+                          distance</strong> — 20–60&nbsp;cm from the surface
+                          gives the best detail-to-coverage ratio at the
+                          default 20&nbsp;cm patch size
+                        </li>
+                        <li>
+                          <strong className="text-white">Lighting</strong>{" "}
+                          — ambient + the iPhone torch. Too-bright ambient
+                          washes out the controlled flash signal that drives
+                          the roughness estimate
+                        </li>
+                        <li>
+                          <strong className="text-white">Best
+                          surfaces</strong> — wood, fabric, leather, brick,
+                          concrete, plaster, painted drywall, asphalt,
+                          ceramic tile (matte), unpolished plastic, paper,
+                          carpet, bark, stone — anything opaque, dielectric,
+                          and roughly diffuse
+                        </li>
+                      </ul>
+                    </>
+                  </Card>
+                </div>
+
+                <div className="mt-4">
+                  <Card title="Limitations & v1.2 caveats">
+                    <>
+                      <p className="mb-2">
+                        Surfaces where the pipeline degrades or fails:
+                        <strong className="text-white"> glass</strong>{" "}
+                        (LiDAR passes through),{" "}
+                        <strong className="text-white">mirrors and
+                        chrome</strong> (captures the reflection, not the
+                        surface),{" "}
+                        <strong className="text-white">polished
+                        metal</strong> (basecolor contaminated by
+                        reflections),{" "}
+                        <strong className="text-white">skin / wax /
+                        translucent plastic</strong> (subsurface scattering
+                        not modeled),{" "}
+                        <strong className="text-white">velvet and
+                        fur</strong> (anisotropic / sheen BRDFs not
+                        modeled),{" "}
+                        <strong className="text-white">wet
+                        surfaces</strong> (captures the wet film).
+                      </p>
+                      <p className="mb-1">
+                        <strong className="text-white">v1.2 caveats</strong>{" "}
+                        (planned for v1.3+):
+                      </p>
+                      <ul className="space-y-1 text-zinc-500">
+                        <li>
+                          Metallic is a uniform toggle (manifest only) — no
+                          per-texel <Kbd>metallic.png</Kbd>. v1.3 adds
+                          CoreML SVBRDF inference
+                        </li>
+                        <li>
+                          Roughness is a heuristic
+                          (<Kbd>flashPairSpecularSharpness</Kbd>) — adjust
+                          the roughness scale slider to bias the result
+                        </li>
+                        <li>
+                          Framing rect is auto-installed at 20&nbsp;cm —
+                          drag handles to resize / reposition land in v1.3
+                        </li>
+                        <li>
+                          Single-shot only — multi-view capture for cleaner
+                          albedo planned for v1.3
+                        </li>
+                      </ul>
+                    </>
+                  </Card>
+                </div>
               </div>
             </section>
 
@@ -1600,11 +1832,14 @@ export default function DocsPage() {
                   <Setting name="Port" defaultValue="9848">
                     PLY stream destination port.
                   </Setting>
-                  <Setting name="Binary Format" defaultValue="Off">
+                  <Setting name="Binary Format" defaultValue="Off (always leave on)">
                     Packed binary (15 bytes/point) vs CSV text. Binary is ~40%
-                    smaller but requires a byte-parsing receiver. CSV text works
-                    with TouchDesigner&apos;s TCP/IP DAT in &quot;One Per
-                    Line&quot; mode.
+                    smaller, parses ~3&times; faster on the receiver, and is
+                    the format the supported{" "}
+                    <Kbd>LOTABinaryPLYRecieverV2.tox</Kbd> drop-in component
+                    targets — turn it on for every new capture. CSV text mode
+                    remains for backwards compatibility with custom receivers
+                    but is deprecated and will be removed in a future update.
                   </Setting>
                 </SettingsGroup>
 

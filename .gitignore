@@ -45,6 +45,8 @@ yarn-error.log*
 /app/test2/
 /public/iphone_17_pro_max/
 /public/iphone_17_pro_max.zip
+/LOTAmarketingAssests/
+/lotamessages/
 
 # typescript
 *.tsbuildinfo
