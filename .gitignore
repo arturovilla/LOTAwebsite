@@ -40,6 +40,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# claude
+.claude/
+
 # local scratchpad — not tracked
 /app/test/
 /app/test2/
