@@ -287,21 +287,43 @@ export default function DocsPage() {
               </div>
 
               <div className="space-y-5">
-                <Step n={1} title="Install LOTA">
-                  Download LOTA from the App Store. Open the app and grant camera
-                  and local network permissions when prompted.
+                <Step n={1} title="Install LOTA and complete first launch">
+                  Download LOTA from the App Store. The first time you open the
+                  app, a welcome screen lists the four iOS permissions LOTA
+                  needs (Camera, Microphone, Speech Recognition, Location for
+                  compass heading) plus a privacy reassurance — LOTA
+                  doesn&apos;t track or store anything; captures stream over
+                  your local network or save to the iCloud folder you choose.
+                  Tap <Kbd>Continue</Kbd> and the four OS permission dialogs
+                  appear in sequence.
                 </Step>
-                <Step n={2} title="Choose a capture mode">
-                  Tap the mode dropdown at the top of the screen to switch
-                  between Color, Mono, Depth, Point Cloud, Blob Track,
-                  Transcription, Motion, or Audio. Each mode activates instantly
-                  — no restart required.
+                <Step n={2} title="Take the 9-step guided tour">
+                  After permissions, a hybrid welcome card &rarr; spotlight
+                  tour walks you through the three pages, the mode picker, the
+                  status bar, mode-specific settings, and the transmit button.
+                  Tap anywhere to advance, or use the Skip button at the
+                  bottom-left. Replay anytime from{" "}
+                  <Kbd>Transmission Settings &rarr; Help &rarr; Replay Tutorial</Kbd>.
                 </Step>
-                <Step n={3} title="Start streaming or recording">
-                  Tap the stream button (bottom right) to broadcast over the
-                  network. Configure transports via the Settings gear icon
-                  (bottom left). Swipe right to access Gaussian Capture for
-                  recording 3D datasets.
+                <Step n={3} title="Choose a capture mode">
+                  Tap the mode picker at the top — a glass capsule showing the
+                  active mode&apos;s icon next to a 3&times;2 dot-grid glyph,
+                  mirroring the iOS Camera app&apos;s &quot;more controls&quot;
+                  affordance. A glass panel drops down with all 8 modes laid
+                  out in a 2&times;4 grid of circular icon buttons (Color,
+                  Mono, Depth, Point Cloud, Blob Track, Transcription, Motion,
+                  Audio). Active mode is highlighted yellow; LiDAR-required
+                  modes are dimmed and disabled on non-LiDAR devices. Each
+                  mode activates instantly — no restart required.
+                </Step>
+                <Step n={4} title="Start streaming or recording">
+                  Tap the transmit button (bottom right) to broadcast over the
+                  network — all enabled transports send simultaneously.
+                  Configure transports by tapping the floating status bar pill
+                  at the top (opens Transmission Settings). Tweak per-mode
+                  options via the <Kbd>&lt;Mode&gt; Settings</Kbd> button just
+                  under the status bar. Swipe right to access Gaussian
+                  Capture for recording 3D datasets or capturing PBR materials.
                 </Step>
               </div>
             </section>
@@ -325,9 +347,13 @@ export default function DocsPage() {
                 <Card title="Camera / Streaming — Center (default)">
                   The main page. Live camera feed with eight capture modes
                   (Color, Mono, Depth, Point Cloud, Blob Track, Transcription,
-                  Motion, Audio) and streaming controls. Tap the mode dropdown
-                  at the top to switch modes. Settings gear icon is bottom left,
-                  streaming toggle is bottom right.
+                  Motion, Audio) and streaming controls. Tap the mode picker
+                  at the top (glass capsule + 3&times;2 dot-grid glyph) to
+                  open the panel and switch modes. Tap the floating status bar
+                  pill for Transmission Settings, or the per-mode{" "}
+                  <Kbd>&lt;Mode&gt; Settings</Kbd> button just below it for
+                  options specific to the active mode. Streaming toggle is
+                  bottom right.
                 </Card>
                 <Card title="Gaussian Capture — Swipe Right">
                   Record datasets for Gaussian Splatting and 3D reconstruction,
@@ -346,8 +372,12 @@ export default function DocsPage() {
             >
               <SectionHeading tag="Capture" title="Capture Modes">
                 LOTA provides eight distinct capture modes on the Camera /
-                Streaming page. Tap the mode dropdown at the top of the screen
-                to switch — each mode shows an icon and description.
+                Streaming page. Tap the mode picker at the top (glass capsule
+                with the active mode&apos;s icon next to a 3&times;2 dot-grid
+                glyph) to open a glass panel laid out as a 2&times;4 grid of
+                circular icon buttons. Active mode is highlighted yellow;
+                LiDAR-required modes are dimmed on non-LiDAR devices. Tap
+                outside the panel to dismiss without picking.
               </SectionHeading>
 
               <div className="grid gap-4 sm:grid-cols-2">
@@ -421,8 +451,9 @@ export default function DocsPage() {
                   Switching modes
                 </h3>
                 <p className="text-sm text-zinc-400 leading-relaxed">
-                  Use the mode dropdown at the top of the screen, or
-                  say <Kbd>switch to Depth</Kbd> with Voice Control enabled.
+                  Tap the mode picker at the top of the screen and select a
+                  cell from the dot-grid panel, or say{" "}
+                  <Kbd>switch to Depth</Kbd> with Voice Control enabled.
                   Switching is instant and does not interrupt an active stream.
                 </p>
               </div>
@@ -433,7 +464,7 @@ export default function DocsPage() {
                   Blob Track mode
                 </h3>
                 <p className="text-sm text-zinc-400 leading-relaxed mb-6">
-                  Select <Kbd>Blob Track</Kbd> from the mode dropdown to turn
+                  Select <Kbd>Blob Track</Kbd> from the mode picker to turn
                   the iPhone into a wireless TouchDesigner-compatible blob
                   tracker. LOTA carves a configurable depth slab out of the
                   LiDAR scan, finds connected regions of in-range pixels,
@@ -457,7 +488,7 @@ export default function DocsPage() {
                     <li>
                       <strong className="text-white">Live depth range</strong>{" "}
                       — The current slab (e.g. <Kbd>0.5m – 3.0m</Kbd>) is
-                      shown under the mode dropdown so operators can verify
+                      shown just below the status pill so operators can verify
                       the active range without opening Settings
                     </li>
                     <li>
@@ -485,7 +516,8 @@ export default function DocsPage() {
                     Base styles
                   </h4>
                   <p className="text-sm text-zinc-400 leading-relaxed mb-3">
-                    Set in Settings &rarr; Blob Tracking &rarr; Detection.
+                    Set in Blob Track Settings &rarr; Detection (tap the
+                    <Kbd>Blob Track Settings</Kbd> button below the status bar).
                     Controls what the underlying camera layer looks like
                     behind the rectangles.
                   </p>
@@ -580,7 +612,7 @@ export default function DocsPage() {
                   Transcription mode
                 </h3>
                 <p className="text-sm text-zinc-400 leading-relaxed mb-6">
-                  Select <Kbd>Transcription</Kbd> from the mode dropdown to
+                  Select <Kbd>Transcription</Kbd> from the mode picker to
                   turn your iPhone into a wireless live speech-to-text source
                   for creative tools. The camera view is replaced with a black
                   canvas and a 200-bar mirrored waveform driven by the
@@ -594,13 +626,16 @@ export default function DocsPage() {
                     First-time setup
                   </h4>
                   <p className="text-sm text-zinc-400 leading-relaxed">
-                    On first use, iOS prompts for Microphone and Speech
-                    Recognition permissions. Both are required. If denied, the
-                    mode displays a message with a shortcut to the Settings app
-                    to grant access. iOS may also briefly download the speech
-                    model for your device&apos;s language on the first
-                    recognition session — on-device from that point on, no
-                    internet needed.
+                    Microphone and Speech Recognition permissions are
+                    requested upfront on first launch (along with Camera and
+                    Location), and the on-device speech model for your
+                    language is prefetched in the background. By the time you
+                    open this mode for the first time, transcription is
+                    usually ready to go — no model-download wait. If you
+                    denied either permission, the mode displays a message
+                    with a shortcut to iOS Settings to grant access. If the
+                    prefetch didn&apos;t finish or failed, the mode falls
+                    back to downloading on first use.
                   </p>
                 </div>
 
@@ -711,7 +746,7 @@ export default function DocsPage() {
                   Motion mode
                 </h3>
                 <p className="text-sm text-zinc-400 leading-relaxed mb-6">
-                  Select <Kbd>Motion</Kbd> from the mode dropdown to turn the
+                  Select <Kbd>Motion</Kbd> from the mode picker to turn the
                   iPhone into a wireless motion-sensor OSC source. LOTA reads
                   the device motion sensors and streams them as OSC. Each
                   active sensor value also renders as its own scrolling line
@@ -821,7 +856,7 @@ export default function DocsPage() {
                   Audio mode
                 </h3>
                 <p className="text-sm text-zinc-400 leading-relaxed mb-6">
-                  Select <Kbd>Audio</Kbd> from the mode dropdown to turn the
+                  Select <Kbd>Audio</Kbd> from the mode picker to turn the
                   iPhone into a wireless real-time audio analysis source. LOTA
                   taps the microphone via <Kbd>AVAudioEngine</Kbd> and extracts
                   musically relevant features using Apple&apos;s{" "}
@@ -996,8 +1031,16 @@ export default function DocsPage() {
             >
               <SectionHeading tag="Network" title="Streaming">
                 Tap the transmit button (bottom right) to start streaming. All
-                enabled transports send simultaneously. Configure transports in
-                Settings (gear icon, bottom left).
+                enabled transports send simultaneously. Configure transports
+                by tapping the floating status bar pill at the top of the
+                screen — this opens <strong className="text-white">Transmission
+                Settings</strong>, a focused sheet with Receiver IP, TCP/UDP,
+                NDI, OSC, Point Cloud Stream, and Protocol Info sections.
+                While streaming, the per-protocol chip in the status bar (OSC,
+                NDI, TCP/UDP, PLY) goes from dim white to red, and a small
+                dim text block at the bottom of the screen lists each active
+                transmission as <Kbd>&lt;protocol&gt; &lt;host&gt;:&lt;port&gt;</Kbd>{" "}
+                so you can confirm settings at a glance.
               </SectionHeading>
 
               <div className="space-y-4 mb-8">
@@ -1055,10 +1098,11 @@ export default function DocsPage() {
                 <h3 className="text-sm font-semibold text-white">
                   How to start streaming
                 </h3>
-                <Step n={1} title="Open Settings (gear icon, bottom left)">
+                <Step n={1} title="Open Transmission Settings (tap the status bar pill)">
+                  Tap the floating status bar pill at the top of the screen.
                   Enable the protocols you need and set the destination IP
-                  (shared across all transports) and port for each. NDI requires
-                  no configuration.
+                  (shared across all transports) and port for each. NDI
+                  requires no configuration.
                 </Step>
                 <Step n={2} title="Connect to the same Wi-Fi network">
                   LOTA and your receiving machine must be on the same local
@@ -1141,7 +1185,9 @@ export default function DocsPage() {
                   iPhones. <strong className="text-white">3D
                   (opt-in)</strong> — world-space coordinates projected via
                   LiDAR depth. Requires a LiDAR device. Toggle
-                  in Settings &rarr; Tracking &rarr; 3D Hand Coordinates.
+                  in Hands Settings &rarr; 3D Hand Coordinates (tap the
+                  <Kbd>Hands Settings</Kbd> button below the status bar on the
+                  ARKit Tracking page).
                 </p>
               </div>
             </section>
@@ -1170,7 +1216,8 @@ export default function DocsPage() {
                         for the receiver port and a Script TOP target. Uses
                         numpy bulk parsing and GPU instancing to handle 49K+
                         points at 60&nbsp;fps. Enable <Kbd>Binary Format</Kbd>{" "}
-                        in Settings &rarr; Point Cloud Stream and point this
+                        in Transmission Settings &rarr; Point Cloud Stream
+                        (tap the floating status bar pill) and point this
                         component at the same port.
                       </p>
                     </div>
@@ -1269,7 +1316,7 @@ export default function DocsPage() {
                       </li>
                       <li>
                         In LOTA, enable <Kbd>PLY Streaming</Kbd> and{" "}
-                        <Kbd>Binary Format</Kbd> in Settings &rarr; Point Cloud
+                        <Kbd>Binary Format</Kbd> in Transmission Settings &rarr; Point Cloud
                         Stream and note the port.
                       </li>
                       <li>
@@ -1427,7 +1474,7 @@ export default function DocsPage() {
                   Material Capture
                 </h3>
                 <p className="text-sm text-zinc-400 leading-relaxed mb-6">
-                  Select <Kbd>Material</Kbd> from the format dropdown to swap
+                  Select <Kbd>Material</Kbd> from the format picker to swap
                   the page from a recording flow to a plane-lock + shutter
                   flow. One tap, ~½-second bake on iPhone 15/16 Pro at
                   1024², ZIP saved to your iCloud folder. Requires LiDAR.
@@ -1452,7 +1499,7 @@ export default function DocsPage() {
                 </div>
 
                 <div className="space-y-5 mb-8">
-                  <Step n={1} title="Pick Material from the format dropdown">
+                  <Step n={1} title="Pick Material from the format picker">
                     The page swaps to the material-capture UI: status icon,
                     plane-status chip, Lock Plane action, and shutter button.
                   </Step>
@@ -1668,19 +1715,31 @@ export default function DocsPage() {
               ref={(el) => { sectionRefs.current["settings"] = el; }}
             >
               <SectionHeading tag="Configuration" title="Settings Reference">
-                Access settings via the gear icon on the Camera / Streaming page
-                (bottom left). The receiver IP is shared across all transports.
+                Settings are split into focused sheets reachable from two
+                places: <strong className="text-white">Transmission
+                Settings</strong> (tap the floating status bar pill at the top
+                of the Camera / Streaming or ARKit Tracking page — Receiver,
+                Transport, NDI, OSC, Point Cloud Stream, Protocol Info, and
+                a Help section with{" "}
+                <Kbd>Replay Tutorial</Kbd>) and{" "}
+                <strong className="text-white">mode-specific settings</strong>{" "}
+                (tap the <Kbd>&lt;Mode&gt; Settings</Kbd> button just below
+                the status bar — only the section relevant to the active mode).
+                Color and Mono have no per-mode settings, so no button is shown.
+                The receiver IP is shared across all transports. The reference
+                below documents every setting; the headings indicate which
+                sheet hosts each section.
               </SectionHeading>
 
               <div className="space-y-4">
-                <SettingsGroup title="Receiver">
+                <SettingsGroup title="Receiver — Transmission Settings">
                   <Setting name="Receiver IP" defaultValue="192.168.1.100">
                     IP address of the computer receiving streams. Shared across
                     all transports (TCP, UDP, OSC, PLY).
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Transport (TCP/UDP)">
+                <SettingsGroup title="Transport (TCP/UDP) — Transmission Settings">
                   <Setting name="TCP/UDP Output" defaultValue="On">
                     Enable or disable the video transport.
                   </Setting>
@@ -1694,7 +1753,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="NDI">
+                <SettingsGroup title="NDI — Transmission Settings">
                   <Setting name="NDI Video Output" defaultValue="Off">
                     Enable or disable NDI streaming. Auto-broadcasts
                     as &quot;LOTA (iPhone)&quot; on the local network.
@@ -1706,7 +1765,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="OSC">
+                <SettingsGroup title="OSC — Transmission Settings">
                   <Setting name="OSC Output" defaultValue="Off">
                     Enable or disable OSC messages.
                   </Setting>
@@ -1715,7 +1774,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Depth">
+                <SettingsGroup title="Depth — Depth Settings sheet">
                   <Setting name="Color Map" defaultValue="Visible Spectrum">
                     Colormap for depth visualization. Options: Black &amp; White,
                     Black Aqua White, Blue Red, Deep Sea, Color Spectrum,
@@ -1723,7 +1782,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Point Cloud">
+                <SettingsGroup title="Point Cloud — Point Cloud Settings sheet">
                   <Setting name="Frame Window" defaultValue="30 (range 5–60)">
                     Number of accumulated LiDAR frames in the live point cloud
                     sliding window. Higher values show more spatial coverage but
@@ -1749,7 +1808,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Blob Tracking — Detection">
+                <SettingsGroup title="Blob Tracking — Detection (Blob Track Settings sheet)">
                   <Setting name="Base Style" defaultValue="Color">
                     What the underlying camera layer looks like behind the
                     rectangle outlines. Color (live RGB), Mono (grayscale),
@@ -1770,7 +1829,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Blob Tracking — Depth">
+                <SettingsGroup title="Blob Tracking — Depth (Blob Track Settings sheet)">
                   <Setting name="Min Depth" defaultValue="0.5 m (range 0.1–5.0 m)">
                     Near edge of the depth slab. Pixels closer than this are
                     excluded from blob detection.
@@ -1786,7 +1845,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Blob Tracking — Constraints">
+                <SettingsGroup title="Blob Tracking — Constraints (Blob Track Settings sheet)">
                   <Setting name="Min Blob Size" defaultValue="50 px (range 10–500)">
                     Minimum pixel area to count as a blob. Filters out single
                     noise pixels and tiny artifacts.
@@ -1803,7 +1862,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Blob Tracking — Revival">
+                <SettingsGroup title="Blob Tracking — Revival (Blob Track Settings sheet)">
                   <Setting name="Revive Blobs" defaultValue="On">
                     Re-identify lost blobs with the same ID if they reappear
                     inside the revival window. Mirrors TouchDesigner&apos;s
@@ -1825,7 +1884,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Point Cloud Stream (PLY)">
+                <SettingsGroup title="Point Cloud Stream (PLY) — Transmission Settings">
                   <Setting name="PLY Streaming" defaultValue="Off">
                     Enable or disable live point cloud TCP stream.
                   </Setting>
@@ -1843,7 +1902,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Tracking">
+                <SettingsGroup title="Tracking — Body / Face / Hands Settings sheets">
                   <Setting name="Skeleton Overlay" defaultValue="On">
                     Show or hide body skeleton visualization on the tracking page.
                   </Setting>
@@ -1860,7 +1919,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Transcription">
+                <SettingsGroup title="Transcription — Transcription Settings sheet">
                   <Setting name="Send Per-Word OSC" defaultValue="On">
                     Send each recognized word as it arrives
                     (<Kbd>/lota/speech/word</Kbd> + TCP/UDP word frames).
@@ -1883,7 +1942,7 @@ export default function DocsPage() {
                   </div>
                 </SettingsGroup>
 
-                <SettingsGroup title="Device Motion">
+                <SettingsGroup title="Device Motion — Motion Settings sheet">
                   <Setting name="Acceleration (X, Y, Z)" defaultValue="On">
                     Gravity-removed acceleration in G-force, sent as three OSC
                     floats per update (<Kbd>/lota/motion/accel/x</Kbd>,{" "}
@@ -1917,7 +1976,7 @@ export default function DocsPage() {
                   </div>
                 </SettingsGroup>
 
-                <SettingsGroup title="Audio Analysis">
+                <SettingsGroup title="Audio Analysis — Audio Settings sheet">
                   <Setting name="Levels (Bass / Mid / High)" defaultValue="On">
                     Continuous 0–1 energy per frequency band with rolling
                     auto-gain. <Kbd>/lota/audio/bass</Kbd>,{" "}
@@ -2011,20 +2070,24 @@ export default function DocsPage() {
               <div className="space-y-6">
                 <Faq q="Which iPhones support LOTA?">
                   Any iPhone running iOS 26.2 or later. LiDAR features (Depth,
-                  Point Cloud, Gaussian Capture, 3D hand coordinates) require
-                  iPhone 12 Pro or later. Color, Mono, and Transcription modes,
-                  NDI streaming, and TCP/UDP streaming all work on iPhones
-                  without LiDAR. Face tracking requires TrueDepth camera
-                  (iPhone X or later). Body tracking requires A12 chip or
-                  later. iPad Pro models with LiDAR are also supported.
+                  Point Cloud, Blob Track, Gaussian Capture, Material Capture,
+                  3D hand coordinates) require iPhone 12 Pro or later. Color,
+                  Mono, Transcription, Motion, and Audio modes, NDI streaming,
+                  and TCP/UDP streaming all work on iPhones without LiDAR.
+                  Face tracking requires TrueDepth camera (iPhone X or later).
+                  Body tracking requires A12 chip or later. iPad Pro models
+                  with LiDAR are also supported.
                 </Faq>
                 <Faq q="Does Transcription mode need internet access?">
                   No. Transcription uses iOS 26&apos;s on-device
                   {" "}<Kbd>SpeechAnalyzer</Kbd> framework and runs entirely
-                  offline. The first time you use it in a given language, iOS
-                  briefly downloads the speech model for that language in the
-                  background — after that, recognition works fully offline.
-                  Audio never leaves your device.
+                  offline. After you grant Speech Recognition permission on
+                  first launch, LOTA prefetches the on-device speech model for
+                  your locale in the background — by the time you open
+                  Transcription mode the model is on disk, so first captions
+                  arrive without a download wait. If the prefetch didn&apos;t
+                  finish, the model installs lazily on first use as a
+                  fallback. Audio never leaves your device.
                 </Faq>
                 <Faq q="Do the receiving machine and iPhone need to be on the same network?">
                   Yes. For TCP, UDP, OSC, and PLY streaming, both devices must be

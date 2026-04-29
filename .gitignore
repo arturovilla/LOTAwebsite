@@ -46,6 +46,7 @@ yarn-error.log*
 # local scratchpad — not tracked
 /app/test/
 /app/test2/
+/app/test3/
 /public/iphone_17_pro_max/
 /public/iphone_17_pro_max.zip
 /LOTAmarketingAssests/
