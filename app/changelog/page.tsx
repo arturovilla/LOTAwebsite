@@ -1,8 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
 import type { Metadata } from "next";
 import fs from "fs";
 import path from "path";
-import Link from "next/link";
+import Navbar from "../components/Navbar";
 import Signup from "../components/Signup";
 import Footer from "../components/Footer";
 
@@ -137,48 +136,14 @@ export default function ChangelogPage() {
   const releases = parseChangelog(raw);
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* ── top bar ─────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-black/80 backdrop-blur-xl border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2.5">
-              <img
-                src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/LOTA-dark.jpg"
-                alt="LOTA"
-                width={28}
-                height={28}
-                className="rounded-lg"
-              />
-              <span className="text-lg font-semibold text-white tracking-tight">
-                LOTA
-              </span>
-            </Link>
-            <span className="hidden sm:inline text-zinc-600 text-sm">/</span>
-            <span className="hidden sm:inline text-sm text-zinc-400">
-              Changelog
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <Link
-              href="/docs"
-              className="text-sm text-zinc-400 hover:text-white transition-colors"
-            >
-              Docs
-            </Link>
-            <Link
-              href="/"
-              className="text-sm text-zinc-400 hover:text-white transition-colors"
-            >
-              Home
-            </Link>
-          </div>
-        </div>
-      </header>
+    <div
+      className="min-h-screen bg-black text-white font-mono"
+      style={{ ["--font-mono" as string]: "var(--font-ibm-plex-mono)" }}
+    >
+      <Navbar />
 
       {/* ── content ─────────────────────────────────────────── */}
-      <main className="max-w-3xl mx-auto px-6 md:px-12 py-16">
+      <main className="max-w-3xl mx-auto px-6 md:px-12 py-16 pt-24">
         <div className="mb-16">
           <p className="text-xs font-mono text-zinc-600 uppercase tracking-[0.2em] mb-2">
             Updates

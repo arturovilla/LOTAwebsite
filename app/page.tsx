@@ -1,31 +1,20 @@
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Features from "./components/Features";
-import GaussianSplat from "./components/GaussianSplat";
-import Streaming from "./components/Streaming";
-import VideoDemo from "./components/VideoDemo";
-import InUse from "./components/InUse";
-import ARKitTracking from "./components/ARKitTracking";
-import HandTracking from "./components/HandTracking";
-import AccessibilitySection from "./components/Accessibility";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import UseCases from "./components/UseCases";
 import Signup from "./components/Signup";
 import Footer from "./components/Footer";
 
 export default function Home() {
   return (
-    <>
+    <div className="font-pixel-line text-glow">
       <Navbar />
       <Hero />
       <Features />
-      <Streaming />
-      <VideoDemo />
-      <InUse />
-      <ARKitTracking />
-      <HandTracking />
-      <GaussianSplat />
-      <AccessibilitySection />
+      {/* <UseCases /> */}
       <Signup />
       <Footer />
-    </>
+    </div>
   );
 }

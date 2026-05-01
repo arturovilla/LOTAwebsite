@@ -1,12 +1,26 @@
 /* eslint-disable @next/next/no-img-element */
 
+import HeroPointCloud from "./HeroPointCloud";
+
 export default function Hero() {
   return (
     <section
       id="hero"
       className="relative min-h-screen flex items-center justify-center overflow-hidden gradient-hero"
     >
-      <div className="relative z-10 text-center px-6 pt-24 pb-48 sm:pb-56 max-w-3xl mx-auto">
+      {/* Animated point cloud background. Layered behind the centered
+          content via z-index. The CSS gradient stays in place underneath
+          so the section has a sensible look while the 15 MB PLY loads. */}
+      <HeroPointCloud />
+
+      {/* Top vignette: keeps the navbar legible against bright cloud regions. */}
+      <div className="absolute top-0 inset-x-0 h-40 z-[5] bg-gradient-to-b from-black/50 to-transparent pointer-events-none" />
+
+      {/* Bottom blend: fades the cloud cleanly into the Features section's
+          solid bg-black. The taller the fade, the smoother the transition. */}
+      <div className="absolute bottom-0 inset-x-0 h-[40vh] z-[5] bg-gradient-to-b from-transparent to-black pointer-events-none" />
+
+      <div className="relative z-10 text-center px-6 py-24 max-w-3xl mx-auto">
         {/* Logo */}
         <div className="flex justify-center mb-8 animate-fade-in-up">
           <img
@@ -24,11 +38,19 @@ export default function Hero() {
 
         <p className="text-lg sm:text-xl text-zinc-400 mt-6 max-w-2xl mx-auto leading-relaxed animate-fade-in-up-delay-2">
           Turn your iPhone into a professional spatial capture tool.
-          Stream depth, color, and point cloud data over the network in real time —
-          no expensive hardware required.
+          Stream depth, color, and point cloud data over the network in real time,
+          with no expensive hardware required.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10 animate-fade-in-up-delay-3">
+          <a
+            href="https://testflight.apple.com/join/jFNkCjNF"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-white text-black rounded-full font-semibold text-sm hover:bg-zinc-200 transition-colors"
+          >
+            Join the Beta
+          </a>
           <span
             className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-white/10 text-white border border-white/[0.15] rounded-full font-semibold text-sm cursor-default"
           >
@@ -40,37 +62,6 @@ export default function Hero() {
           >
             See what it does
           </a>
-        </div>
-      </div>
-
-      {/* Phone mockups */}
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 flex items-end gap-6 md:gap-10 pointer-events-none">
-        <div className="animate-float hidden sm:block -mb-20 md:-mb-28">
-          <img
-            src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/colormode.webp"
-            alt="LOTA color capture mode"
-            width={200}
-            height={430}
-            className="rounded-[2rem] drop-shadow-2xl"
-          />
-        </div>
-        <div className="animate-float-delay -mb-10 md:-mb-16">
-          <img
-            src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/depthmode.webp"
-            alt="LOTA depth map visualization"
-            width={220}
-            height={470}
-            className="rounded-[2rem] drop-shadow-2xl"
-          />
-        </div>
-        <div className="animate-float hidden md:block -mb-24 md:-mb-32">
-          <img
-            src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/pointcloudmode.webp"
-            alt="LOTA point cloud mode"
-            width={200}
-            height={430}
-            className="rounded-[2rem] drop-shadow-2xl"
-          />
         </div>
       </div>
     </section>

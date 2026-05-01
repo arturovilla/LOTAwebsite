@@ -1,8 +1,7 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import Link from "next/link";
+import Navbar from "../components/Navbar";
 import Signup from "../components/Signup";
 import Footer from "../components/Footer";
 
@@ -173,55 +172,33 @@ export default function DocsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-white">
-      {/* ── top bar ─────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-black/80 backdrop-blur-xl border-b border-white/[0.06]">
-        <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2.5">
-              <img
-                src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/LOTA-dark.jpg"
-                alt="LOTA"
-                width={28}
-                height={28}
-                className="rounded-lg"
-              />
-              <span className="text-lg font-semibold text-white tracking-tight">
-                LOTA
-              </span>
-            </Link>
-            <span className="hidden sm:inline text-zinc-600 text-sm">/</span>
-            <span className="hidden sm:inline text-sm text-zinc-400">Docs</span>
-          </div>
+    <div
+      className="min-h-screen bg-black text-white font-mono"
+      style={{ ["--font-mono" as string]: "var(--font-ibm-plex-mono)" }}
+    >
+      <Navbar />
 
-          <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              className="text-sm text-zinc-400 hover:text-white transition-colors"
-            >
-              Home
-            </Link>
-            <button
-              className="lg:hidden p-2 text-zinc-400 hover:text-white"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              aria-label="Toggle sidebar"
-            >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 20 20"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.5"
-              >
-                <path d="M3 5h14M3 10h14M3 15h14" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* Floating sidebar toggle — visible only below lg, where the docs
+          sidebar is hidden by default. */}
+      <button
+        className="lg:hidden fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/10 border border-white/[0.15] text-zinc-200 backdrop-blur-xl hover:bg-white/[0.15] transition-colors text-sm font-medium shadow-lg"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        aria-label="Toggle docs sidebar"
+      >
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 20 20"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.5"
+        >
+          <path d="M3 5h14M3 10h14M3 15h14" />
+        </svg>
+        Contents
+      </button>
 
-      <div className="max-w-7xl mx-auto flex">
+      <div className="max-w-7xl mx-auto flex pt-16">
         {/* ── sidebar ───────────────────────────────────────── */}
         <aside
           className={`
@@ -279,8 +256,8 @@ export default function DocsPage() {
                   Requirements
                 </h3>
                 <ul className="text-sm text-zinc-400 space-y-1.5">
-                  <li>• iPhone 12 Pro or later (LiDAR required for Depth, Point Cloud, Blob Track, and Gaussian Capture)</li>
-                  <li>• Color, Mono, Transcription, Motion, and Audio modes work on all iPhones</li>
+                  <li>• iPhone 12 Pro or later (LiDAR required for Depth, Point Cloud, Blob Track, Gaussian Capture, and Material Capture)</li>
+                  <li>• Color, Mono, <strong className="text-white">Neural Depth</strong>, Transcription, Motion, and Audio modes work on every iPhone — no LiDAR needed</li>
                   <li>• iOS 26.2 or later</li>
                   <li>• Wi-Fi network (for streaming features)</li>
                 </ul>
@@ -288,42 +265,57 @@ export default function DocsPage() {
 
               <div className="space-y-5">
                 <Step n={1} title="Install LOTA and complete first launch">
-                  Download LOTA from the App Store. The first time you open the
-                  app, a welcome screen lists the four iOS permissions LOTA
-                  needs (Camera, Microphone, Speech Recognition, Location for
-                  compass heading) plus a privacy reassurance — LOTA
-                  doesn&apos;t track or store anything; captures stream over
-                  your local network or save to the iCloud folder you choose.
-                  Tap <Kbd>Continue</Kbd> and the four OS permission dialogs
-                  appear in sequence.
+                  Download LOTA from the App Store. The first time you open
+                  the app, a welcome screen lists the seven iOS permissions
+                  LOTA needs (Camera, Microphone, Speech Recognition, Local
+                  Network, Location for compass heading, Motion &amp; Fitness,
+                  and Photos <strong className="text-white">add-only</strong>{" "}
+                  for saving local recordings) plus a privacy reassurance —
+                  LOTA never tracks you, sells your data, or sends anything
+                  off your device unless you point it at a receiver. Tap{" "}
+                  <Kbd>Continue</Kbd> and the seven OS permission dialogs
+                  appear in sequence. The Photos prompt is the narrower{" "}
+                  <strong className="text-white">add-only</strong> variant —
+                  LOTA can write videos to your camera roll but never read
+                  existing photos.
                 </Step>
-                <Step n={2} title="Take the 9-step guided tour">
+                <Step n={2} title="Take the 10-step guided tour">
                   After permissions, a hybrid welcome card &rarr; spotlight
-                  tour walks you through the three pages, the mode picker, the
-                  status bar, mode-specific settings, and the transmit button.
-                  Tap anywhere to advance, or use the Skip button at the
-                  bottom-left. Replay anytime from{" "}
+                  tour walks you through the three pages, the mode picker,
+                  the status bar, the bottom endpoint summary, mode-specific
+                  settings, and the transmit button. Tap anywhere to advance,
+                  or use the Skip button at the bottom-left. Replay anytime
+                  from{" "}
                   <Kbd>Transmission Settings &rarr; Help &rarr; Replay Tutorial</Kbd>.
                 </Step>
                 <Step n={3} title="Choose a capture mode">
-                  Tap the mode picker at the top — a glass capsule showing the
-                  active mode&apos;s icon next to a 3&times;2 dot-grid glyph,
-                  mirroring the iOS Camera app&apos;s &quot;more controls&quot;
-                  affordance. A glass panel drops down with all 8 modes laid
-                  out in a 2&times;4 grid of circular icon buttons (Color,
-                  Mono, Depth, Point Cloud, Blob Track, Transcription, Motion,
-                  Audio). Active mode is highlighted yellow; LiDAR-required
-                  modes are dimmed and disabled on non-LiDAR devices. Each
-                  mode activates instantly — no restart required.
+                  Tap the mode picker at the top — a glass capsule showing
+                  the active mode&apos;s icon next to a chevron that flips
+                  down / up as the panel opens and closes. A glass panel
+                  drops down with all 9 modes laid out in a circular-icon
+                  grid (Color, Mono, Depth, Neural Depth, Point Cloud, Blob
+                  Track, Transcription, Motion, Audio). Active mode is
+                  highlighted yellow; LiDAR-required modes are dimmed and
+                  disabled on non-LiDAR devices. Each mode activates instantly
+                  — no restart required.
                 </Step>
-                <Step n={4} title="Start streaming or recording">
-                  Tap the transmit button (bottom right) to broadcast over the
-                  network — all enabled transports send simultaneously.
-                  Configure transports by tapping the floating status bar pill
-                  at the top (opens Transmission Settings). Tweak per-mode
-                  options via the <Kbd>&lt;Mode&gt; Settings</Kbd> button just
-                  under the status bar. Swipe right to access Gaussian
-                  Capture for recording 3D datasets or capturing PBR materials.
+                <Step n={4} title="Stream or record locally">
+                  The middle page has an iOS Camera-style shutter button at
+                  the bottom-center with a{" "}
+                  <strong className="text-white">STREAM | RECORD</strong>{" "}
+                  segmented control directly below it. The two paradigms are{" "}
+                  <em>mutually exclusive</em>: while one is active the other
+                  is locked, so a recording can&apos;t start mid-stream and
+                  vice versa. <strong className="text-white">STREAM</strong>{" "}
+                  broadcasts over the network (all enabled transports send
+                  simultaneously); <strong className="text-white">RECORD</strong>{" "}
+                  saves an H.264 <Kbd>.mov</Kbd> of the live composited Metal
+                  output to your Photos library on stop (4-hour cap).
+                  Configure transports by tapping the floating status bar
+                  pill (Transmission Settings); tweak per-mode options via
+                  the <Kbd>&lt;Mode&gt; Settings</Kbd> button. Swipe right
+                  for Gaussian Capture (3D datasets, PBR materials, IMU /
+                  Audio Trace exports).
                 </Step>
               </div>
             </section>
@@ -345,22 +337,25 @@ export default function DocsPage() {
                   Max/MSP, Ableton, and more.
                 </Card>
                 <Card title="Camera / Streaming — Center (default)">
-                  The main page. Live camera feed with eight capture modes
-                  (Color, Mono, Depth, Point Cloud, Blob Track, Transcription,
-                  Motion, Audio) and streaming controls. Tap the mode picker
-                  at the top (glass capsule + 3&times;2 dot-grid glyph) to
-                  open the panel and switch modes. Tap the floating status bar
-                  pill for Transmission Settings, or the per-mode{" "}
-                  <Kbd>&lt;Mode&gt; Settings</Kbd> button just below it for
-                  options specific to the active mode. Streaming toggle is
-                  bottom right.
+                  The main page. Live camera feed with nine capture modes
+                  (Color, Mono, Depth, Neural Depth, Point Cloud, Blob Track,
+                  Transcription, Motion, Audio) and streaming controls. Tap
+                  the mode picker at the top (glass capsule + chevron that
+                  flips down/up) to open the panel and switch modes. Tap the
+                  floating status bar pill for Transmission Settings, or the
+                  per-mode <Kbd>&lt;Mode&gt; Settings</Kbd> button just below
+                  it for options specific to the active mode. Streaming
+                  toggle is bottom right.
                 </Card>
                 <Card title="Gaussian Capture — Swipe Right">
                   Record datasets for Gaussian Splatting and 3D reconstruction,
-                  or capture a flat surface as a complete PBR material set
-                  with the Material format. Choose a format, pick an iCloud
-                  folder, then either tap record (3D scene formats) or lock
-                  a plane and tap the shutter (Material).
+                  capture a flat surface as a complete PBR material set with
+                  the Material format, or record IMU / Audio Trace exports
+                  (sensor or audio analysis data over time as
+                  CSV/TSV + manifest + optional PDF report). Choose a format,
+                  pick an iCloud folder, then either tap record (3D scene
+                  and trace formats) or lock a plane and tap the shutter
+                  (Material).
                 </Card>
               </div>
             </section>
@@ -371,13 +366,14 @@ export default function DocsPage() {
               ref={(el) => { sectionRefs.current["capture-modes"] = el; }}
             >
               <SectionHeading tag="Capture" title="Capture Modes">
-                LOTA provides eight distinct capture modes on the Camera /
+                LOTA provides nine distinct capture modes on the Camera /
                 Streaming page. Tap the mode picker at the top (glass capsule
-                with the active mode&apos;s icon next to a 3&times;2 dot-grid
-                glyph) to open a glass panel laid out as a 2&times;4 grid of
-                circular icon buttons. Active mode is highlighted yellow;
-                LiDAR-required modes are dimmed on non-LiDAR devices. Tap
-                outside the panel to dismiss without picking.
+                with the active mode&apos;s icon next to a chevron that flips
+                down/up as the panel opens and closes) to open a glass panel
+                laid out as a grid of circular icon buttons. Active mode is
+                highlighted yellow; LiDAR-required modes are dimmed on
+                non-LiDAR devices. Tap outside the panel to dismiss without
+                picking.
               </SectionHeading>
 
               <div className="grid gap-4 sm:grid-cols-2">
@@ -396,6 +392,19 @@ export default function DocsPage() {
                     LiDAR depth visualization with <strong className="text-white">9 selectable
                     colormaps</strong> including thermal, incandescent, deep sea,
                     and visible spectrum. Requires a LiDAR-equipped iPhone.
+                  </>
+                </Card>
+                <Card title="Neural Depth">
+                  <>
+                    AI-estimated depth from the regular camera feed via{" "}
+                    <strong className="text-white">Depth Anything V2 Small</strong>{" "}
+                    (ByteDance Research, packaged for Core ML by Apple),
+                    running on the <strong className="text-white">Apple Neural
+                    Engine</strong> at ~30 ms / frame. Same nine colormaps as
+                    LiDAR Depth. Works on every iPhone — no LiDAR required —
+                    and doubles as a fallback for NDI side-by-side on
+                    non-LiDAR phones. Fully on-device; nothing leaves the
+                    phone.
                   </>
                 </Card>
                 <Card title="Point Cloud">
@@ -452,10 +461,84 @@ export default function DocsPage() {
                 </h3>
                 <p className="text-sm text-zinc-400 leading-relaxed">
                   Tap the mode picker at the top of the screen and select a
-                  cell from the dot-grid panel, or say{" "}
+                  cell from the panel, or say{" "}
                   <Kbd>switch to Depth</Kbd> with Voice Control enabled.
                   Switching is instant and does not interrupt an active stream.
                 </p>
+              </div>
+
+              {/* ─── Neural Depth details ──────────────────── */}
+              <div className="mt-10">
+                <h3 className="text-xl font-bold text-white mb-2">
+                  Neural Depth mode
+                </h3>
+                <p className="text-sm text-zinc-400 leading-relaxed mb-6">
+                  Select <Kbd>Neural Depth</Kbd> from the mode picker to
+                  estimate depth from the regular camera feed using{" "}
+                  <strong className="text-white">Depth Anything V2 Small</strong>{" "}
+                  (ByteDance Research, packaged for Core ML by Apple, Apache
+                  2.0, 24.8 M params). Inference runs entirely on the{" "}
+                  <strong className="text-white">Apple Neural Engine</strong>{" "}
+                  at roughly 30 ms per frame — nothing leaves the device.
+                </p>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    Use Neural Depth when
+                  </h4>
+                  <ul className="text-sm text-zinc-400 space-y-2">
+                    <li>
+                      You&apos;re on a{" "}
+                      <strong className="text-white">non-LiDAR iPhone</strong>{" "}
+                      and want a depth visualization or NDI side-by-side feed
+                    </li>
+                    <li>
+                      You want a{" "}
+                      <strong className="text-white">comparison source</strong>{" "}
+                      alongside LiDAR for testing or stylistic reasons
+                    </li>
+                    <li>
+                      You need depth in conditions where{" "}
+                      <strong className="text-white">LiDAR struggles</strong>{" "}
+                      — very bright sunlight, very long range,
+                      glass/reflective surfaces
+                    </li>
+                  </ul>
+                </div>
+
+                <Card title="First selection">
+                  <>
+                    A centered glass card appears explaining the model is
+                    initializing. The first frame can take a moment as the
+                    Neural Engine warms up; subsequent frames are real-time.
+                    The card auto-fades when inference begins.
+                  </>
+                </Card>
+
+                <div className="mt-4">
+                  <Card title="Color map and About the Model">
+                    <>
+                      The same nine colormaps as LiDAR Depth are available
+                      under <Kbd>Neural Depth Settings &rarr; Visualization</Kbd>.
+                      The <strong className="text-white">About the Model</strong>{" "}
+                      section credits ByteDance Research and Apple, confirms
+                      inference runs fully on-device on the Neural Engine,
+                      and links to the Hugging Face model page.
+                    </>
+                  </Card>
+                </div>
+
+                <div className="mt-4">
+                  <Card title="NDI side-by-side fallback">
+                    <>
+                      Enabling NDI side-by-side on a phone{" "}
+                      <strong className="text-white">without LiDAR</strong>{" "}
+                      now composites the regular camera on the left and Depth
+                      Anything V2 estimated depth on the right — the
+                      side-by-side workflow is no longer LiDAR-only.
+                    </>
+                  </Card>
+                </div>
               </div>
 
               {/* ─── Blob Track details ────────────────────── */}
@@ -1029,29 +1112,82 @@ export default function DocsPage() {
               id="streaming"
               ref={(el) => { sectionRefs.current["streaming"] = el; }}
             >
-              <SectionHeading tag="Network" title="Streaming">
-                Tap the transmit button (bottom right) to start streaming. All
-                enabled transports send simultaneously. Configure transports
-                by tapping the floating status bar pill at the top of the
-                screen — this opens <strong className="text-white">Transmission
-                Settings</strong>, a focused sheet with Receiver IP, TCP/UDP,
-                NDI, OSC, Point Cloud Stream, and Protocol Info sections.
-                While streaming, the per-protocol chip in the status bar (OSC,
-                NDI, TCP/UDP, PLY) goes from dim white to red, and a small
-                dim text block at the bottom of the screen lists each active
-                transmission as <Kbd>&lt;protocol&gt; &lt;host&gt;:&lt;port&gt;</Kbd>{" "}
-                so you can confirm settings at a glance.
+              <SectionHeading tag="Network" title="Streaming and local recording">
+                The middle page has an iOS Camera-style{" "}
+                <strong className="text-white">shutter button</strong> at the
+                bottom-center with a{" "}
+                <strong className="text-white">STREAM | RECORD</strong>{" "}
+                segmented control directly below it that picks which paradigm
+                the shutter triggers. The two are mutually exclusive — while
+                one is running the other is locked, so you can&apos;t
+                accidentally start a recording mid-stream or vice versa.
+                Configure transports by tapping the floating status bar pill
+                at the top — this opens <strong className="text-white">Transmission
+                Settings</strong>, a focused sheet with This Device (your
+                iPhone&apos;s active IPs), Receiver, TCP/UDP, NDI, OSC, Point
+                Cloud Stream, and Protocol Info sections. While streaming,
+                the per-protocol chip in the status bar (OSC, NDI, TCP/UDP,
+                PLY) goes from dim white to red, and a centered dim table at
+                the bottom of the screen lists each active transmission with
+                its <Kbd>&lt;host&gt;:&lt;port&gt;</Kbd> (and the NDI source
+                name <Kbd>LOTA - &lt;deviceLabel&gt;</Kbd>), plus a footer
+                line showing the iPhone&apos;s own active IPs (e.g.{" "}
+                <Kbd>This iPhone: 192.168.1.42 (Wi-Fi)</Kbd>) so you can
+                verify the entire wiring at a glance without opening the
+                sheet.{" "}
+                <strong className="text-white">In landscape</strong>, the
+                shutter + segmented control stay pinned to the device&apos;s{" "}
+                <em>physical</em> bottom edge (where they sit in portrait),
+                matching iOS Camera&apos;s shutter behavior — rotate the
+                phone and the island slides to the screen edge that now
+                corresponds to that physical position. All other UI rotates
+                naturally.
               </SectionHeading>
+
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-8">
+                <h3 className="text-sm font-semibold text-white mb-3">
+                  STREAM vs. RECORD
+                </h3>
+                <ul className="text-sm text-zinc-400 space-y-3">
+                  <li>
+                    <strong className="text-white">STREAM</strong> — taps the
+                    shutter to start/stop network streaming. All enabled
+                    transports (TCP/UDP, NDI, OSC, PLY) send simultaneously.
+                  </li>
+                  <li>
+                    <strong className="text-white">RECORD</strong> — taps the
+                    shutter to start/stop a{" "}
+                    <strong className="text-white">local recording</strong>{" "}
+                    of the live composited Metal output. Saved as an H.264{" "}
+                    <Kbd>.mov</Kbd> to your Photos library on stop. Available
+                    in every camera-using mode (Color, Mono, Depth, Neural
+                    Depth, Point Cloud, Blob Track); disabled in Transcription /
+                    Motion / Audio because there&apos;s no camera content to
+                    capture. <strong className="text-white">4-hour cap</strong>{" "}
+                    per recording. Uses <Kbd>PHPhotoLibrary</Kbd> add-only
+                    access — LOTA can write videos but never read your
+                    existing photos.
+                  </li>
+                </ul>
+              </div>
 
               <div className="space-y-4 mb-8">
                 <Card title="NDI">
                   <>
-                    Industry-standard video-over-IP. LOTA appears as{" "}
-                    <Kbd>LOTA (iPhone)</Kbd> on your network and is
-                    auto-discovered by TouchDesigner, OBS, vMix, Resolume, and
-                    any other NDI-compatible receiver. No IP configuration
-                    needed. Optional side-by-side mode sends a 2x-wide frame
-                    with camera view on the left and depth colormap on the right.
+                    Industry-standard video-over-IP. LOTA broadcasts as{" "}
+                    <Kbd>LOTA - &lt;Device Label&gt;</Kbd> (random 4-char ID
+                    by default — e.g. <Kbd>LOTA - 7F3A</Kbd> — customizable
+                    in the Receiver section to anything like{" "}
+                    <Kbd>LOTA - Stage Left</Kbd>) and is auto-discovered by
+                    TouchDesigner, OBS, vMix, Resolume, and any other
+                    NDI-compatible receiver. Per-device labels mean multiple
+                    LOTA phones in the same venue show up as distinct
+                    sources. Optional side-by-side mode sends a 2x-wide frame
+                    with camera view on the left and depth colormap on the
+                    right — uses LiDAR depth on Pro phones and{" "}
+                    <strong className="text-white">Depth Anything V2
+                    estimated depth</strong> on non-LiDAR phones, so the
+                    side-by-side workflow is no longer LiDAR-only.
                   </>
                 </Card>
                 <Card title="TCP / UDP">
@@ -1081,15 +1217,17 @@ export default function DocsPage() {
                 </Card>
                 <Card title="PLY (live point cloud)">
                   <>
-                    Sends live point cloud frames over TCP as packed binary
-                    (15&nbsp;bytes/point: 3 floats + 3 uint8 RGB) on
-                    port <Kbd>9848</Kbd> by default. Pair it with the{" "}
-                    <Kbd>LOTABinaryPLYRecieverV2.tox</Kbd> drop-in component
-                    (TouchDesigner section below) — it auto-detects the binary
-                    header and only asks for the port and a Script TOP target.
-                    A legacy CSV text mode remains available for custom
-                    receivers but is deprecated and will be removed in a
-                    future update.
+                    Sends live point cloud frames over TCP in a fixed{" "}
+                    <strong className="text-white">packed binary</strong>{" "}
+                    format: <Kbd>UInt32 LE point count</Kbd> followed by{" "}
+                    <Kbd>N × (3 Float32 XYZ + 3 UInt8 RGB)</Kbd> ={" "}
+                    <strong className="text-white">15 bytes/point</strong>.
+                    Default port <Kbd>9848</Kbd>. Pair with the{" "}
+                    <Kbd>LOTABinaryPLYRecieverV2.tox</Kbd> drop-in
+                    TouchDesigner component (section below) — plug-and-play.
+                    The legacy CSV-text variant and its toggle were{" "}
+                    <strong className="text-white">removed in v1.2.3</strong>;
+                    binary is now the only supported wire format.
                   </>
                 </Card>
               </div>
@@ -1108,9 +1246,13 @@ export default function DocsPage() {
                   LOTA and your receiving machine must be on the same local
                   network. A 5&nbsp;GHz network is recommended for lowest latency.
                 </Step>
-                <Step n={3} title="Tap the stream button (bottom right)">
-                  All enabled protocols start simultaneously. The status bar
-                  shows a live indicator for each active protocol.
+                <Step n={3} title="Set STREAM (bottom-center) and tap the shutter">
+                  Make sure the segmented control under the shutter is on{" "}
+                  <Kbd>STREAM</Kbd> (not <Kbd>RECORD</Kbd>), then tap the
+                  shutter. All enabled protocols start simultaneously. The
+                  status bar pill shows a red chip for each active protocol;
+                  the bottom endpoint summary lists their <Kbd>host:port</Kbd>{" "}
+                  destinations.
                 </Step>
               </div>
             </section>
@@ -1398,6 +1540,40 @@ export default function DocsPage() {
                     TouchDesigner. Requires LiDAR.
                   </>
                 </Card>
+                <Card title="IMU Trace">
+                  <>
+                    Records device motion sensors (acceleration, gyroscope,
+                    compass heading, barometric pressure / relative altitude)
+                    over time. ZIP contains{" "}
+                    <Kbd>recording.csv</Kbd> or <Kbd>.tsv</Kbd> (one row per
+                    sample, first column <Kbd>t_seconds</Kbd>),{" "}
+                    <Kbd>manifest.json</Kbd> describing every column, and{" "}
+                    <Kbd>README.txt</Kbd>. Optional multi-page dark-theme PDF
+                    report with per-channel charts (X/Y/Z lines, |A|
+                    magnitude, compass polar rose, pressure & altitude) and a
+                    statistics table.
+                  </>
+                </Card>
+                <Card title="Audio Trace">
+                  <>
+                    Records audio analysis frames (bass/mid/high levels, drum
+                    onsets, dynamics, 20-band FFT spectrum) over time using
+                    the same mic engine as Audio mode. Same ZIP shape as IMU
+                    Trace; optional PDF report with FFT spectrogram heatmap,
+                    levels traces, beat-events timeline, dynamics burst, and
+                    statistics. Works on every iPhone — no LiDAR.
+                  </>
+                </Card>
+              </div>
+
+              <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-8">
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  <strong className="text-white">ZIP naming:</strong> every
+                  export ZIP is named{" "}
+                  <Kbd>LOTA_&lt;timestamp&gt;_&lt;MODE&gt;.zip</Kbd> (e.g.{" "}
+                  <Kbd>LOTA_2026-04-30_14-22-08_IMU.zip</Kbd>) so the format
+                  is identifiable from the filename alone.
+                </p>
               </div>
 
               <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-8">
@@ -1707,6 +1883,131 @@ export default function DocsPage() {
                   </Card>
                 </div>
               </div>
+
+              {/* ─── IMU / Audio Trace ─────────────────────── */}
+              <div className="mt-12">
+                <h3 className="text-xl font-bold text-white mb-2">
+                  IMU Trace and Audio Trace
+                </h3>
+                <p className="text-sm text-zinc-400 leading-relaxed mb-6">
+                  Pick <Kbd>IMU Trace</Kbd> or <Kbd>Audio Trace</Kbd> from
+                  the format picker to record sensor or audio analysis data
+                  over time as a structured file you can hand to a data
+                  science / motion / music workflow. The right page swaps to
+                  the matching live visualization (the same scrolling lane
+                  graphs as the middle page&apos;s Motion / Audio modes)
+                  while the trace is being collected.
+                </p>
+
+                <div className="space-y-5 mb-8">
+                  <Step n={1} title="Pick the format">
+                    Tap <Kbd>IMU Trace</Kbd> or <Kbd>Audio Trace</Kbd> in the
+                    format picker.
+                  </Step>
+                  <Step n={2} title="Set the export folder">
+                    Tap the folder icon (bottom left) to choose an iCloud
+                    Files folder if you haven&apos;t already.
+                  </Step>
+                  <Step n={3} title="Open IMU/Audio Trace Settings">
+                    Choose which sensor channels to include, the file format
+                    (<Kbd>CSV</Kbd> / <Kbd>TSV</Kbd>), whether to bundle a
+                    PDF report, and an optional auto-stop duration cap
+                    (5–600 s).
+                  </Step>
+                  <Step n={4} title="Tap the shutter to start">
+                    Sample counter and elapsed timer update at 10 Hz. The
+                    same scrolling lane visualization renders live so you
+                    can confirm signal is coming through.
+                  </Step>
+                  <Step n={5} title="Tap again to stop (or let it auto-stop)">
+                    Saves to your iCloud folder. A save-summary sheet shows
+                    file size and sample count.
+                  </Step>
+                </div>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    What&apos;s in the ZIP
+                  </h4>
+                  <ul className="text-sm text-zinc-400 space-y-2">
+                    <li>
+                      <Kbd>recording.csv</Kbd> or <Kbd>.tsv</Kbd> — one row
+                      per sample. First column is <Kbd>t_seconds</Kbd>; the
+                      rest are described in the manifest
+                    </li>
+                    <li>
+                      <Kbd>manifest.json</Kbd> — recording metadata (device,
+                      version, timestamps, sample count, sample rate, stop
+                      reason) plus a per-column dictionary (name, unit,
+                      dtype, description). Device names are mapped from{" "}
+                      <Kbd>sysctl</Kbd> hardware IDs to consumer names (e.g.{" "}
+                      <Kbd>iPhone 17 Pro Max</Kbd>)
+                    </li>
+                    <li>
+                      <Kbd>README.txt</Kbd> — one-paragraph human description
+                      of the bundle layout
+                    </li>
+                    <li>
+                      <Kbd>report.pdf</Kbd> (optional) — multi-page
+                      dark-theme report with cover, per-channel charts, and
+                      a statistics table
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    PDF report contents
+                  </h4>
+                  <ul className="text-sm text-zinc-400 space-y-2">
+                    <li>
+                      <strong className="text-white">IMU Trace</strong> —
+                      Cover · Accelerometer X/Y/Z line · |A| magnitude ·
+                      Gyroscope X/Y/Z line · Compass heading polar rose (if
+                      heading recorded) · Pressure &amp; altitude (if
+                      pressure recorded) · Per-channel statistics
+                    </li>
+                    <li>
+                      <strong className="text-white">Audio Trace</strong> —
+                      Cover · FFT spectrogram (20 bands × time, viridis
+                      heatmap) · Bass/Mid/High levels · Beat events timeline
+                      (per band) · Dynamics burst trace · Per-channel
+                      statistics
+                    </li>
+                  </ul>
+                  <p className="text-sm text-zinc-500 leading-relaxed mt-3">
+                    Charts that have no data to plot show a centered{" "}
+                    <em>&quot;No data captured&quot;</em> placeholder so the
+                    recipient can tell an empty page is intentional, not
+                    broken (typical for an Audio Trace recorded in a silent
+                    room — the FFT charts populate, the beat-events page
+                    shows the placeholder).
+                  </p>
+                </div>
+
+                <Card title="When to use these">
+                  <>
+                    <ul className="space-y-1.5 mt-1">
+                      <li>
+                        Capture a short walk to plot device motion against
+                        ground-truth GPS in a Jupyter notebook
+                      </li>
+                      <li>
+                        Record a song through the mic to extract beat onsets
+                        for an Ableton MIDI workflow
+                      </li>
+                      <li>
+                        Sample IMU data from a moving rig and ship it to
+                        TouchDesigner / Blender as a baked animation source
+                      </li>
+                      <li>
+                        Build a training dataset for sensor-fusion or
+                        audio-classification models
+                      </li>
+                    </ul>
+                  </>
+                </Card>
+              </div>
             </section>
 
             {/* ─── Settings ───────────────────────────────── */}
@@ -1732,10 +2033,41 @@ export default function DocsPage() {
               </SectionHeading>
 
               <div className="space-y-4">
+                <SettingsGroup title="This Device — Transmission Settings (top of sheet)">
+                  <Setting name="Active IPv4 addresses" defaultValue="live, read-only">
+                    Pinned to the top of Transmission Settings. Lists the
+                    iPhone&apos;s currently active IPv4 addresses with
+                    friendly interface labels: <strong className="text-white">Wi-Fi</strong>{" "}
+                    (joined to a network), <strong className="text-white">USB Hotspot</strong>{" "}
+                    (Personal Hotspot enabled while plugged into a Mac via
+                    USB — e.g. <Kbd>172.20.10.1</Kbd>), <strong className="text-white">Ethernet</strong>{" "}
+                    (USB-Ethernet adapter for multi-device wired rigs).{" "}
+                    <strong className="text-white">Tap any row to copy</strong>{" "}
+                    the address with a haptic + brief &quot;Copied&quot; chip.
+                    The list updates live as you toggle Personal Hotspot,
+                    plug in / unplug USB-Ethernet, or join / leave Wi-Fi —
+                    no need to re-open the sheet. These are the iPhone&apos;s{" "}
+                    <em>own</em> addresses, shown to help you set the right
+                    Receiver IP <em>on your computer</em>; not values to paste
+                    into LOTA&apos;s Receiver IP field.
+                  </Setting>
+                </SettingsGroup>
+
                 <SettingsGroup title="Receiver — Transmission Settings">
                   <Setting name="Receiver IP" defaultValue="192.168.1.100">
                     IP address of the computer receiving streams. Shared across
                     all transports (TCP, UDP, OSC, PLY).
+                  </Setting>
+                  <Setting name="Device Label" defaultValue="random 4-char ID (e.g. 7F3A)">
+                    4–20 character ID used to build the NDI broadcast name{" "}
+                    <Kbd>LOTA - &lt;label&gt;</Kbd>. Random base36 default on
+                    first launch (e.g. <Kbd>LOTA - 7F3A</Kbd>); customizable
+                    to anything memorable like <Kbd>Stage Left</Kbd>,{" "}
+                    <Kbd>FOH</Kbd>, or <Kbd>Front Camera</Kbd>. Persists
+                    across launches. Critical for multi-device venues so each
+                    LOTA phone is distinguishable in TouchDesigner / OBS /
+                    NDI Studio Monitor. Changes take effect within ~1 s — no
+                    need to stop and restart streaming.
                   </Setting>
                 </SettingsGroup>
 
@@ -1755,13 +2087,23 @@ export default function DocsPage() {
 
                 <SettingsGroup title="NDI — Transmission Settings">
                   <Setting name="NDI Video Output" defaultValue="Off">
-                    Enable or disable NDI streaming. Auto-broadcasts
-                    as &quot;LOTA (iPhone)&quot; on the local network.
+                    Enable or disable NDI streaming. Auto-broadcasts as{" "}
+                    <Kbd>LOTA - &lt;Device Label&gt;</Kbd> (default{" "}
+                    <Kbd>LOTA - &lt;random 4-char ID&gt;</Kbd>, customizable
+                    in the Receiver section). Multiple LOTA devices on the
+                    same network show up as distinct sources thanks to
+                    per-device labels.
                   </Setting>
                   <Setting name="Side-by-Side" defaultValue="Off">
-                    Sends a 2x-wide frame: left half is the camera view, right
-                    half is the depth colormap. Standard format for TouchDesigner
-                    and Notch workflows.
+                    Sends a 2x-wide frame: left half is the camera view,
+                    right half is the depth colormap. Uses LiDAR depth on
+                    Pro phones; falls back to{" "}
+                    <strong className="text-white">Depth Anything V2
+                    estimated depth</strong> on non-LiDAR phones, so the
+                    side-by-side workflow is no longer LiDAR-only. Disabled
+                    on Transcription / Motion / Audio modes (no camera
+                    content to composite) with a one-line caption explaining
+                    why.
                   </Setting>
                 </SettingsGroup>
 
@@ -1780,6 +2122,22 @@ export default function DocsPage() {
                     Black Aqua White, Blue Red, Deep Sea, Color Spectrum,
                     Incandescent, Heated Metal, Sunrise, Visible Spectrum.
                   </Setting>
+                </SettingsGroup>
+
+                <SettingsGroup title="Neural Depth — Neural Depth Settings sheet">
+                  <Setting name="Color Map" defaultValue="Visible Spectrum">
+                    Colormap for AI-estimated depth visualization. Same nine
+                    options as LiDAR Depth.
+                  </Setting>
+                  <div className="pt-2 text-xs text-zinc-500 leading-relaxed">
+                    <strong className="text-white">About the Model</strong>{" "}
+                    section credits ByteDance Research (model authors) and
+                    Apple (Core ML packaging), confirms inference runs on the
+                    Apple Neural Engine at ~30 ms / frame, and links to the
+                    Hugging Face model page.{" "}
+                    <strong className="text-white">Apache 2.0;</strong>{" "}
+                    nothing leaves the device.
+                  </div>
                 </SettingsGroup>
 
                 <SettingsGroup title="Point Cloud — Point Cloud Settings sheet">
@@ -1891,15 +2249,18 @@ export default function DocsPage() {
                   <Setting name="Port" defaultValue="9848">
                     PLY stream destination port.
                   </Setting>
-                  <Setting name="Binary Format" defaultValue="Off (always leave on)">
-                    Packed binary (15 bytes/point) vs CSV text. Binary is ~40%
-                    smaller, parses ~3&times; faster on the receiver, and is
-                    the format the supported{" "}
-                    <Kbd>LOTABinaryPLYRecieverV2.tox</Kbd> drop-in component
-                    targets — turn it on for every new capture. CSV text mode
-                    remains for backwards compatibility with custom receivers
-                    but is deprecated and will be removed in a future update.
-                  </Setting>
+                  <div className="pt-2 text-xs text-zinc-500 leading-relaxed">
+                    <strong className="text-white">Wire format (binary, fixed):</strong>{" "}
+                    <Kbd>UInt32 LE point count</Kbd> followed by{" "}
+                    <Kbd>N × (3 Float32 XYZ + 3 UInt8 RGB)</Kbd> = 15 bytes
+                    per point. Drop in{" "}
+                    <Kbd>LOTABinaryPLYRecieverV2.tox</Kbd> from the
+                    TouchDesigner section above — plug-and-play. The CSV-text
+                    variant and its toggle were removed in v1.2.3; binary is
+                    the only supported wire format. Custom receivers built
+                    against the legacy CSV stream will need to switch to the
+                    binary parser.
+                  </div>
                 </SettingsGroup>
 
                 <SettingsGroup title="Tracking — Body / Face / Hands Settings sheets">
@@ -2072,11 +2433,15 @@ export default function DocsPage() {
                   Any iPhone running iOS 26.2 or later. LiDAR features (Depth,
                   Point Cloud, Blob Track, Gaussian Capture, Material Capture,
                   3D hand coordinates) require iPhone 12 Pro or later. Color,
-                  Mono, Transcription, Motion, and Audio modes, NDI streaming,
-                  and TCP/UDP streaming all work on iPhones without LiDAR.
-                  Face tracking requires TrueDepth camera (iPhone X or later).
-                  Body tracking requires A12 chip or later. iPad Pro models
-                  with LiDAR are also supported.
+                  Mono, <strong className="text-white">Neural Depth</strong>{" "}
+                  (Depth Anything V2 on the Apple Neural Engine),
+                  Transcription, Motion, and Audio modes, NDI streaming, and
+                  TCP/UDP streaming all work on iPhones without LiDAR — and
+                  Neural Depth doubles as the side-by-side NDI fallback so
+                  multi-pane workflows work on any iPhone. Face tracking
+                  requires TrueDepth camera (iPhone X or later). Body
+                  tracking requires A12 chip or later. iPad Pro models with
+                  LiDAR are also supported.
                 </Faq>
                 <Faq q="Does Transcription mode need internet access?">
                   No. Transcription uses iOS 26&apos;s on-device

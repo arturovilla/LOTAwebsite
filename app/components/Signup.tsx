@@ -41,7 +41,7 @@ export default function Signup() {
 
         {status === "success" ? (
           <p className="text-sm text-green-400 font-medium">
-            You&apos;re on the list — we&apos;ll be in touch.
+            You&apos;re on the list. We&apos;ll be in touch.
           </p>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
@@ -65,7 +65,7 @@ export default function Signup() {
 
         {status === "error" && (
           <p className="text-sm text-red-400 mt-4">
-            Something went wrong — please try again.
+            Something went wrong. Please try again.
           </p>
         )}
       </div>

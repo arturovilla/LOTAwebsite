@@ -2,11 +2,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 const links = [
-  { label: "Features", href: "#features" },
-  { label: "Streaming", href: "#streaming" },
-  { label: "Export", href: "#export" },
+  { label: "Features", href: "/#features" },
+  // { label: "Use Cases", href: "/#use-cases" },
   { label: "Docs", href: "/docs" },
   { label: "Changelog", href: "/changelog" },
 ];
@@ -23,14 +23,14 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+      className={`fixed top-0 w-full z-50 font-pixel-line transition-all duration-300 ${
         scrolled
           ? "bg-black/80 backdrop-blur-xl border-b border-white/[0.06]"
           : "bg-transparent"
       }`}
     >
       <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-        <a href="#hero" className="flex items-center gap-2.5">
+        <Link href="/" className="flex items-center gap-2.5">
           <img
             src="https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/LOTA-dark.jpg"
             alt="LOTA"
@@ -41,24 +41,19 @@ export default function Navbar() {
           <span className="text-lg font-semibold text-white tracking-tight">
             LOTA
           </span>
-        </a>
+        </Link>
 
         {/* Desktop */}
         <div className="hidden md:flex items-center gap-8">
           {links.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               className="text-sm text-zinc-400 hover:text-white transition-colors"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
-          <span
-            className="text-sm font-medium px-5 py-2 rounded-full bg-white/10 text-zinc-300 border border-white/[0.1] cursor-default"
-          >
-            Coming Soon
-          </span>
         </div>
 
         {/* Mobile hamburger */}
@@ -89,20 +84,15 @@ export default function Navbar() {
       {menuOpen && (
         <div className="md:hidden bg-black/95 backdrop-blur-xl border-t border-white/[0.06] px-6 pb-6 pt-4 flex flex-col gap-4">
           {links.map((link) => (
-            <a
+            <Link
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
               className="text-zinc-400 hover:text-white transition-colors"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
-          <span
-            className="text-sm font-medium px-5 py-2.5 rounded-full bg-white/10 text-zinc-300 border border-white/[0.1] text-center cursor-default"
-          >
-            Coming Soon
-          </span>
         </div>
       )}
     </nav>
