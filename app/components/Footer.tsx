@@ -57,14 +57,14 @@ export default function Footer() {
             <span className="text-xs font-mono text-zinc-700 uppercase tracking-[0.15em] mb-1">
               Navigate
             </span>
-            <a href="#features" className="text-sm text-zinc-500 hover:text-white transition-colors">
-              Capture Modes
+            <a href="/#features" className="text-sm text-zinc-500 hover:text-white transition-colors">
+              Features
             </a>
-            <a href="#streaming" className="text-sm text-zinc-500 hover:text-white transition-colors">
-              Streaming
+            <a href="/docs" className="text-sm text-zinc-500 hover:text-white transition-colors">
+              Docs
             </a>
-            <a href="#export" className="text-sm text-zinc-500 hover:text-white transition-colors">
-              Export
+            <a href="/changelog" className="text-sm text-zinc-500 hover:text-white transition-colors">
+              Changelog
             </a>
             <a href="/privacy" className="text-sm text-zinc-500 hover:text-white transition-colors">
               Privacy Policy
@@ -73,11 +73,14 @@ export default function Footer() {
 
           {/* CTA */}
           <div className="flex flex-col items-start md:items-end gap-4">
-            <span
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-white/10 text-zinc-300 border border-white/[0.1] rounded-full font-semibold text-sm cursor-default"
+            <a
+              href="https://testflight.apple.com/join/jFNkCjNF"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-2.5 bg-white text-black rounded-full font-semibold text-sm hover:bg-zinc-200 transition-colors"
             >
-              Coming Soon
-            </span>
+              Join the Beta
+            </a>
             <p className="text-xs text-zinc-700">
               &copy; {new Date().getFullYear()} LOTA. All rights reserved.
             </p>
