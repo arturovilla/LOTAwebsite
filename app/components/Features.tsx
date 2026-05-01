@@ -27,7 +27,8 @@ import {
   type Mesh,
 } from "three";
 
-const MODEL = "/iphone_17_pro_max/scene.gltf";
+const MODEL =
+  "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/iphone_17_pro_max/scene.gltf";
 const SCREEN_VIDEO =
   "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/fullFatMarketingVideo.MP4";
 const SCREEN_MATERIAL_NAME = "17ProMax_Screen";
