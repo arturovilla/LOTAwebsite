@@ -1,38 +1,14 @@
 "use client";
 
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import {
-  Environment,
-  OrbitControls,
-  useGLTF,
-  useVideoTexture,
-} from "@react-three/drei";
-import {
-  Suspense,
-  useCallback,
   useEffect,
-  useMemo,
   useRef,
   useState,
   type RefObject,
 } from "react";
-import {
-  ACESFilmicToneMapping,
-  Box3,
-  MeshBasicMaterial,
-  PerspectiveCamera,
-  SRGBColorSpace,
-  Vector3,
-  type Group,
-  type Mesh,
-} from "three";
 
-const MODEL =
-  "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/iphone_17_pro_max/scene.gltf";
 const SCREEN_VIDEO =
-  "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/fullFatMarketingVideo.MP4";
-const SCREEN_MATERIAL_NAME = "17ProMax_Screen";
-const FIT_MARGIN = 1.17;
+  "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/fullFatMarketingVideoWithFrame.mp4";
 
 // Stylization timing (in seconds within the video loop).
 //
@@ -94,7 +70,7 @@ const RIGHTPAGE_IN_END = 93.5;
 const RIGHTPAGE_OUT_START = 99.0;
 const RIGHTPAGE_OUT_END = 100.0;
 
-// Fraction of the phone's own width to slide left when a panel is open.
+// Fraction of the video's own width to slide left when a panel is open.
 const SLIDE_FRACTION = 0.55;
 
 function smoothstep(x: number) {
@@ -115,112 +91,6 @@ function computeProgress(
   if (t < outEnd) return 1 - smoothstep((t - outStart) / (outEnd - outStart));
   return 0;
 }
-
-function Phone({
-  onMeasure,
-  onVideoReady,
-  slideEnabled,
-}: {
-  onMeasure: (size: Vector3) => void;
-  onVideoReady: (video: HTMLVideoElement) => void;
-  slideEnabled: boolean;
-}) {
-  const ref = useRef<Group>(null);
-  const slideAmountRef = useRef(0);
-  const { scene: gltfScene } = useGLTF(MODEL);
-  // Clone the GLTF scene so this Phone instance has its own object tree.
-  // useGLTF returns a shared scene; mounting it into a second <Canvas>
-  // would steal it from the first.
-  const scene = useMemo(() => gltfScene.clone(true), [gltfScene]);
-  const videoTexture = useVideoTexture(SCREEN_VIDEO, {
-    muted: true,
-    loop: true,
-    playsInline: true,
-    crossOrigin: "anonymous",
-  });
-
-  useEffect(() => {
-    videoTexture.flipY = false;
-    videoTexture.colorSpace = SRGBColorSpace;
-    scene.traverse((obj) => {
-      const mesh = obj as Mesh;
-      if (!mesh.isMesh) return;
-      const mat = mesh.material as { name?: string };
-      if (mat?.name === SCREEN_MATERIAL_NAME) {
-        mesh.material = new MeshBasicMaterial({
-          map: videoTexture,
-          toneMapped: false,
-          depthTest: false,
-          depthWrite: false,
-        });
-        mesh.renderOrder = 999;
-      }
-    });
-  }, [scene, videoTexture]);
-
-  useEffect(() => {
-    const video = videoTexture.image as HTMLVideoElement | null;
-    if (video) onVideoReady(video);
-  }, [videoTexture, onVideoReady]);
-
-  const offset = useMemo(() => {
-    const box = new Box3().setFromObject(scene);
-    const size = new Vector3();
-    const center = new Vector3();
-    box.getSize(size);
-    box.getCenter(center);
-    slideAmountRef.current = size.x * SLIDE_FRACTION;
-    onMeasure(size);
-    return center.clone().negate();
-  }, [scene, onMeasure]);
-
-  useFrame(() => {
-    if (!ref.current) return;
-    if (!slideEnabled) {
-      ref.current.position.x = 0;
-      return;
-    }
-    const video = videoTexture.image as HTMLVideoElement | null;
-    if (!video || video.readyState < 2) return;
-    const progress = computeProgress(
-      video.currentTime,
-      PHONE_IN_START,
-      PHONE_IN_END,
-      PHONE_OUT_START,
-      PHONE_OUT_END
-    );
-    ref.current.position.x = -slideAmountRef.current * progress;
-  });
-
-  return (
-    <group ref={ref} rotation={[0, Math.PI, 0]}>
-      <group position={offset}>
-        <primitive object={scene} />
-      </group>
-    </group>
-  );
-}
-
-function FitCamera({ modelSize }: { modelSize: Vector3 | null }) {
-  const { camera, size } = useThree();
-  useEffect(() => {
-    if (!modelSize) return;
-    if (!(camera instanceof PerspectiveCamera)) return;
-    const aspect = size.width / size.height;
-    const fov = (camera.fov * Math.PI) / 180;
-    const fitHeightDistance = modelSize.y / (2 * Math.tan(fov / 2));
-    const fitWidthDistance = modelSize.x / aspect / (2 * Math.tan(fov / 2));
-    const distance = FIT_MARGIN * Math.max(fitHeightDistance, fitWidthDistance);
-    camera.position.set(0, 0, distance);
-    camera.near = Math.max(0.01, distance / 100);
-    camera.far = distance * 100;
-    camera.updateProjectionMatrix();
-    camera.lookAt(0, 0, 0);
-  }, [camera, size, modelSize]);
-  return null;
-}
-
-useGLTF.preload(MODEL);
 
 /* ───────────── Panel content (shared between wide + narrow renderings) ───────────── */
 
@@ -767,9 +637,9 @@ function PanelWrapper({
 /* ───────────── Features section ───────────── */
 
 export default function Features() {
-  const [modelSize, setModelSize] = useState<Vector3 | null>(null);
   const [isWide, setIsWide] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const videoSlideRef = useRef<HTMLDivElement | null>(null);
 
   // Wide-layout panel refs (overlaid on the right of the canvas).
   const networkingRef = useRef<HTMLDivElement | null>(null);
@@ -802,10 +672,6 @@ export default function Features() {
     update();
     mq.addEventListener("change", update);
     return () => mq.removeEventListener("change", update);
-  }, []);
-
-  const handleVideoReady = useCallback((video: HTMLVideoElement) => {
-    videoRef.current = video;
   }, []);
 
   // rAF loop drives every panel directly off video.currentTime; no React
@@ -886,12 +752,24 @@ export default function Features() {
           rightPageNarrowRef.current,
           computeProgress(t, RIGHTPAGE_IN_START, RIGHTPAGE_IN_END, RIGHTPAGE_OUT_START, RIGHTPAGE_OUT_END),
         );
+
+        const slide = videoSlideRef.current;
+        if (slide) {
+          if (isWide) {
+            const slideProgress = computeProgress(
+              t, PHONE_IN_START, PHONE_IN_END, PHONE_OUT_START, PHONE_OUT_END,
+            );
+            slide.style.transform = `translateX(${-SLIDE_FRACTION * 100 * slideProgress}%)`;
+          } else {
+            slide.style.transform = "translateX(0)";
+          }
+        }
       }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, []);
+  }, [isWide]);
 
   return (
     <section id="features" className="py-28 px-6 bg-black">
@@ -912,27 +790,24 @@ export default function Features() {
         </div>
 
         <div className="relative h-[60vh] min-h-[420px] w-full">
-          <Canvas
-            camera={{ position: [0, 0, 5], fov: 30 }}
-            dpr={[1, 2]}
-            gl={{
-              antialias: true,
-              toneMapping: ACESFilmicToneMapping,
-              toneMappingExposure: 1.1,
-            }}
-          >
-            <Suspense fallback={null}>
-              <Environment files="/monochrome_studio_02_1k.exr" background={false} />
-              <directionalLight position={[5, 8, 5]} intensity={0.6} />
-              <Phone
-                onMeasure={setModelSize}
-                onVideoReady={handleVideoReady}
-                slideEnabled={isWide}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div
+              ref={videoSlideRef}
+              className="h-full"
+              style={{ willChange: "transform" }}
+            >
+              <video
+                ref={videoRef}
+                src={SCREEN_VIDEO}
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="auto"
+                className="h-full w-auto block"
               />
-              <FitCamera modelSize={modelSize} />
-            </Suspense>
-            <OrbitControls enableZoom={false} enablePan={false} />
-          </Canvas>
+            </div>
+          </div>
 
           {/* Wide-layout panels: overlaid on the right of the canvas. */}
           <PanelWrapper panelRef={networkingRef} isWide gap="gap-5">
