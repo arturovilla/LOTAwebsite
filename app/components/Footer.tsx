@@ -35,6 +35,16 @@ export default function Footer() {
               >
                 Arturo Villalobos
               </a>
+              {" "}(AKA{" "}
+              <a
+                href="https://www.instagram.com/hyprtexture/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-zinc-400 hover:text-white transition-colors"
+              >
+                Hyprtexture
+              </a>
+              )
             </p>
             <div className="flex items-center gap-3 mt-4">
               <a href="https://www.linkedin.com/in/rtvro/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-zinc-600 hover:text-white transition-colors">
