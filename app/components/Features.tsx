@@ -8,7 +8,7 @@ import {
 } from "react";
 
 const SCREEN_VIDEO =
-  "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/fullFatMarketingVideoWithFrame.mp4";
+  "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/fullFatMarketingNewWithFrame.mp4";
 
 // Stylization timing (in seconds within the video loop).
 //

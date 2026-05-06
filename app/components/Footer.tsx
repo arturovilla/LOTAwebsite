@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { FaLinkedinIn, FaInstagram, FaPatreon, FaRedditAlien } from "react-icons/fa";
+import BetaButton from "./BetaButton";
 
 export default function Footer() {
   return (
@@ -83,14 +84,10 @@ export default function Footer() {
 
           {/* CTA */}
           <div className="flex flex-col items-start md:items-end gap-4">
-            <a
-              href="https://testflight.apple.com/join/jFNkCjNF"
-              target="_blank"
-              rel="noopener noreferrer"
+            <BetaButton
+              source="footer"
               className="inline-flex items-center gap-2 px-6 py-2.5 bg-white text-black rounded-full font-semibold text-sm hover:bg-zinc-200 transition-colors"
-            >
-              Join the Beta
-            </a>
+            />
             <p className="text-xs text-zinc-700">
               &copy; {new Date().getFullYear()} LOTA. All rights reserved.
             </p>

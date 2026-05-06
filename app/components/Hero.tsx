@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import HeroPointCloud from "./HeroPointCloud";
+import BetaButton from "./BetaButton";
 
 export default function Hero() {
   return (
@@ -43,14 +44,10 @@ export default function Hero() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10 animate-fade-in-up-delay-3">
-          <a
-            href="https://testflight.apple.com/join/jFNkCjNF"
-            target="_blank"
-            rel="noopener noreferrer"
+          <BetaButton
+            source="hero"
             className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-white text-black rounded-full font-semibold text-sm hover:bg-zinc-200 transition-colors"
-          >
-            Join the Beta
-          </a>
+          />
           <span
             className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-white/10 text-white border border-white/[0.15] rounded-full font-semibold text-sm cursor-default"
           >

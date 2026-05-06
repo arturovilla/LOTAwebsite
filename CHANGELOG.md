@@ -4,6 +4,21 @@ All notable changes to the LOTA project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.2.4] - 2026-05-05
+
+### Added
+
+- **NDI SDK license artifacts** — `Vendor/NDI/NDI SDK License Agreement.pdf` (v1.1, 15 August 2025) and `Vendor/NDI/README.md` documenting SDK version (v6 Apple), download steps, Xcode wiring, and license obligations. Pins the terms LOTA ships under and gives a fresh-clone path to set up the now-untracked static lib
+- **Acknowledgements section in Transmission Settings** — new section below Help → Replay Tutorial showing `NDI® is a registered trademark of Vizrt NDI AB.` and a link to ndi.video. Satisfies the NDI SDK license attribution requirement for shipping apps
+- **Dependencies section in `README.md`** — table of external components (NDI SDK, ZIPFoundation, Depth Anything V2) with versions, sources, distribution, and licenses. Getting Started expanded with the NDI SDK install/copy step now required on a fresh clone
+- **`APP-STORE-DESCRIPTION.md`** — promotional copy ready to drop into App Store Connect
+
+### Changed
+
+- **`Vendor/NDI/lib/libndi_ios.a` gitignored** — the 256 MB static lib is no longer tracked. Per NDI license: don't redistribute the SDK; per repo hygiene: don't commit large binaries. Local Archive builds work fine since the file stays on the developer's disk; Xcode Cloud builds will need a `ci_post_clone.sh` follow-up to download and stage the SDK before building
+
+---
+
 ## [1.2.3] - 2026-04-30
 
 ### Added

@@ -8,6 +8,7 @@
 - GPU-accelerated via Metal compute shaders — full depth map sampling at interactive frame rates
 - All processing on-device, no analytics, no data collection
 - Fully accessible: VoiceOver, Voice Control, Dynamic Type, Switch Control, Reduce Motion
+- Currently in public TestFlight beta — join at https://testflight.apple.com/join/jFNkCjNF; full App Store release coming soon
 
 ## Documentation
 

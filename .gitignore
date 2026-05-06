@@ -46,7 +46,7 @@ yarn-error.log*
 # local scratchpad — not tracked
 /app/test/
 /app/test2/
-/app/test3/
+/app/playground/
 /public/iphone_17_pro_max/
 /public/iphone_17_pro_max.zip
 /public/monochrome_studio_02_1k.exr

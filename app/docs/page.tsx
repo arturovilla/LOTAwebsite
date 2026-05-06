@@ -66,16 +66,53 @@ function Step({
 
 function Card({
   title,
+  tag,
   children,
 }: {
   title: string;
+  tag?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
-      <h3 className="text-sm font-semibold text-white mb-2">{title}</h3>
+      {tag ? (
+        <div className="flex items-center justify-between gap-3 mb-2 flex-wrap">
+          <h3 className="text-sm font-semibold text-white">{title}</h3>
+          <div className="flex items-center gap-2 flex-wrap">{tag}</div>
+        </div>
+      ) : (
+        <h3 className="text-sm font-semibold text-white mb-2">{title}</h3>
+      )}
       <div className="text-sm text-zinc-400 leading-relaxed">{children}</div>
     </div>
+  );
+}
+
+const TAG_VARIANT_STYLES = {
+  emerald: "text-emerald-400 border-emerald-400/20 bg-emerald-400/[0.06]",
+  amber: "text-amber-400 border-amber-400/20 bg-amber-400/[0.06]",
+  blue: "text-blue-400 border-blue-400/20 bg-blue-400/[0.06]",
+  violet: "text-violet-400 border-violet-400/20 bg-violet-400/[0.06]",
+  rose: "text-rose-400 border-rose-400/20 bg-rose-400/[0.06]",
+  cyan: "text-cyan-400 border-cyan-400/20 bg-cyan-400/[0.06]",
+  zinc: "text-zinc-400 border-zinc-400/20 bg-zinc-400/[0.06]",
+} as const;
+
+type TagVariant = keyof typeof TAG_VARIANT_STYLES;
+
+function Tag({
+  variant = "zinc",
+  children,
+}: {
+  variant?: TagVariant;
+  children: React.ReactNode;
+}) {
+  return (
+    <span
+      className={`inline-block text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full border whitespace-nowrap ${TAG_VARIANT_STYLES[variant]}`}
+    >
+      {children}
+    </span>
   );
 }
 
@@ -377,80 +414,101 @@ export default function DocsPage() {
               </SectionHeading>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <Card title="Color">
+                <Card
+                  title="Color"
+                  tag={<Tag variant="emerald">No LiDAR required</Tag>}
+                >
                   Live RGB camera feed at 60&nbsp;FPS. What you see on screen
-                  is exactly what gets streamed. Works on all iPhones — no
-                  LiDAR required.
+                  is exactly what gets streamed.
                 </Card>
-                <Card title="Mono">
+                <Card
+                  title="Mono"
+                  tag={<Tag variant="emerald">No LiDAR required</Tag>}
+                >
                   High-contrast grayscale feed optimized for low-light
-                  environments and precision spatial scanning. Works on all
-                  iPhones — no LiDAR required.
+                  environments and precision spatial scanning.
                 </Card>
-                <Card title="Depth">
+                <Card
+                  title="Depth"
+                  tag={<Tag variant="amber">LiDAR required</Tag>}
+                >
                   <>
                     LiDAR depth visualization with <strong className="text-white">9 selectable
                     colormaps</strong> including thermal, incandescent, deep sea,
-                    and visible spectrum. Requires a LiDAR-equipped iPhone.
+                    and visible spectrum.
                   </>
                 </Card>
-                <Card title="Neural Depth">
+                <Card
+                  title="Neural Depth"
+                  tag={<Tag variant="emerald">No LiDAR required</Tag>}
+                >
                   <>
                     AI-estimated depth from the regular camera feed via{" "}
                     <strong className="text-white">Depth Anything V2 Small</strong>{" "}
                     (ByteDance Research, packaged for Core ML by Apple),
                     running on the <strong className="text-white">Apple Neural
                     Engine</strong> at ~30 ms / frame. Same nine colormaps as
-                    LiDAR Depth. Works on every iPhone — no LiDAR required —
-                    and doubles as a fallback for NDI side-by-side on
-                    non-LiDAR phones. Fully on-device; nothing leaves the
+                    LiDAR Depth. Doubles as a fallback for NDI side-by-side
+                    on non-LiDAR phones. Fully on-device; nothing leaves the
                     phone.
                   </>
                 </Card>
-                <Card title="Point Cloud">
+                <Card
+                  title="Point Cloud"
+                  tag={<Tag variant="amber">LiDAR required</Tag>}
+                >
                   <>
                     Real-time 3D point cloud rendered with true RGB colors. Every
                     pixel of the 256&times;192 depth map is unprojected into 3D
                     space. Configure frame window, max depth, and compute quality
-                    in Settings. Requires LiDAR.
+                    in Settings.
                   </>
                 </Card>
-                <Card title="Blob Track">
+                <Card
+                  title="Blob Track"
+                  tag={<Tag variant="amber">LiDAR required</Tag>}
+                >
                   <>
                     TouchDesigner-compatible blob tracker. Carves a configurable
                     depth slab out of the LiDAR scan, finds connected regions,
                     assigns each one a stable ID across frames, and streams
                     per-blob metadata over OSC at TD-matching addresses. The
                     full visualization (camera + outlines + ID labels) is
-                    captured by NDI. Requires LiDAR.
+                    captured by NDI.
                   </>
                 </Card>
-                <Card title="Transcription">
+                <Card
+                  title="Transcription"
+                  tag={<Tag variant="emerald">No LiDAR required</Tag>}
+                >
                   <>
                     Live on-device speech-to-text with a mirrored bar waveform
                     visualization. Recognized words stream out over OSC, TCP,
-                    UDP, and appear on screen as captions. Works on every
-                    iPhone — <strong className="text-white">no LiDAR required</strong>.
+                    UDP, and appear on screen as captions.
                   </>
                 </Card>
-                <Card title="Motion">
+                <Card
+                  title="Motion"
+                  tag={<Tag variant="emerald">No LiDAR required</Tag>}
+                >
                   <>
                     Turns the iPhone into a wireless motion-sensor OSC source.
                     Streams accelerometer, gyroscope, compass heading, and
                     barometric pressure as per-axis OSC channels. Each active
                     value draws its own scrolling line graph on screen
                     (TouchDesigner CHOP viewer aesthetic), captured by NDI.
-                    Works on every iPhone — <strong className="text-white">no LiDAR required</strong>.
                   </>
                 </Card>
-                <Card title="Audio">
+                <Card
+                  title="Audio"
+                  tag={<Tag variant="emerald">No LiDAR required</Tag>}
+                >
                   <>
                     Real-time microphone audio analysis using Apple&apos;s
                     Accelerate/vDSP framework. Streams frequency-band Levels,
                     per-band Beat Detection triggers, Dynamics bursts, and a
                     20-band FFT spectrum as OSC channels. Each active channel
-                    renders as a scrolling graph lane, captured by NDI. Works
-                    on every iPhone — <strong className="text-white">no LiDAR required</strong>.
+                    renders as a scrolling graph lane, captured by NDI.
                   </>
                 </Card>
               </div>
@@ -1705,10 +1763,25 @@ export default function DocsPage() {
                   <Step n={6} title="Save to Files">
                     The Material Save Summary sheet shows a live PBR sphere
                     preview, file-size estimate, and a metallic toggle. Tap
-                    Save — ZIP is written to your iCloud folder, the sheet
+                    Save: the ZIP is written to your iCloud folder, the sheet
                     auto-dismisses, and the plane lock stays active for the
                     next shot.
                   </Step>
+                </div>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    Bake performance
+                  </h4>
+                  <p className="text-sm text-zinc-400 mb-3 leading-relaxed">
+                    Measured on iPhone 15 / 16 Pro at 1024² output:
+                  </p>
+                  <ul className="text-sm text-zinc-400 space-y-1.5">
+                    <li>AO 32 samples: ~150&nbsp;ms</li>
+                    <li>AO 64 samples (default): ~220&nbsp;ms</li>
+                    <li>AO 128 samples: ~400&nbsp;ms</li>
+                    <li>2048² output: roughly 4× the time</li>
+                  </ul>
                 </div>
 
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
@@ -2020,9 +2093,10 @@ export default function DocsPage() {
                 places: <strong className="text-white">Transmission
                 Settings</strong> (tap the floating status bar pill at the top
                 of the Camera / Streaming or ARKit Tracking page — Receiver,
-                Transport, NDI, OSC, Point Cloud Stream, Protocol Info, and
-                a Help section with{" "}
-                <Kbd>Replay Tutorial</Kbd>) and{" "}
+                Transport, NDI, OSC, Point Cloud Stream, Protocol Info, a
+                Help section with <Kbd>Replay Tutorial</Kbd>, and an
+                Acknowledgements section listing third-party SDK notices)
+                and{" "}
                 <strong className="text-white">mode-specific settings</strong>{" "}
                 (tap the <Kbd>&lt;Mode&gt; Settings</Kbd> button just below
                 the status bar — only the section relevant to the active mode).
@@ -2113,6 +2187,25 @@ export default function DocsPage() {
                   </Setting>
                   <Setting name="Port" defaultValue="9000">
                     OSC destination port.
+                  </Setting>
+                </SettingsGroup>
+
+                <SettingsGroup title="Acknowledgements — Transmission Settings (bottom of sheet)">
+                  <Setting name="NDI® trademark notice" defaultValue="static">
+                    Pinned to the bottom of Transmission Settings, below
+                    Help &rarr; Replay Tutorial. Reads{" "}
+                    <em>NDI® is a registered trademark of Vizrt NDI AB.</em>{" "}
+                    with a link to{" "}
+                    <a
+                      href="https://ndi.video"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-zinc-300 underline underline-offset-2 hover:text-white transition-colors"
+                    >
+                      ndi.video
+                    </a>
+                    . Required attribution for the NDI SDK that ships
+                    inside LOTA.
                   </Setting>
                 </SettingsGroup>
 
@@ -2440,8 +2533,12 @@ export default function DocsPage() {
                   Neural Depth doubles as the side-by-side NDI fallback so
                   multi-pane workflows work on any iPhone. Face tracking
                   requires TrueDepth camera (iPhone X or later). Body
-                  tracking requires A12 chip or later. iPad Pro models with
-                  LiDAR are also supported.
+                  tracking requires A12 chip or later.{" "}
+                  <strong className="text-white">LOTA is officially
+                  iPhone-only.</strong>{" "}
+                  iPad Pro models with LiDAR have run successfully during
+                  beta testing, but iPad is not an officially supported
+                  target — your mileage may vary.
                 </Faq>
                 <Faq q="Does Transcription mode need internet access?">
                   No. Transcription uses iOS 26&apos;s on-device

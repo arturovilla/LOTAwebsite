@@ -22,9 +22,13 @@ LOTA turns your iPhone into a professional spatial capture and streaming tool. S
 - Color, Mono, and Transcription modes work on every iPhone — no LiDAR needed
 - Wi-Fi network (for streaming features)
 
+### Availability
+
+LOTA is currently in public TestFlight beta. The full App Store release is coming soon. Join the beta at https://testflight.apple.com/join/jFNkCjNF.
+
 ### Quick Start
 
-1. **Install LOTA**: Download LOTA from the App Store. Open the app and grant camera and local network permissions when prompted.
+1. **Install LOTA**: Join the public TestFlight beta at https://testflight.apple.com/join/jFNkCjNF and install via the TestFlight app. Open LOTA and grant camera and local network permissions when prompted.
 2. **Choose a capture mode**: Tap the mode dropdown at the top of the screen to switch between Color, Mono, Depth, Point Cloud, Blob Track, or Transcription. Each mode activates instantly — no restart required.
 3. **Start streaming**: Tap the stream button (bottom right) to broadcast over the network. For Gaussian Splat capture, swipe right to the capture page and tap record to save a training-ready dataset.
 
