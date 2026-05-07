@@ -4,6 +4,14 @@ All notable changes to the LOTA project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.2.5] - 2026-05-07
+
+### Fixed
+
+- **iPad rotation no longer reverts the active capture mode to Color** — on iPad, picking a non-camera capture mode (Motion, Audio, Transcription) on the middle page, rotating to landscape, then rotating back to portrait would silently snap the mode back to Color. iPhone was unaffected. Root cause: `PageTabViewStyle`'s underlying `UIPageViewController` is more aggressive about discarding cached off-screen pages on iPad than on iPhone, so the right page (`GaussianCaptureView`) was being remounted on the landscape→portrait transition. Its `.onAppear` re-fired and called `applyCaptureModeForFormat(.colmap)` — the default export format — which falls into the `default:` branch of the helper and runs `setMode(.color)`, clobbering whatever mode the user had selected on the middle page. The author's existing comment ("`onAppear` doesn't re-fire in TabView's `.page` style") documented an assumption that holds on iPhone but breaks on iPad. Fixed by gating the offending `.onAppear` with `guard selectedPage == 1 else { return }` so the format-restore logic only runs when the right page is actually the active one. The legitimate first-entry-to-right-page path remains covered by `.onChange(of: selectedPage)` directly below it. Verified end-to-end with instrumented logging on a physical iPad before applying the fix
+
+---
+
 ## [1.2.4] - 2026-05-05
 
 ### Added
