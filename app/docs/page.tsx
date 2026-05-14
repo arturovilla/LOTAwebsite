@@ -1622,6 +1622,22 @@ export default function DocsPage() {
                     statistics. Works on every iPhone — no LiDAR.
                   </>
                 </Card>
+                <Card
+                  title="PLY Viewer"
+                  tag={<Tag variant="emerald">New in v1.2.6</Tag>}
+                >
+                  <>
+                    Read-only. Inspect any saved <Kbd>.ply</Kbd> point cloud
+                    on the device — LOTA captures or files dragged in via
+                    the Files app — in an interactive 3D viewer. Selecting
+                    PLY Viewer pauses the ARSession (saves battery and
+                    thermals), swaps the page to a dark canvas with orbit
+                    controls and a neon axis gizmo, and morphs the shutter
+                    into a folder glyph that opens the file picker. Loads
+                    are streamed off the main thread; clouds are capped at
+                    5 M points with uniform sub-sampling.
+                  </>
+                </Card>
               </div>
 
               <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-8">
@@ -1700,6 +1716,44 @@ export default function DocsPage() {
                   reflective and transparent surfaces — LiDAR struggles with
                   glass and mirrors.
                 </Step>
+              </div>
+
+              {/* ─── Capture Settings (v1.2.6) ──────────────── */}
+              <div className="mt-12">
+                <div className="flex items-baseline gap-3 flex-wrap mb-2">
+                  <h3 className="text-xl font-bold text-white">
+                    Capture Settings
+                  </h3>
+                  <Tag variant="emerald">New in v1.2.6</Tag>
+                </div>
+                <p className="text-sm text-zinc-400 leading-relaxed mb-6">
+                  The 3D-scene recording formats (COLMAP, Nerfstudio,
+                  Nerfstudio + Depth, Point Cloud PLY) share a{" "}
+                  <strong className="text-white">Capture Settings</strong>{" "}
+                  sheet, opened via the settings pill below the format
+                  picker. Replaces the previous &quot;No settings for this
+                  mode&quot; placeholder.
+                </p>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
+                  <div className="flex items-baseline gap-2 mb-1">
+                    <Kbd>Capture Rate</Kbd>
+                    <span className="text-xs text-zinc-600">— 60 Hz (default) / 30 Hz / 15 Hz</span>
+                  </div>
+                  <p className="text-sm text-zinc-500 leading-relaxed">
+                    ARKit delivers depth at ~60 Hz; lowering the rate makes
+                    LOTA drop every Nth ARFrame{" "}
+                    <em>at the source</em> — before per-pixel unprojection
+                    and JPEG encoding run — so both CPU work and encode are
+                    skipped for the dropped frames. 30 Hz roughly halves
+                    captured point count and zip size; 15 Hz quarters them.
+                    The default 60 Hz keeps the densest possible capture
+                    and preserves pre-1.2.6 behavior. Useful when you&apos;re
+                    scanning a small subject for a Gaussian-splat training
+                    set and don&apos;t need every depth sample, or when
+                    throttling a long scan to keep the device cool.
+                  </p>
+                </div>
               </div>
 
               {/* ─── Material Capture ──────────────────────── */}
@@ -2081,6 +2135,182 @@ export default function DocsPage() {
                   </>
                 </Card>
               </div>
+
+              {/* ─── PLY Viewer (v1.2.6) ───────────────────── */}
+              <div className="mt-12">
+                <div className="flex items-baseline gap-3 flex-wrap mb-2">
+                  <h3 className="text-xl font-bold text-white">PLY Viewer</h3>
+                  <Tag variant="emerald">New in v1.2.6</Tag>
+                </div>
+                <p className="text-sm text-zinc-400 leading-relaxed mb-6">
+                  Select <Kbd>PLY Viewer</Kbd> from the format picker to
+                  open the read-only point cloud inspector. ARKit pauses
+                  (the live camera goes black), and the right page swaps
+                  to a dark canvas with the bottom shutter morphed into a
+                  folder glyph. Tap the folder to open the file picker
+                  (filtered to <Kbd>.ply</Kbd> via the new{" "}
+                  <Kbd>dev.lota.ply</Kbd> UTI), choose any PLY on the
+                  device — LOTA captures, iCloud Drive, third-party
+                  sources — and the cloud loads off the main thread.
+                </p>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    Once a cloud is loaded
+                  </h4>
+                  <ul className="text-sm text-zinc-400 space-y-2">
+                    <li>
+                      <strong className="text-white">Info chip</strong> — a
+                      centered top chip shows point count (thousand-separated),
+                      AABB extents (in metres or centimetres), file size, and
+                      yellow <Kbd>subsampled</Kbd> / <Kbd>no RGB</Kbd> badges
+                      when applicable
+                    </li>
+                    <li>
+                      <strong className="text-white">Neon axis gizmo</strong>{" "}
+                      — six axis caps in the top-trailing corner, projected
+                      from the live camera basis. Positives carry X/Y/Z
+                      letters; negatives are hollow rings (Blender
+                      convention). Tap any cap to spring-snap the camera to
+                      that view. The gizmo stays anchored to world axes
+                      regardless of mirror toggles
+                    </li>
+                    <li>
+                      <strong className="text-white">Folder button</strong>{" "}
+                      — the bottom shutter becomes a load-new-file button so
+                      you can swap clouds without leaving the mode
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    Gestures
+                  </h4>
+                  <ul className="text-sm text-zinc-400 space-y-2">
+                    <li>
+                      <Kbd>One-finger drag</Kbd> — orbit yaw / pitch
+                    </li>
+                    <li>
+                      <Kbd>Two-finger drag</Kbd> — pan the orbit target
+                    </li>
+                    <li>
+                      <Kbd>Pinch</Kbd> — zoom (clamped to 0.05× / 8× of
+                      fit-bounds distance)
+                    </li>
+                    <li>
+                      <Kbd>Double-tap</Kbd> — reset to fit-bounds with a
+                      15° downward pitch
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    Color modes
+                  </h4>
+                  <ul className="text-sm text-zinc-400 space-y-2">
+                    <li>
+                      <strong className="text-white">Original</strong> —
+                      per-point RGB from the file. Falls back to white if
+                      the file has no color
+                    </li>
+                    <li>
+                      <strong className="text-white">Solid</strong> —
+                      single user-picked color, useful for inspecting
+                      shape without color noise
+                    </li>
+                    <li>
+                      <strong className="text-white">By Height</strong> —
+                      Y coordinate mapped through the selected palette;
+                      tall features pop visually
+                    </li>
+                    <li>
+                      <strong className="text-white">By Distance</strong>{" "}
+                      — distance from the camera to each point, recomputed
+                      live as you orbit. Good for spotting depth structure;
+                      noisy clouds look like a fog when colored this way
+                    </li>
+                    <li>
+                      <strong className="text-white">By Axis</strong> —
+                      same as By Height but along any of X / Y / Z. Lets
+                      you find the long axis of an asymmetric scan
+                    </li>
+                  </ul>
+                  <p className="text-sm text-zinc-500 leading-relaxed mt-3">
+                    The scalar modes (Height / Distance / Axis) share the
+                    nine LiDAR depth palettes.
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <h4 className="text-sm font-semibold text-white mb-3">
+                    Limits and behavior
+                  </h4>
+                  <ul className="text-sm text-zinc-400 space-y-2">
+                    <li>
+                      <strong className="text-white">5 M point cap</strong>{" "}
+                      — larger files are uniformly sub-sampled and the chip
+                      shows a <Kbd>subsampled</Kbd> badge. Keeps memory
+                      predictable; a 5 M-point cloud needs ~120 MB of GPU
+                      buffers
+                    </li>
+                    <li>
+                      <strong className="text-white">
+                        Binary little-endian PLY only
+                      </strong>{" "}
+                      — matches what LOTA writes and what most photogrammetry
+                      / DCC tools export. ASCII and big-endian PLY produce a
+                      clear &quot;Unsupported PLY format&quot; error
+                    </li>
+                    <li>
+                      <strong className="text-white">Extra properties</strong>{" "}
+                      (normals, alpha, intensity) are tolerated — the parser
+                      builds an offset map for whatever the file declares, so
+                      clouds from Blender, CloudCompare, and Nerfstudio load
+                      cleanly as long as <Kbd>x y z</Kbd> (and optionally{" "}
+                      <Kbd>red green blue</Kbd>) are present
+                    </li>
+                    <li>
+                      <strong className="text-white">Mirror toggles</strong>{" "}
+                      apply at draw time (model matrix), not at parse time —
+                      toggling does not re-read the file
+                    </li>
+                    <li>
+                      <strong className="text-white">ARSession resumes</strong>{" "}
+                      as soon as you switch off the PLY Viewer format.
+                      Swiping between pages while a cloud is loaded keeps it
+                      in memory; no need to re-pick the file on return
+                    </li>
+                  </ul>
+                </div>
+
+                <Card title="Tips">
+                  <>
+                    <ul className="space-y-1.5 mt-1">
+                      <li>
+                        For files saved from Blender or CloudCompare, the{" "}
+                        <strong className="text-white">Y-up / Z-up</strong>{" "}
+                        setting in Orientation is the first thing to check
+                        if the cloud appears tipped on its side. LOTA&apos;s
+                        own captures are Y-up
+                      </li>
+                      <li>
+                        <strong className="text-white">By Distance</strong>{" "}
+                        color mode is a quick &quot;is this cloud noisy
+                        from the inside?&quot; inspection — noise looks
+                        like a fog when colored by distance from the orbit
+                        center
+                      </li>
+                      <li>
+                        <strong className="text-white">Auto Spin</strong>{" "}
+                        at ~0.2 rev/s is a good speed for casually
+                        presenting a capture without manual orbiting
+                      </li>
+                    </ul>
+                  </>
+                </Card>
+              </div>
             </section>
 
             {/* ─── Settings ───────────────────────────────── */}
@@ -2256,6 +2486,66 @@ export default function DocsPage() {
                     density. Medium+ = removes low-confidence noisy edge pixels.
                     High Only = fewest points, highest accuracy. Affects both live
                     view and Gaussian Capture exports.
+                  </Setting>
+                </SettingsGroup>
+
+                <SettingsGroup title="Gaussian Capture — Capture Settings sheet">
+                  <Setting name="Capture Rate" defaultValue="60 Hz (60 / 30 / 15)">
+                    Max rate at which the recorder appends points from
+                    ARFrames. Lowering the rate drops every Nth ARFrame{" "}
+                    <em>before</em> point unprojection and JPEG encoding
+                    run, so both per-pixel CPU work and the encode for
+                    that frame are skipped. 30 Hz roughly halves point
+                    count and zip size; 15 Hz quarters them. Default
+                    60 Hz keeps the densest possible capture. Useful for
+                    trading density for cost on long static holds or
+                    thermally constrained sessions. Applies to COLMAP,
+                    Nerfstudio, Nerfstudio + Depth, and Point Cloud PLY
+                    formats.
+                  </Setting>
+                </SettingsGroup>
+
+                <SettingsGroup title="PLY Viewer — PLY Viewer Settings sheet">
+                  <Setting name="Color Mode" defaultValue="Original">
+                    Original (per-point RGB) / Solid (color picker) /
+                    By Height (Y coordinate) / By Distance (from camera,
+                    live as you orbit) / By Axis (signed distance along
+                    chosen X/Y/Z). Original on a colorless file falls
+                    back to white.
+                  </Setting>
+                  <Setting name="Palette" defaultValue="shared LiDAR palettes (9 presets)">
+                    Colormap for the scalar modes (By Height / By
+                    Distance / By Axis). Same nine presets as the
+                    LiDAR depth visualization.
+                  </Setting>
+                  <Setting name="Camera Mode" defaultValue="Free Orbit">
+                    Free Orbit / Auto Spin / Top / Front / Side.
+                    Presets snap via the same animated path as
+                    tapping a gizmo cap.
+                  </Setting>
+                  <Setting name="Spin Speed" defaultValue="0.2 rev/s (range 0.05–2.0)">
+                    Auto-rotation speed when Camera Mode is{" "}
+                    <Kbd>Auto Spin</Kbd>. Hidden in other modes.
+                  </Setting>
+                  <Setting name="Up Axis" defaultValue="Y-up">
+                    Y-up / Z-up segmented control. Matches the source
+                    file&apos;s convention. LOTA captures are Y-up;
+                    flip to Z-up for files saved from Blender or
+                    similar DCCs that expect Z-up.
+                  </Setting>
+                  <Setting name="Mirror X / Y / Z" defaultValue="Off">
+                    Per-axis mirror toggles. Applied at draw time via
+                    the model matrix, so flipping does not re-read the
+                    file. The orientation gizmo stays anchored to
+                    world axes regardless.
+                  </Setting>
+                  <Setting name="Reset View" defaultValue="action">
+                    Re-runs fit-bounds with a 15° downward pitch —
+                    same result as double-tapping the canvas.
+                  </Setting>
+                  <Setting name="Point Size" defaultValue="3.0 (range 1.0–12.0)">
+                    Per-point screen size. All settings persist
+                    between launches.
                   </Setting>
                 </SettingsGroup>
 

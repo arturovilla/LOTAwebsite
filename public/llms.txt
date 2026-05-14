@@ -1,28 +1,31 @@
 # LOTA — LiDAR Over The Air
 
-> LOTA is an iOS app that transforms iPhones into professional spatial capture and streaming tools. Stream real-time depth, color, point cloud, motion capture, and live transcription data over NDI, TCP/UDP, OSC, and PLY. Export COLMAP-compatible datasets for Gaussian Splat and NeRF training. Built for creative professionals using TouchDesigner, OBS, vMix, Resolume, Max/MSP, and other live visual tools.
+> LOTA is an iOS app that turns iPhones into professional spatial capture and streaming tools. Stream real-time depth, color, point cloud, motion capture, IMU, audio analysis, and live transcription data over NDI, TCP/UDP, OSC, and PLY. Export COLMAP and Nerfstudio datasets for Gaussian Splat and NeRF training, capture PBR material sets from flat surfaces, and inspect saved point clouds in an on-device 3D viewer. Built for creative professionals using TouchDesigner, OBS, vMix, Resolume, Max/MSP, Ableton, Unreal, Unity, Blender, and other live visual / 3D tools.
 
-- Requires iOS 26.2+. LiDAR (iPhone 12 Pro or later) needed for Depth, Point Cloud, Blob Tracking, and Gaussian Capture. Color, Mono, and Transcription modes work on every iPhone
-- Six capture modes: Color (60 FPS RGB), Mono, Depth (9 colormaps), Point Cloud (real-time 3D), Blob Track (TouchDesigner-compatible), Transcription (on-device speech-to-text)
-- ARKit tracking page: body (91 joints), face (52 blend shapes), and hand tracking (21 landmarks per hand) streamed over OSC
-- GPU-accelerated via Metal compute shaders — full depth map sampling at interactive frame rates
+- Requires iOS 26.2+. LiDAR (iPhone 12 Pro or later) needed for Depth, Point Cloud, Blob Track, Material Capture, and the LiDAR-based 3D-scene recording formats. Color, Mono, Neural Depth (Depth Anything V2 on the Apple Neural Engine), Transcription, Motion, and Audio modes work on every iPhone. **LOTA is officially iPhone-only** — iPad Pro with LiDAR has run during beta testing but is not an officially supported target
+- Nine capture modes on the Camera / Streaming page: Color (60 FPS RGB), Mono (grayscale), Depth (9 LiDAR colormaps), Neural Depth (AI depth on every iPhone), Point Cloud (real-time 3D), Blob Track (TouchDesigner-compatible), Transcription (on-device speech-to-text), Motion (IMU graphs), Audio (mic analysis)
+- ARKit Tracking page: body (91 joints, 18 key joints over OSC), face (52 blend shapes), hand tracking (21 landmarks per hand, up to 2 hands) — all streamed over OSC
+- Gaussian Capture page: COLMAP, Nerfstudio, Nerfstudio + Depth, Point Cloud PLY, Material (PBR), IMU Trace, Audio Trace, and (new in v1.2.6) PLY Viewer — a read-only 3D inspector for any `.ply` file on the device
+- Streaming transports: NDI (auto-discovered as `LOTA - <deviceLabel>`), TCP / UDP (H.264 video or raw Float32 depth), OSC (camera pose at ~30 Hz, body/face/hand tracking, IMU, audio analysis, transcription), and binary PLY (live point cloud over TCP)
+- iOS Camera-style **STREAM | RECORD** paradigm switch on the middle page. Record saves the live composited Metal output as an H.264 `.mov` to the Photos library (add-only access)
+- GPU-accelerated via Metal compute shaders; adaptive thermal throttle keeps long sessions stable
 - All processing on-device, no analytics, no data collection
-- Fully accessible: VoiceOver, Voice Control, Dynamic Type, Switch Control, Reduce Motion
-- Currently in public TestFlight beta — join at https://testflight.apple.com/join/jFNkCjNF; full App Store release coming soon
+- Fully accessible: VoiceOver, Voice Control, Dynamic Type, Differentiate Without Color, Increase Contrast, Reduce Motion
+- Currently in public TestFlight beta — join at https://testflight.apple.com/join/jFNkCjNF; App Store release coming soon
 
 ## Documentation
 
-- [Getting Started](https://lidarota.app/docs): Device requirements, installation, capture mode overview, and quick-start guide
-- [Capture Modes](https://lidarota.app/docs#capture-modes): Color, Mono, Depth, Point Cloud, Blob Track, and Transcription mode specifications and usage
-- [Streaming Protocols](https://lidarota.app/docs#streaming): NDI auto-discovery, TCP/UDP H.264 and Float32 streaming, OSC at 30 Hz, live PLY point cloud streaming
+- [Getting Started](https://lidarota.app/docs): Device requirements, first-launch permission flow, on-device speech model prefetch, the three-page swipe navigation, quick-start
+- [Capture Modes](https://lidarota.app/docs#capture-modes): Color, Mono, Depth, Neural Depth, Point Cloud, Blob Track, Transcription, Motion, and Audio mode specifications and usage
+- [Streaming Protocols](https://lidarota.app/docs#streaming): NDI auto-discovery with customizable per-device label, TCP/UDP H.264 and Float32 streaming, OSC at 30 Hz, binary PLY point cloud streaming
 - [ARKit Tracking](https://lidarota.app/docs#tracking): Body, face, and hand motion capture streamed over OSC
-- [TouchDesigner Integration](https://lidarota.app/docs#touchdesigner): NDI In TOP setup, LOTAPoints.tox, LOTABinaryPLYReciever.tox, LOTASpeechTCP.tox, LOTASpeechUDP.tox drop-in components
-- [Export & 3D Pipelines](https://lidarota.app/docs#export): COLMAP binary export, Nerfstudio + depth, PLY point cloud export, iCloud sync, compatibility with OpenSplat, Nerfstudio, and gsplat
-- [Settings Reference](https://lidarota.app/docs#settings): Receiver, transports, depth, point cloud, blob tracking, tracking, and transcription configuration
+- [TouchDesigner Integration](https://lidarota.app/docs#touchdesigner): NDI In TOP setup, LOTAPoints.tox, LOTABinaryPLYRecieverV2.tox, LOTASpeechTCP.tox, LOTASpeechUDP.tox drop-in components
+- [Export & 3D Pipelines](https://lidarota.app/docs#export): COLMAP, Nerfstudio, Nerfstudio + Depth, Point Cloud PLY, Material (PBR), IMU Trace, Audio Trace, and PLY Viewer. Capture Rate setting (60/30/15 Hz) for 3D-scene recording formats. Compatible with OpenSplat, Nerfstudio, gsplat, Substance Designer/Painter, Blender, Unreal, Unity, TouchDesigner
+- [Settings Reference](https://lidarota.app/docs#settings): Receiver IP, transport configs, depth, point cloud, blob tracking, tracking overlays, transcription, motion, audio, Gaussian Capture, PLY Viewer
 - [Accessibility](https://lidarota.app/docs#accessibility): VoiceOver, Voice Control, Dynamic Type, Dark Interface, Differentiate Without Color, Increase Contrast, Reduce Motion
-- [FAQ](https://lidarota.app/docs#faq): Supported devices, network requirements, latency, compatible software
+- [FAQ](https://lidarota.app/docs#faq): Supported devices, network requirements, latency, compatible software, recommended export formats
 
 ## Product
 
-- [Changelog](https://lidarota.app/changelog): Version history from v0.0.1 to v1.0.9 with detailed release notes
+- [Changelog](https://lidarota.app/changelog): Full version history through v1.2.6 (current). v1.2.6 adds PLY Viewer mode with orbit / pan / zoom, five color modes, neon axis gizmo, plus a Capture Rate setting (60 / 30 / 15 Hz) for 3D-scene recording formats
 - [Privacy Policy](https://lidarota.app/privacy): On-device processing, no analytics, no data collection, local network streaming only

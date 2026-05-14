@@ -4,6 +4,27 @@ All notable changes to the LOTA project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.2.6] - 2026-05-13
+
+### Added
+
+- **PLY Viewer export mode** (right page) — new read-only entry in the Gaussian Capture format dropdown for inspecting `.ply` point clouds without leaving LOTA. Selecting it pauses the ARSession (saves battery and thermals) and arms the renderer's static-cloud branch. The bottom shutter morphs into a folder glyph that opens `.fileImporter` filtered to a new `dev.lota.ply` UTI. `Capture/PLYReader.swift` streams the binary LE payload off the main thread, builds two `SIMD3<Float>` buffers, computes the AABB, and caps at 5 M points with uniform sub-sampling
+- **Orbit camera with pan, zoom, and snap** — `Rendering/ViewerCamera.swift` (spherical yaw/pitch/distance/target/pan), fit-bounds reset at 15° pitch. Gestures go through a UIKit overlay (`Views/PLYViewerGestureLayer.swift`) so single-finger drag (orbit), two-finger drag (pan), and pinch (zoom) can be disambiguated by touch count, which SwiftUI's `DragGesture` cannot do. Double-tap resets to fit-bounds. The renderer reads the view-projection matrix once per frame via a `nonisolated(unsafe)` snapshot pushed from a `TimelineView` tick
+- **Static point cloud shader path** — `staticPointCloudVertex` in `Shaders.metal` plus a sibling pipeline that reuses `pointCloudFragment`. `draw(in:)` short-circuits to `drawStaticCloud` when `staticCloudActive` is true, skipping ARKit passes and clearing to near-black. The shader applies a model matrix (up-axis swap + mirror flips) before view-projection and branches color by a uniform mode index, sampling a 256-texel 1D LUT for scalar palettes
+- **Five viewer color modes** — Original (per-point RGB), Solid (`ColorPicker`), By Height (Y coordinate), By Distance (length from camera origin, live as you orbit), By Axis (signed distance along chosen X/Y/Z). Scalar modes share the nine `DepthColorMapStyle` palettes. Original on a colorless file falls back to white
+- **Neon axis orientation gizmo** (top-trailing overlay in viewer mode) — six axis caps projected from the live camera basis, X/Y/Z letters on positive ends and hollow rings on negative ends (Blender convention). Tap any cap to spring-snap the camera via a shared `ViewerCamera.snap(toAxis:sign:)` that the Top/Front/Side preset picker also routes through. Mirror toggles do **not** affect the gizmo so the user keeps a stable world-axis reference after flipping handedness
+- **Cloud info chip** — centered top chip while loaded: point count (thousand-separated), AABB extents in metres or centimetres, file size on disk, plus `subsampled` (yellow) and `no RGB` badges. Same `RoundedRectangle(8) + .ultraThinMaterial` treatment as the live capture counter row
+- **PLY Viewer Settings sheet** — `Views/PLYViewerSettingsSheet.swift`: Color (mode + palette + axis), Orientation (camera mode + optional spin speed + Y-up/Z-up + per-axis mirrors + Reset View), Point Size (1.0–12.0 slider). Persisted via `Models/PLYViewerSettings.swift` (`@Published` + `UserDefaults`)
+- **Capture Rate setting** for the recording formats (COLMAP / Nerfstudio / Nerfstudio + Depth / Point Cloud PLY) — 60 / 30 / 15 Hz segmented picker that throttles `GaussianRecorder.recordFrame`. Drops every Nth ARFrame **before** `extractPoints`, so the per-pixel CPU work and JPEG encode are skipped too. Roughly halves point count and zip size at 30 Hz, quarters at 15 Hz. Default 60 preserves pre-1.2.6 behavior. Lives in a new `Views/GaussianCaptureSettingsSheet.swift` reached via a **Capture** settings button that replaces the previous "No settings for this mode" placeholder
+- **`dev.lota.ply` UTType declaration** in `Info.plist` (`UTImportedTypeDeclarations`) — imported type conforming to `public.data` with the `ply` extension. Required for `.fileImporter` to filter cleanly across Files, iCloud Drive, and third-party providers; the system has no built-in UTI for PLY
+
+### Changed
+
+- **3D-scene recording formats now have a settings cog** — was a dimmed "No settings for this mode" pill. Same `ModeSettingsButton` shell as Material / IMU / Audio, opens the new Capture Settings sheet
+- **`ExportFormat` extended with `.plyViewer` + `isViewer: Bool`** — sits alongside the existing `isSingleShot` and `isTimeSeries` flags. `needsImages` and `needsPoses` now also gate on `!isViewer` so accidentally routing a viewer format through the keyframe / JPEG paths is a compile error rather than a runtime no-op
+
+---
+
 ## [1.2.5] - 2026-05-07
 
 ### Fixed
