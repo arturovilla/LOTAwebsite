@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import { FaLinkedinIn, FaInstagram, FaPatreon, FaRedditAlien, FaApple } from "react-icons/fa";
-import { BETA_URL } from "../config";
+import { APP_STORE_URL } from "../config";
 
 export default function Footer() {
   return (
@@ -84,24 +84,12 @@ export default function Footer() {
 
           {/* CTA */}
           <div className="flex flex-col items-start md:items-end gap-4">
-            {/* App Store CTA — disabled while LOTA is in App Review.
-                Re-enable (and import APP_STORE_URL) once the listing is live.
             <a
               href={APP_STORE_URL}
               className="inline-flex items-center gap-2.5 px-6 py-2.5 bg-white/10 backdrop-blur-sm text-white border border-white/[0.18] rounded-full font-semibold text-sm hover:bg-white/20 transition-colors"
             >
               <FaApple size={16} />
               Download on the App Store
-            </a>
-            */}
-            <a
-              href={BETA_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 px-6 py-2.5 bg-white/10 backdrop-blur-sm text-white border border-white/[0.18] rounded-full font-semibold text-sm hover:bg-white/20 transition-colors"
-            >
-              <FaApple size={16} />
-              Join the beta
             </a>
             <p className="text-xs text-zinc-700">
               &copy; {new Date().getFullYear()} LOTA. All rights reserved.

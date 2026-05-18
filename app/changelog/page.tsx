@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
 import fs from "fs";
 import path from "path";
+import { FaApple } from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import Signup from "../components/Signup";
 import Footer from "../components/Footer";
+
+/* The release that shipped to the App Store. The changelog renders an
+   App Store launch banner directly above this version. */
+const APP_STORE_LAUNCH_VERSION = "1.2.7";
 
 export const metadata: Metadata = {
   title: "Changelog",
@@ -158,7 +163,24 @@ export default function ChangelogPage() {
 
         <div className="space-y-16">
           {releases.map((release) => (
-            <article key={release.version}>
+            <div key={release.version}>
+              {/* App Store launch banner — sits above the release that
+                  first shipped to the App Store. */}
+              {release.version === APP_STORE_LAUNCH_VERSION && (
+                <div className="flex items-center gap-3.5 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.06] px-5 py-4 mb-8">
+                  <FaApple className="shrink-0 text-emerald-400" size={22} />
+                  <div>
+                    <p className="text-sm font-semibold text-white">
+                      Now on the App Store
+                    </p>
+                    <p className="text-xs text-zinc-400 mt-0.5 leading-relaxed">
+                      LOTA {APP_STORE_LAUNCH_VERSION} is the first release
+                      available on the App Store.
+                    </p>
+                  </div>
+                </div>
+              )}
+            <article>
               {/* version header */}
               <div className="flex flex-wrap items-baseline gap-3 mb-6">
                 <h2 className="text-xl sm:text-2xl font-bold text-white">
@@ -197,6 +219,7 @@ export default function ChangelogPage() {
                 <div className="mt-12 border-t border-white/[0.06]" />
               )}
             </article>
+            </div>
           ))}
         </div>
       </main>
