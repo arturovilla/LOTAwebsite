@@ -9,7 +9,7 @@ import { Analytics } from "@vercel/analytics/next"
 export const metadata: Metadata = {
   metadataBase: new URL("https://lidarota.app"),
   title: {
-    default: "LOTA — LiDAR Over the Air",
+    default: "LOTA: LiDAR Over the Air",
     template: "%s | LOTA",
   },
   description:
@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     apple: "/LOTA-light.jpg",
   },
   openGraph: {
-    title: "LOTA — LiDAR Over the Air",
+    title: "LOTA: LiDAR Over the Air",
     description:
       "Turn your iPhone into a professional spatial capture tool. Stream real-time LiDAR data via NDI, TCP/UDP, OSC, and PLY.",
     url: "https://lidarota.app",
@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "LOTA — LiDAR Over the Air",
+    title: "LOTA: LiDAR Over the Air",
     description:
       "Turn your iPhone into a professional spatial capture tool. Stream real-time LiDAR data via NDI, TCP/UDP, OSC, and PLY.",
     images: [
@@ -51,7 +51,7 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "SoftwareApplication",
-      name: "LOTA — LiDAR Over the Air",
+      name: "LOTA: LiDAR Over the Air",
       description:
         "iOS app that transforms iPhones with LiDAR sensors into professional spatial capture tools. Stream depth, color, and point cloud data via NDI, TCP/UDP, OSC, and PLY.",
       operatingSystem: "iOS 17.0+",

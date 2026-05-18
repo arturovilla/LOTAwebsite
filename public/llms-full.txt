@@ -358,7 +358,7 @@ This page records datasets for Gaussian Splatting and 3D reconstruction training
 | **COLMAP** | `sparse/0/cameras.bin`, `images.bin`, `points3D.bin` + `images/` JPEGs | 3D Gaussian Splatting, OpenSplat, gsplat |
 | **Nerfstudio** | `transforms.json` + `images/` JPEGs + `points3D.ply` | Nerfstudio/splatfacto, Instant-NGP |
 | **Nerfstudio + Depth** | Same as Nerfstudio + `depth/` 16-bit PNG depth maps | Depth-supervised training (best geometry on flat surfaces) |
-| **Point Cloud** | Single `points3D.ply` file | Blender, CloudCompare, MeshLab |
+| **Point Cloud** | Single `points3D.ply` file (binary or ASCII) | Blender, CloudCompare, MeshLab |
 | **Material** | PBR map set ZIP — `basecolor.png`, `normal.png`, `height.png` (16-bit), `ao.png`, `roughness.png`, `preview.png`, `material.json` | Substance Designer/Painter, Blender, Unreal, Unity, TouchDesigner |
 | **IMU Trace** | `recording.csv` or `.tsv` + `manifest.json` + `README.txt` (+ optional `report.pdf`) | Motion analysis, sensor research, data science workflows |
 | **Audio Trace** | Same shape as IMU Trace, with audio analysis columns | Music analysis, beat detection research, audio reactive workflows |
@@ -377,9 +377,10 @@ Every export ZIP is named `LOTA_<timestamp>_<MODE>.zip` (e.g. `LOTA_2026-04-30_1
 
 ### Capture Settings (new in v1.2.6)
 
-The 3D-scene recording formats (COLMAP, Nerfstudio, Nerfstudio + Depth, Point Cloud PLY) share a **Capture Settings** sheet, opened via the settings pill below the format picker. One knob in v1.2.6:
+The 3D-scene recording formats (COLMAP, Nerfstudio, Nerfstudio + Depth, Point Cloud PLY) share a **Capture Settings** sheet, opened via the settings pill below the format picker:
 
 - **Capture Rate** (60 Hz default / 30 Hz / 15 Hz) — ARKit delivers depth at ~60 Hz; lowering the rate drops every Nth ARFrame *at the source*, before per-pixel unprojection and JPEG encoding run. 30 Hz roughly halves the captured point count and zip size; 15 Hz quarters them. Useful for scanning a small subject without needing every depth sample, or for throttling a long scan to keep the device cool
+- **PLY Format** (Binary default / ASCII; new in v1.2.7) — shown only when the Point Cloud format is selected. Binary (`binary_little_endian`) is compact and read natively by OpenSplat, COLMAP, MeshLab, and CloudCompare. ASCII writes a human-readable text PLY (one `x y z r g b` line per point), easier to inspect or script against but roughly 3× larger before zipping; ASCII artifacts are named `LOTA_<timestamp>_PLY_ASCII.zip`
 
 ### Material Capture
 
@@ -484,11 +485,11 @@ Charts that have no data to plot show a centered "No data captured" placeholder 
 
 ### PLY Viewer (new in v1.2.6)
 
-Select **PLY Viewer** from the format picker to open the read-only point cloud inspector. The format picker pauses ARKit (the live camera goes black), and the right page swaps to a dark canvas with the bottom shutter morphed into a folder glyph. Tap the folder to open the file picker (filtered to `.ply` via the new `dev.lota.ply` UTI), choose any PLY on the device (LOTA captures, iCloud Drive, third-party sources), and the cloud loads off the main thread.
+Select **PLY Viewer** from the format picker to open the read-only inspector. The format picker pauses ARKit (the live camera goes black), and the right page swaps to a dark canvas with the bottom shutter morphed into a folder glyph. Tap the folder to open the file picker (filtered to `.ply` via the new `dev.lota.ply` UTI), choose any PLY on the device (LOTA captures, iCloud Drive, third-party sources), and the file loads off the main thread. The viewer handles two kinds of `.ply`: a plain point cloud renders as flat points, while a 3D Gaussian Splat file is detected automatically and rendered as splats (new in v1.2.7).
 
 **Once a cloud is loaded**:
 
-- A centered top **info chip** shows point count, AABB extents (in metres or centimetres), file size, and badges for `subsampled` (yellow) and `no RGB` when applicable
+- A centered top **info chip** shows point count (or a splat count for a Gaussian splat), AABB extents (in metres or centimetres), file size, and badges for `subsampled` (yellow) and `no RGB` when applicable
 - A small **neon axis gizmo** pins to the top-trailing corner. Each axis cap is a 3D-projected dot (positives carry X/Y/Z letters, negatives are hollow rings, Blender convention) and updates live as you orbit. Tap any cap to spring-snap the camera to that view
 - The bottom shutter morphs to a **load-new-file** button so you can swap clouds without leaving the mode
 
@@ -509,7 +510,17 @@ Select **PLY Viewer** from the format picker to open the read-only point cloud i
 | **Orientation** | Camera Mode (Free Orbit / Auto Spin / Top / Front / Side), spin speed slider (0.05–2.0 rev/s) when Auto Spin is selected, Y-up / Z-up segmented, per-axis Mirror toggles, Reset View button |
 | **Point Size** | Slider 1.0–12.0 |
 
-All settings persist between launches.
+All settings persist between launches. When the loaded file is a **Gaussian splat**, the Color section and Point Size slider are replaced by a single **Splat Size** slider (0.25×–3.0×, default 1.0×).
+
+**Gaussian splats** (new in v1.2.7):
+
+When the loaded file is a 3D Gaussian Splat — the layout OpenSplat and other 3DGS trainers write — the viewer detects it from the header and renders it with proper splatting: each Gaussian is an oriented, anisotropic, alpha-blended ellipse rather than a flat dot, depth-sorted on the GPU so it composites correctly from every angle.
+
+- The info chip shows a **splat count** instead of a point count
+- The settings sheet replaces the **Color** section and **Point Size** slider with a single **Splat Size** slider (0.25×–3.0×, default 1.0×). Below 1.0× thins the splat to reveal structure; above 1.0× fills gaps in a sparse splat. Splats carry their own baked color, so the point-cloud color modes do not apply
+- **Orientation** (camera mode, spin, Y-up / Z-up, mirrors, Reset View) works exactly as it does for a point cloud. OpenSplat results are not always Y-up — if a splat loads tipped on its side, flip Y-up / Z-up first
+- View-dependent shading (specular glints from higher-order spherical harmonics) is not rendered yet, so the splat can look slightly flatter than it does in a desktop viewer
+- Capped at **2,000,000 Gaussians**. Larger splats are uniformly sub-sampled and the chip shows the `subsampled` badge
 
 **Color modes in detail**:
 

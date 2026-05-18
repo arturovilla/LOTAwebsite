@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
-import { FaLinkedinIn, FaInstagram, FaPatreon, FaRedditAlien } from "react-icons/fa";
-import BetaButton from "./BetaButton";
+import { FaLinkedinIn, FaInstagram, FaPatreon, FaRedditAlien, FaApple } from "react-icons/fa";
+import { APP_STORE_URL } from "../config";
 
 export default function Footer() {
   return (
@@ -84,10 +84,13 @@ export default function Footer() {
 
           {/* CTA */}
           <div className="flex flex-col items-start md:items-end gap-4">
-            <BetaButton
-              source="footer"
-              className="inline-flex items-center gap-2 px-6 py-2.5 bg-white text-black rounded-full font-semibold text-sm hover:bg-zinc-200 transition-colors"
-            />
+            <a
+              href={APP_STORE_URL}
+              className="inline-flex items-center gap-2.5 px-6 py-2.5 bg-white/10 backdrop-blur-sm text-white border border-white/[0.18] rounded-full font-semibold text-sm hover:bg-white/20 transition-colors"
+            >
+              <FaApple size={16} />
+              Download on the App Store
+            </a>
             <p className="text-xs text-zinc-700">
               &copy; {new Date().getFullYear()} LOTA. All rights reserved.
             </p>

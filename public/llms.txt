@@ -5,7 +5,7 @@
 - Requires iOS 26.2+. LiDAR (iPhone 12 Pro or later) needed for Depth, Point Cloud, Blob Track, Material Capture, and the LiDAR-based 3D-scene recording formats. Color, Mono, Neural Depth (Depth Anything V2 on the Apple Neural Engine), Transcription, Motion, and Audio modes work on every iPhone. **LOTA is officially iPhone-only** — iPad Pro with LiDAR has run during beta testing but is not an officially supported target
 - Nine capture modes on the Camera / Streaming page: Color (60 FPS RGB), Mono (grayscale), Depth (9 LiDAR colormaps), Neural Depth (AI depth on every iPhone), Point Cloud (real-time 3D), Blob Track (TouchDesigner-compatible), Transcription (on-device speech-to-text), Motion (IMU graphs), Audio (mic analysis)
 - ARKit Tracking page: body (91 joints, 18 key joints over OSC), face (52 blend shapes), hand tracking (21 landmarks per hand, up to 2 hands) — all streamed over OSC
-- Gaussian Capture page: COLMAP, Nerfstudio, Nerfstudio + Depth, Point Cloud PLY, Material (PBR), IMU Trace, Audio Trace, and (new in v1.2.6) PLY Viewer — a read-only 3D inspector for any `.ply` file on the device
+- Gaussian Capture page: COLMAP, Nerfstudio, Nerfstudio + Depth, Point Cloud PLY, Material (PBR), IMU Trace, Audio Trace, and (new in v1.2.6) PLY Viewer — a read-only 3D inspector for any `.ply` file on the device, with 3D Gaussian Splat rendering added in v1.2.7
 - Streaming transports: NDI (auto-discovered as `LOTA - <deviceLabel>`), TCP / UDP (H.264 video or raw Float32 depth), OSC (camera pose at ~30 Hz, body/face/hand tracking, IMU, audio analysis, transcription), and binary PLY (live point cloud over TCP)
 - iOS Camera-style **STREAM | RECORD** paradigm switch on the middle page. Record saves the live composited Metal output as an H.264 `.mov` to the Photos library (add-only access)
 - GPU-accelerated via Metal compute shaders; adaptive thermal throttle keeps long sessions stable
@@ -20,12 +20,12 @@
 - [Streaming Protocols](https://lidarota.app/docs#streaming): NDI auto-discovery with customizable per-device label, TCP/UDP H.264 and Float32 streaming, OSC at 30 Hz, binary PLY point cloud streaming
 - [ARKit Tracking](https://lidarota.app/docs#tracking): Body, face, and hand motion capture streamed over OSC
 - [TouchDesigner Integration](https://lidarota.app/docs#touchdesigner): NDI In TOP setup, LOTAPoints.tox, LOTABinaryPLYRecieverV2.tox, LOTASpeechTCP.tox, LOTASpeechUDP.tox drop-in components
-- [Export & 3D Pipelines](https://lidarota.app/docs#export): COLMAP, Nerfstudio, Nerfstudio + Depth, Point Cloud PLY, Material (PBR), IMU Trace, Audio Trace, and PLY Viewer. Capture Rate setting (60/30/15 Hz) for 3D-scene recording formats. Compatible with OpenSplat, Nerfstudio, gsplat, Substance Designer/Painter, Blender, Unreal, Unity, TouchDesigner
+- [Export & 3D Pipelines](https://lidarota.app/docs#export): COLMAP, Nerfstudio, Nerfstudio + Depth, Point Cloud PLY, Material (PBR), IMU Trace, Audio Trace, and PLY Viewer. Capture Rate setting (60/30/15 Hz) and binary/ASCII PLY Format toggle for 3D-scene recording formats. Compatible with OpenSplat, Nerfstudio, gsplat, Substance Designer/Painter, Blender, Unreal, Unity, TouchDesigner
 - [Settings Reference](https://lidarota.app/docs#settings): Receiver IP, transport configs, depth, point cloud, blob tracking, tracking overlays, transcription, motion, audio, Gaussian Capture, PLY Viewer
 - [Accessibility](https://lidarota.app/docs#accessibility): VoiceOver, Voice Control, Dynamic Type, Dark Interface, Differentiate Without Color, Increase Contrast, Reduce Motion
 - [FAQ](https://lidarota.app/docs#faq): Supported devices, network requirements, latency, compatible software, recommended export formats
 
 ## Product
 
-- [Changelog](https://lidarota.app/changelog): Full version history through v1.2.6 (current). v1.2.6 adds PLY Viewer mode with orbit / pan / zoom, five color modes, neon axis gizmo, plus a Capture Rate setting (60 / 30 / 15 Hz) for 3D-scene recording formats
+- [Changelog](https://lidarota.app/changelog): Full version history through v1.2.7 (current). v1.2.7 adds 3D Gaussian Splat viewing in the PLY Viewer, a Splat Size control, and an ASCII PLY export option. v1.2.6 added PLY Viewer mode with orbit / pan / zoom, five color modes, neon axis gizmo, plus a Capture Rate setting (60 / 30 / 15 Hz)
 - [Privacy Policy](https://lidarota.app/privacy): On-device processing, no analytics, no data collection, local network streaming only

@@ -4,6 +4,22 @@ All notable changes to the LOTA project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.2.7] - 2026-05-16
+
+### Added
+
+- **Gaussian splat viewing in the PLY Viewer** — the PLY Viewer now recognizes 3D Gaussian Splat `.ply` files (the layout OpenSplat and other 3DGS trainers write) and renders them as splats instead of flat points. A splat is detected from the header by its splat-specific properties (`scale_0`, `rot_0`, `f_dc_0`, `opacity`); a file without them still loads on the existing point-cloud path. `Capture/PLYReader.swift` parses the splat properties off the main thread, applies the standard activations (exponentiate the log-scale, sigmoid the opacity, SH degree-0 basis for color, normalize the rotation quaternion), precomputes each Gaussian's 3D covariance, and returns a new `LoadedScene` enum so callers route point clouds and splats separately
+- **Metal Gaussian splat renderer** — new `Rendering/SplatRenderer.swift` + `Rendering/SplatShaders.metal`. EWA splatting: each Gaussian's precomputed 3D covariance is projected to a 2D screen-space ellipse through the perspective Jacobian and drawn as an instanced, alpha-blended quad. A GPU bitonic sort orders the Gaussians back-to-front every frame the camera moves (a static view skips the sort, so an idle viewer costs nothing). v1 renders the degree-0 (DC) color; capped at 2,000,000 Gaussians with uniform sub-sampling
+- **Splat Size control** — when the loaded file is a splat, the PLY Viewer Settings sheet replaces the Color section and Point Size slider with a single **Splat Size** slider (0.25×–3.0×, default 1.0×) that scales every Gaussian. Persisted in `Models/PLYViewerSettings.swift`
+- **ASCII PLY export** — the Point Cloud export format gains a **PLY Format** toggle (binary / ASCII) in the Capture Settings sheet, shown only when Point Cloud is selected. ASCII writes a human-readable text PLY — one `x y z r g b` line per point, positions at 6-decimal precision — easier to inspect in an editor or parse in a custom script, roughly 3× larger before zipping. `Capture/COLMAPExporter.swift` gains an `ascii` parameter and a sibling text writer. ASCII artifacts are named `LOTA_<timestamp>_PLY_ASCII.zip` so the encoding is clear from the filename; the encoding is snapshotted at `startRecording` so toggling mid-session cannot desync the zip suffix from the file
+
+### Changed
+
+- **PLY Viewer adapts to the loaded file kind** — the info chip shows a splat count for splats (point count for clouds), the settings sheet branches between the point-cloud controls and the splat control, and the neon axis-orientation gizmo now appears for splats as well as point clouds
+- **`MetalRenderer` gained a splat draw branch** — `draw(in:)` routes to the `SplatRenderer` when a splat is loaded, parallel to the existing `staticCloudActive` static-cloud path, so the point-cloud render path is unchanged. `Rendering/ViewerCamera.swift` now exposes its view and projection matrices separately (the splat EWA Jacobian needs camera space, not just the combined view-projection)
+
+---
+
 ## [1.2.6] - 2026-05-13
 
 ### Added

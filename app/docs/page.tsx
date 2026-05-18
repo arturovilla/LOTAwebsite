@@ -157,19 +157,37 @@ function SettingsGroup({
 function Setting({
   name,
   defaultValue,
+  perf = false,
   children,
 }: {
   name: string;
   defaultValue?: string;
+  perf?: boolean;
   children: React.ReactNode;
 }) {
+  /* The default value is highlighted in green; any trailing parenthetical
+     (range / option list) stays dim so the default itself stands out. */
+  let defaultHead = defaultValue;
+  let defaultTail = "";
+  if (defaultValue) {
+    const splitIdx = defaultValue.indexOf(" (");
+    if (splitIdx !== -1) {
+      defaultHead = defaultValue.slice(0, splitIdx);
+      defaultTail = defaultValue.slice(splitIdx);
+    }
+  }
+
   return (
     <div className="border-b border-white/[0.04] pb-3 last:border-0 last:pb-0">
-      <div className="flex items-baseline gap-2 mb-0.5">
+      <div className="flex items-baseline gap-2 mb-0.5 flex-wrap">
         <Kbd>{name}</Kbd>
         {defaultValue && (
-          <span className="text-xs text-zinc-600">— {defaultValue}</span>
+          <span className="text-xs text-zinc-600">
+            <span className="text-emerald-400 font-medium">{defaultHead}</span>
+            {defaultTail}
+          </span>
         )}
+        {perf && <Tag variant="amber">Older devices</Tag>}
       </div>
       <p className="text-sm text-zinc-500 leading-relaxed">{children}</p>
     </div>
@@ -215,7 +233,7 @@ export default function DocsPage() {
     >
       <Navbar />
 
-      {/* Floating sidebar toggle — visible only below lg, where the docs
+      {/* Floating sidebar toggle, visible only below lg, where the docs
           sidebar is hidden by default. */}
       <button
         className="lg:hidden fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/10 border border-white/[0.15] text-zinc-200 backdrop-blur-xl hover:bg-white/[0.15] transition-colors text-sm font-medium shadow-lg"
@@ -283,9 +301,9 @@ export default function DocsPage() {
               <SectionHeading tag="Introduction" title="Getting Started">
                 LOTA turns your iPhone&apos;s LiDAR sensor into a professional
                 spatial capture and streaming tool. Stream depth, color, and
-                point cloud data over the network in real time, capture datasets
-                for 3D reconstruction, and stream motion capture data — no extra
-                hardware required.
+                point cloud over the network in real time, capture datasets for
+                3D reconstruction, and stream motion capture, all with no extra
+                hardware.
               </SectionHeading>
 
               <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-8">
@@ -294,65 +312,90 @@ export default function DocsPage() {
                 </h3>
                 <ul className="text-sm text-zinc-400 space-y-1.5">
                   <li>• iPhone 12 Pro or later (LiDAR required for Depth, Point Cloud, Blob Track, Gaussian Capture, and Material Capture)</li>
-                  <li>• Color, Mono, <strong className="text-white">Neural Depth</strong>, Transcription, Motion, and Audio modes work on every iPhone — no LiDAR needed</li>
+                  <li>• Color, Mono, <strong className="text-white">Neural Depth</strong>, Transcription, Motion, and Audio modes work on every iPhone, no LiDAR needed</li>
                   <li>• iOS 26.2 or later</li>
                   <li>• Wi-Fi network (for streaming features)</li>
                 </ul>
               </div>
 
+              <div className="rounded-xl border border-emerald-400/15 bg-emerald-400/[0.04] p-4 mb-4">
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  <span className="text-emerald-400 font-medium">
+                    Reading this page:
+                  </span>{" "}
+                  throughout these docs, the{" "}
+                  <span className="text-emerald-400 font-medium">
+                    default value
+                  </span>{" "}
+                  of every mode and setting is shown in green, so you can tell
+                  at a glance how LOTA behaves before you change anything.
+                </p>
+              </div>
+
+              <div className="rounded-xl border border-amber-400/15 bg-amber-400/[0.04] p-4 mb-8">
+                <p className="text-sm text-zinc-400 leading-relaxed">
+                  <span className="text-amber-400 font-medium">
+                    Older devices:
+                  </span>{" "}
+                  settings that can affect frame rate, GPU memory, or thermals
+                  on older iPhones carry a yellow{" "}
+                  <Tag variant="amber">Older devices</Tag> tag. Lower these
+                  first if a capture stutters or the phone runs hot.
+                </p>
+              </div>
+
               <div className="space-y-5">
                 <Step n={1} title="Install LOTA and complete first launch">
-                  Download LOTA from the App Store. The first time you open
-                  the app, a welcome screen lists the seven iOS permissions
-                  LOTA needs (Camera, Microphone, Speech Recognition, Local
-                  Network, Location for compass heading, Motion &amp; Fitness,
-                  and Photos <strong className="text-white">add-only</strong>{" "}
-                  for saving local recordings) plus a privacy reassurance —
-                  LOTA never tracks you, sells your data, or sends anything
-                  off your device unless you point it at a receiver. Tap{" "}
+                  Download LOTA from the App Store. On first launch, a welcome
+                  screen lists the seven iOS permissions LOTA needs (Camera,
+                  Microphone, Speech Recognition, Local Network, Location for
+                  compass heading, Motion &amp; Fitness, and Photos{" "}
+                  <strong className="text-white">add-only</strong> for saving
+                  local recordings). It also states plainly that LOTA never
+                  tracks you, sells your data, or sends anything off your
+                  device unless you point it at a receiver. Tap{" "}
                   <Kbd>Continue</Kbd> and the seven OS permission dialogs
-                  appear in sequence. The Photos prompt is the narrower{" "}
-                  <strong className="text-white">add-only</strong> variant —
+                  appear in sequence. The Photos prompt uses the narrower{" "}
+                  <strong className="text-white">add-only</strong> variant, so
                   LOTA can write videos to your camera roll but never read
                   existing photos.
                 </Step>
                 <Step n={2} title="Take the 10-step guided tour">
-                  After permissions, a hybrid welcome card &rarr; spotlight
-                  tour walks you through the three pages, the mode picker,
-                  the status bar, the bottom endpoint summary, mode-specific
-                  settings, and the transmit button. Tap anywhere to advance,
-                  or use the Skip button at the bottom-left. Replay anytime
-                  from{" "}
+                  After permissions, a welcome card and spotlight tour walk
+                  you through the three pages, the mode picker, the status
+                  bar, the bottom endpoint summary, mode-specific settings,
+                  and the transmit button. Tap anywhere to advance, or hit
+                  Skip at the bottom-left. Replay it anytime from{" "}
                   <Kbd>Transmission Settings &rarr; Help &rarr; Replay Tutorial</Kbd>.
                 </Step>
                 <Step n={3} title="Choose a capture mode">
-                  Tap the mode picker at the top — a glass capsule showing
-                  the active mode&apos;s icon next to a chevron that flips
-                  down / up as the panel opens and closes. A glass panel
-                  drops down with all 9 modes laid out in a circular-icon
-                  grid (Color, Mono, Depth, Neural Depth, Point Cloud, Blob
-                  Track, Transcription, Motion, Audio). Active mode is
-                  highlighted yellow; LiDAR-required modes are dimmed and
-                  disabled on non-LiDAR devices. Each mode activates instantly
-                  — no restart required.
+                  Tap the mode picker at the top, a glass capsule showing the
+                  active mode&apos;s icon next to a chevron that flips as the
+                  panel opens and closes. The panel drops down with all 9
+                  modes in a circular-icon grid (Color, Mono, Depth, Neural
+                  Depth, Point Cloud, Blob Track, Transcription, Motion,
+                  Audio). The active mode is highlighted yellow;
+                  LiDAR-required modes are dimmed and disabled on non-LiDAR
+                  devices. Each mode activates instantly, with no restart
+                  required.
                 </Step>
                 <Step n={4} title="Stream or record locally">
                   The middle page has an iOS Camera-style shutter button at
-                  the bottom-center with a{" "}
+                  bottom-center with a{" "}
                   <strong className="text-white">STREAM | RECORD</strong>{" "}
-                  segmented control directly below it. The two paradigms are{" "}
+                  segmented control below it. The two are{" "}
                   <em>mutually exclusive</em>: while one is active the other
-                  is locked, so a recording can&apos;t start mid-stream and
+                  is locked, so a recording can&apos;t start mid-stream or
                   vice versa. <strong className="text-white">STREAM</strong>{" "}
-                  broadcasts over the network (all enabled transports send
-                  simultaneously); <strong className="text-white">RECORD</strong>{" "}
-                  saves an H.264 <Kbd>.mov</Kbd> of the live composited Metal
-                  output to your Photos library on stop (4-hour cap).
-                  Configure transports by tapping the floating status bar
-                  pill (Transmission Settings); tweak per-mode options via
-                  the <Kbd>&lt;Mode&gt; Settings</Kbd> button. Swipe right
-                  for Gaussian Capture (3D datasets, PBR materials, IMU /
-                  Audio Trace exports).
+                  broadcasts over the network (all enabled transports send at
+                  once); <strong className="text-white">RECORD</strong> saves
+                  an H.264 <Kbd>.mov</Kbd> of the live composited Metal output
+                  to your Photos library on stop (4-hour cap). Configure
+                  transports from the floating status bar pill (Transmission
+                  Settings), and set per-mode options from the{" "}
+                  <Kbd>&lt;Mode&gt; Settings</Kbd> button. Swipe right for
+                  Gaussian Capture (3D datasets, PBR materials, IMU and Audio
+                  Trace exports).
                 </Step>
               </div>
             </section>
@@ -368,31 +411,30 @@ export default function DocsPage() {
               </SectionHeading>
 
               <div className="space-y-4">
-                <Card title="ARKit Tracking — Swipe Left">
-                  Body, face, and hand motion capture via ARKit. Stream skeleton,
-                  blend shape, and hand landmark data over OSC to TouchDesigner,
-                  Max/MSP, Ableton, and more.
+                <Card title="ARKit Tracking (Swipe Left)">
+                  Body, face, and hand motion capture via ARKit. Streams
+                  skeleton, blend-shape, and hand-landmark data over OSC to
+                  TouchDesigner, Max/MSP, Ableton, and more.
                 </Card>
-                <Card title="Camera / Streaming — Center (default)">
+                <Card title="Camera / Streaming (Center, default)">
                   The main page. Live camera feed with nine capture modes
                   (Color, Mono, Depth, Neural Depth, Point Cloud, Blob Track,
                   Transcription, Motion, Audio) and streaming controls. Tap
-                  the mode picker at the top (glass capsule + chevron that
-                  flips down/up) to open the panel and switch modes. Tap the
-                  floating status bar pill for Transmission Settings, or the
-                  per-mode <Kbd>&lt;Mode&gt; Settings</Kbd> button just below
-                  it for options specific to the active mode. Streaming
-                  toggle is bottom right.
+                  the mode picker at the top (glass capsule and chevron) to
+                  open the panel and switch modes. Tap the floating status bar
+                  pill for Transmission Settings, or the{" "}
+                  <Kbd>&lt;Mode&gt; Settings</Kbd> button below it for the
+                  active mode&apos;s options. The streaming toggle is at
+                  bottom right.
                 </Card>
-                <Card title="Gaussian Capture — Swipe Right">
+                <Card title="Gaussian Capture (Swipe Right)">
                   Record datasets for Gaussian Splatting and 3D reconstruction,
-                  capture a flat surface as a complete PBR material set with
-                  the Material format, or record IMU / Audio Trace exports
-                  (sensor or audio analysis data over time as
-                  CSV/TSV + manifest + optional PDF report). Choose a format,
-                  pick an iCloud folder, then either tap record (3D scene
-                  and trace formats) or lock a plane and tap the shutter
-                  (Material).
+                  capture a flat surface as a PBR material set with the
+                  Material format, or export IMU and Audio Trace files (sensor
+                  or audio analysis over time as CSV/TSV plus a manifest and
+                  optional PDF report). Choose a format, pick an iCloud folder,
+                  then tap record (3D-scene and trace formats) or lock a plane
+                  and tap the shutter (Material).
                 </Card>
               </div>
             </section>
@@ -403,14 +445,12 @@ export default function DocsPage() {
               ref={(el) => { sectionRefs.current["capture-modes"] = el; }}
             >
               <SectionHeading tag="Capture" title="Capture Modes">
-                LOTA provides nine distinct capture modes on the Camera /
-                Streaming page. Tap the mode picker at the top (glass capsule
-                with the active mode&apos;s icon next to a chevron that flips
-                down/up as the panel opens and closes) to open a glass panel
-                laid out as a grid of circular icon buttons. Active mode is
-                highlighted yellow; LiDAR-required modes are dimmed on
-                non-LiDAR devices. Tap outside the panel to dismiss without
-                picking.
+                LOTA has nine capture modes on the Camera / Streaming page.
+                Tap the mode picker at the top, a glass capsule with the
+                active mode&apos;s icon and a chevron, to open a panel of
+                circular icon buttons. The active mode is highlighted yellow;
+                LiDAR-required modes are dimmed on non-LiDAR devices. Tap
+                outside the panel to dismiss it.
               </SectionHeading>
 
               <div className="grid gap-4 sm:grid-cols-2">
@@ -537,7 +577,7 @@ export default function DocsPage() {
                   (ByteDance Research, packaged for Core ML by Apple, Apache
                   2.0, 24.8 M params). Inference runs entirely on the{" "}
                   <strong className="text-white">Apple Neural Engine</strong>{" "}
-                  at roughly 30 ms per frame — nothing leaves the device.
+                  at roughly 30 ms per frame, so nothing leaves the device.
                 </p>
 
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
@@ -557,9 +597,9 @@ export default function DocsPage() {
                     </li>
                     <li>
                       You need depth in conditions where{" "}
-                      <strong className="text-white">LiDAR struggles</strong>{" "}
-                      — very bright sunlight, very long range,
-                      glass/reflective surfaces
+                      <strong className="text-white">LiDAR struggles</strong>:
+                      very bright sunlight, very long range, glass or
+                      reflective surfaces
                     </li>
                   </ul>
                 </div>
@@ -592,7 +632,7 @@ export default function DocsPage() {
                       Enabling NDI side-by-side on a phone{" "}
                       <strong className="text-white">without LiDAR</strong>{" "}
                       now composites the regular camera on the left and Depth
-                      Anything V2 estimated depth on the right — the
+                      Anything V2 estimated depth on the right, so the
                       side-by-side workflow is no longer LiDAR-only.
                     </>
                   </Card>
@@ -611,9 +651,9 @@ export default function DocsPage() {
                   LiDAR scan, finds connected regions of in-range pixels,
                   assigns each one a stable ID across frames, and streams the
                   result as both a video (NDI) and per-blob metadata (OSC).
-                  Replaces a Kinect + <Kbd>Blob Track TOP</Kbd> chain with a
-                  single iPhone — no background plate, no lighting calibration,
-                  works on a moving camera.
+                  It replaces a Kinect plus <Kbd>Blob Track TOP</Kbd> chain
+                  with a single iPhone: no background plate, no lighting
+                  calibration, and it works on a moving camera.
                 </p>
 
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
@@ -622,30 +662,30 @@ export default function DocsPage() {
                   </h4>
                   <ul className="text-sm text-zinc-400 space-y-2">
                     <li>
-                      <strong className="text-white">Blob count HUD</strong>{" "}
-                      — A <Kbd>N blob(s)</Kbd> count appears in the status
-                      bar with a hex-grid icon
+                      <strong className="text-white">Blob count HUD.</strong>{" "}
+                      A <Kbd>N blob(s)</Kbd> count appears in the status bar
+                      with a hex-grid icon
                     </li>
                     <li>
-                      <strong className="text-white">Live depth range</strong>{" "}
-                      — The current slab (e.g. <Kbd>0.5m – 3.0m</Kbd>) is
-                      shown just below the status pill so operators can verify
-                      the active range without opening Settings
+                      <strong className="text-white">Live depth range.</strong>{" "}
+                      The current slab (e.g. <Kbd>0.5m – 3.0m</Kbd>) is shown
+                      just below the status pill so operators can verify the
+                      active range without opening Settings
                     </li>
                     <li>
-                      <strong className="text-white">Hairline outlines</strong>{" "}
-                      — Each detected blob gets a 1-pixel rectangle drawn
-                      over the camera feed in your chosen color
+                      <strong className="text-white">Hairline outlines.</strong>{" "}
+                      Each detected blob gets a 1-pixel rectangle drawn over
+                      the camera feed in your chosen color
                     </li>
                     <li>
                       <strong className="text-white">NDI captures
-                      everything</strong> — The full composition (base layer
-                      + rectangles + optional ID labels) is captured by NDI
+                      everything.</strong> The full composition (base layer,
+                      rectangles, and optional ID labels) is captured by NDI
                       so receivers see exactly what the phone shows
                     </li>
                     <li>
                       <strong className="text-white">Background
-                      detection</strong> — Connected-components labeling runs
+                      detection.</strong> Connected-components labeling runs
                       off the ARKit delegate thread so the main thread stays
                       responsive for touch and UI
                     </li>
@@ -665,22 +705,22 @@ export default function DocsPage() {
                   <ul className="text-sm text-zinc-400 space-y-2">
                     <li>
                       <strong className="text-white">Color</strong>{" "}
-                      (default) — Live color camera feed. Operator-friendly
-                      view, see what you&apos;re filming
+                      (default). Live color camera feed. Operator-friendly
+                      view that shows what you&apos;re filming
                     </li>
                     <li>
-                      <strong className="text-white">Mono</strong> — Grayscale
+                      <strong className="text-white">Mono.</strong> Grayscale
                       camera feed. Cleaner look, no color distractions
                     </li>
                     <li>
-                      <strong className="text-white">Mask</strong> — Grayscale
+                      <strong className="text-white">Mask.</strong> Grayscale
                       subject silhouette on black. Verifies what&apos;s being
                       detected and hides the background
                     </li>
                     <li>
-                      <strong className="text-white">Binary</strong> — Pure
-                      white silhouette on black. Authentic TouchDesigner
-                      Blob Track TOP look — maximum contrast
+                      <strong className="text-white">Binary.</strong> Pure
+                      white silhouette on black. The authentic TouchDesigner
+                      Blob Track TOP look, maximum contrast
                     </li>
                   </ul>
                   <p className="text-sm text-zinc-500 leading-relaxed mt-3">
@@ -698,17 +738,17 @@ export default function DocsPage() {
                       Field names match TouchDesigner&apos;s
                       <Kbd>blobtrackTOP_Class</Kbd> verbatim. Every message is
                       padded to 10 slots so CHOP channel counts stay stable as
-                      blobs come and go — empty slots have <Kbd>id == 0</Kbd>{" "}
-                      for filtering via a Select CHOP.
+                      blobs come and go, and empty slots have{" "}
+                      <Kbd>id == 0</Kbd> for filtering via a Select CHOP.
                     </p>
                     <ul className="space-y-1 text-zinc-500">
-                      <li><Kbd>/lota/blob/count</Kbd> — active blob count (int)</li>
-                      <li><Kbd>/lota/blob/ids</Kbd> — 10 stable tracker IDs</li>
-                      <li><Kbd>/lota/blob/u</Kbd>, <Kbd>/lota/blob/v</Kbd> — normalized centroid (10 floats each)</li>
-                      <li><Kbd>/lota/blob/width</Kbd>, <Kbd>/lota/blob/height</Kbd> — normalized bbox size (10 floats each)</li>
-                      <li><Kbd>/lota/blob/tx</Kbd>, <Kbd>/lota/blob/ty</Kbd> — pixel centroid in 256&times;192 depth space (10 ints each)</li>
-                      <li><Kbd>/lota/blob/age</Kbd> — seconds tracked (10 floats)</li>
-                      <li><Kbd>/lota/blob/state</Kbd> — <Kbd>0=new, 1=revived, 2=lost, 3=expired</Kbd> (10 ints)</li>
+                      <li><Kbd>/lota/blob/count</Kbd>: active blob count (int)</li>
+                      <li><Kbd>/lota/blob/ids</Kbd>: 10 stable tracker IDs</li>
+                      <li><Kbd>/lota/blob/u</Kbd>, <Kbd>/lota/blob/v</Kbd>: normalized centroid (10 floats each)</li>
+                      <li><Kbd>/lota/blob/width</Kbd>, <Kbd>/lota/blob/height</Kbd>: normalized bbox size (10 floats each)</li>
+                      <li><Kbd>/lota/blob/tx</Kbd>, <Kbd>/lota/blob/ty</Kbd>: pixel centroid in 256&times;192 depth space (10 ints each)</li>
+                      <li><Kbd>/lota/blob/age</Kbd>: seconds tracked (10 floats)</li>
+                      <li><Kbd>/lota/blob/state</Kbd>: <Kbd>0=new, 1=revived, 2=lost, 3=expired</Kbd> (10 ints)</li>
                     </ul>
                   </>
                 </Card>
@@ -758,8 +798,9 @@ export default function DocsPage() {
                   for creative tools. The camera view is replaced with a black
                   canvas and a 200-bar mirrored waveform driven by the
                   microphone. Recognized words appear on screen as live
-                  captions. Uses iOS 26&apos;s on-device
-                  <Kbd>SpeechAnalyzer</Kbd> framework — fast, private, offline.
+                  captions. It uses iOS 26&apos;s on-device
+                  <Kbd>SpeechAnalyzer</Kbd> framework: fast, private, and
+                  offline.
                 </p>
 
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
@@ -772,7 +813,7 @@ export default function DocsPage() {
                     Location), and the on-device speech model for your
                     language is prefetched in the background. By the time you
                     open this mode for the first time, transcription is
-                    usually ready to go — no model-download wait. If you
+                    usually ready to go, with no model-download wait. If you
                     denied either permission, the mode displays a message
                     with a shortcut to iOS Settings to grant access. If the
                     prefetch didn&apos;t finish or failed, the mode falls
@@ -786,28 +827,28 @@ export default function DocsPage() {
                   </h4>
                   <ul className="text-sm text-zinc-400 space-y-2">
                     <li>
-                      <strong className="text-white">Listening indicator</strong>{" "}
-                      — A pulsing microphone icon and &quot;LISTENING&quot;
+                      <strong className="text-white">Listening indicator.</strong>{" "}
+                      A pulsing microphone icon and &quot;LISTENING&quot;
                       label appear in the status bar
                     </li>
                     <li>
-                      <strong className="text-white">Waveform</strong> — 200
+                      <strong className="text-white">Waveform.</strong> 200
                       mirrored bars pulse with your voice in real time and
                       stream through NDI as a black-and-white video source
                     </li>
                     <li>
-                      <strong className="text-white">Live captions</strong> —
+                      <strong className="text-white">Live captions.</strong>{" "}
                       Recognized words appear on screen as large centered
                       text as they arrive
                     </li>
                     <li>
                       <strong className="text-white">Camera tracking OSC
-                      suppressed</strong> — Camera position messages are
+                      suppressed.</strong> Camera position messages are
                       automatically paused so speech data stands out in
                       your OSC receiver
                     </li>
                     <li>
-                      <strong className="text-white">Clean exit</strong> —
+                      <strong className="text-white">Clean exit.</strong>{" "}
                       Leaving transcription mode stops the audio engine
                       completely. No background microphone access.
                     </li>
@@ -821,14 +862,14 @@ export default function DocsPage() {
                       addresses:
                     </p>
                     <ul className="space-y-1 text-zinc-500">
-                      <li><Kbd>/lota/speech/word</Kbd> — each recognized word (string)</li>
-                      <li><Kbd>/lota/speech/word_count</Kbd> — incrementing counter (int, visible in OSC In CHOP)</li>
-                      <li><Kbd>/lota/speech/partial</Kbd> — running partial transcript (string)</li>
-                      <li><Kbd>/lota/speech/final</Kbd> — finalized sentences (string)</li>
+                      <li><Kbd>/lota/speech/word</Kbd>: each recognized word (string)</li>
+                      <li><Kbd>/lota/speech/word_count</Kbd>: incrementing counter (int, visible in OSC In CHOP)</li>
+                      <li><Kbd>/lota/speech/partial</Kbd>: running partial transcript (string)</li>
+                      <li><Kbd>/lota/speech/final</Kbd>: finalized sentences (string)</li>
                     </ul>
                     <p className="mt-3 text-zinc-500">
                       String messages arrive in TouchDesigner&apos;s{" "}
-                      <Kbd>OSC In DAT</Kbd> (not OSC In CHOP — CHOP only handles
+                      <Kbd>OSC In DAT</Kbd> (not OSC In CHOP, which only handles
                       numeric channels). The <Kbd>word_count</Kbd> integer is
                       the only speech message visible in OSC In CHOP, useful for
                       signal-flow monitoring.
@@ -858,12 +899,12 @@ export default function DocsPage() {
                     <>
                       <ul className="space-y-1.5 mt-1">
                         <li>
-                          <strong className="text-white">OSC</strong> —
+                          <strong className="text-white">OSC.</strong>{" "}
                           Easiest for TouchDesigner, Max/MSP, Resolume. Drop
                           in an OSC In DAT, set the port, done.
                         </li>
                         <li>
-                          <strong className="text-white">TCP / UDP</strong> —
+                          <strong className="text-white">TCP / UDP.</strong>{" "}
                           Use the LOTASpeechTCP / LOTASpeechUDP components
                           (downloads in the TouchDesigner section below) for
                           plug-and-play binary parsing, or integrate into
@@ -871,7 +912,7 @@ export default function DocsPage() {
                           don&apos;t have OSC parsers.
                         </li>
                         <li>
-                          <strong className="text-white">NDI</strong> — When
+                          <strong className="text-white">NDI.</strong> When
                           you want the waveform visual as a live video
                           source for reactive effects or broadcast overlays.
                         </li>
@@ -892,8 +933,8 @@ export default function DocsPage() {
                   the device motion sensors and streams them as OSC. Each
                   active sensor value also renders as its own scrolling line
                   graph lane on screen so operators can see the data in real
-                  time — the full graph composition is captured by NDI.
-                  <strong className="text-white"> Works on every iPhone — no LiDAR required.</strong>
+                  time, and the full graph composition is captured by NDI.
+                  <strong className="text-white"> Works on every iPhone, no LiDAR required.</strong>
                 </p>
 
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
@@ -903,22 +944,22 @@ export default function DocsPage() {
                   <ul className="text-sm text-zinc-400 space-y-2">
                     <li>
                       <strong className="text-white">Acceleration</strong>{" "}
-                      <span className="text-emerald-400 text-xs">(ON by default)</span> —
+                      <span className="text-emerald-400 text-xs">(ON by default)</span>.
                       Gravity-removed, G-force units. Addresses{" "}
                       <Kbd>/lota/motion/accel/x</Kbd>, <Kbd>/y</Kbd>, <Kbd>/z</Kbd>
                     </li>
                     <li>
-                      <strong className="text-white">Gyroscope</strong> —
+                      <strong className="text-white">Gyroscope.</strong>{" "}
                       Rotation rate in rad/s. Addresses{" "}
                       <Kbd>/lota/motion/gyro/x</Kbd>, <Kbd>/y</Kbd>, <Kbd>/z</Kbd>
                     </li>
                     <li>
-                      <strong className="text-white">Compass Heading</strong> —
+                      <strong className="text-white">Compass Heading.</strong>{" "}
                       Degrees 0–360 (requires Location permission). Address{" "}
                       <Kbd>/lota/motion/heading</Kbd>
                     </li>
                     <li>
-                      <strong className="text-white">Barometric Pressure</strong> —
+                      <strong className="text-white">Barometric Pressure.</strong>{" "}
                       kPa plus relative altitude in meters from session start.
                       Addresses <Kbd>/lota/motion/pressure</Kbd> and{" "}
                       <Kbd>/lota/motion/altitude</Kbd>
@@ -938,10 +979,10 @@ export default function DocsPage() {
                     Location-When-In-Use prompt appears. CoreMotion data uses
                     <Kbd>NSMotionUsageDescription</Kbd>; heading uses{" "}
                     <Kbd>NSLocationWhenInUseUsageDescription</Kbd>. If denied,
-                    the relevant sensors silently skip (compass stays at −1,
-                    etc.) — no crash. Permissions are requested{" "}
-                    <strong className="text-white">upfront</strong> when
-                    entering the mode, not mid-session.
+                    the relevant sensors silently skip without crashing
+                    (compass stays at −1, for example). Permissions are
+                    requested <strong className="text-white">upfront</strong>{" "}
+                    when entering the mode, not mid-session.
                   </>
                 </Card>
 
@@ -972,11 +1013,11 @@ export default function DocsPage() {
                           Max/MSP
                         </li>
                         <li>
-                          Environmental sensing — barometric pressure drift
+                          Environmental sensing: barometric pressure drift
                           and altitude tracking for installations
                         </li>
                         <li>
-                          Wearable motion source — phone clipped or strapped
+                          Wearable motion source: a phone clipped or strapped
                           to a performer streams tilt, rotation rate, and
                           compass heading as OSC
                         </li>
@@ -1001,10 +1042,11 @@ export default function DocsPage() {
                   iPhone into a wireless real-time audio analysis source. LOTA
                   taps the microphone via <Kbd>AVAudioEngine</Kbd> and extracts
                   musically relevant features using Apple&apos;s{" "}
-                  <Kbd>Accelerate/vDSP</Kbd> framework — zero third-party
-                  dependencies, fully on-device. Each active channel renders as
-                  a scrolling graph lane and is captured by NDI.
-                  <strong className="text-white"> Works on every iPhone — no LiDAR required.</strong>
+                  <Kbd>Accelerate/vDSP</Kbd> framework, with no third-party
+                  dependencies and all processing on-device. Each active
+                  channel renders as a scrolling graph lane and is captured by
+                  NDI.
+                  <strong className="text-white"> Works on every iPhone, no LiDAR required.</strong>
                 </p>
 
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
@@ -1014,13 +1056,13 @@ export default function DocsPage() {
                   <ul className="text-sm text-zinc-400 space-y-2">
                     <li>
                       <strong className="text-white">Levels</strong>{" "}
-                      <span className="text-emerald-400 text-xs">(ON by default)</span> —
+                      <span className="text-emerald-400 text-xs">(ON by default)</span>.
                       Continuous 0–1 energy per frequency band with rolling
                       auto-gain. <Kbd>/lota/audio/bass</Kbd>,{" "}
                       <Kbd>/lota/audio/mid</Kbd>, <Kbd>/lota/audio/high</Kbd>
                     </li>
                     <li>
-                      <strong className="text-white">Beat Detection</strong> —
+                      <strong className="text-white">Beat Detection.</strong>{" "}
                       Binary 0/1 switch per band on detected onset (holds at
                       1.0 for 50 ms after each hit).{" "}
                       <Kbd>/lota/audio/drums/low</Kbd>,{" "}
@@ -1028,13 +1070,13 @@ export default function DocsPage() {
                       <Kbd>/lota/audio/drums/high</Kbd>
                     </li>
                     <li>
-                      <strong className="text-white">Dynamics</strong> —
+                      <strong className="text-white">Dynamics.</strong>{" "}
                       Fast-vs-slow envelope difference, pulse-shaped 0–1
                       (rises instantly on transient, decays over ~200 ms).{" "}
                       <Kbd>/lota/audio/burst</Kbd>
                     </li>
                     <li>
-                      <strong className="text-white">FFT Spectrum</strong> —
+                      <strong className="text-white">FFT Spectrum.</strong>{" "}
                       20 log-spaced frequency bands across 20–20,000 Hz, each
                       normalized 0–1 via per-bin rolling max.{" "}
                       <Kbd>/lota/audio/fft/0</Kbd> through{" "}
@@ -1054,16 +1096,16 @@ export default function DocsPage() {
                   </h4>
                   <ul className="text-sm text-zinc-400 space-y-2">
                     <li>
-                      <strong className="text-white">BASS</strong> (20–200 Hz)
-                      — kick, sub-bass, bass guitar fundamentals
+                      <strong className="text-white">BASS</strong> (20–200 Hz):
+                      kick, sub-bass, bass guitar fundamentals
                     </li>
                     <li>
-                      <strong className="text-white">MID</strong> (200–2000 Hz)
-                      — vocals, snare body, guitars, most instruments
+                      <strong className="text-white">MID</strong> (200–2000 Hz):
+                      vocals, snare body, guitars, most instruments
                     </li>
                     <li>
-                      <strong className="text-white">HIGH</strong> (2000–8000 Hz)
-                      — snare attack, hi-hats, vocal consonants, cymbals
+                      <strong className="text-white">HIGH</strong> (2000–8000 Hz):
+                      snare attack, hi-hats, vocal consonants, cymbals
                     </li>
                   </ul>
                 </div>
@@ -1086,7 +1128,7 @@ export default function DocsPage() {
                       </li>
                       <li>
                         <strong className="text-white">3.</strong> Peak-picking
-                        on local maxima — catches rapid drum fills that
+                        on local maxima, which catches rapid drum fills that
                         threshold-only methods miss
                       </li>
                       <li>
@@ -1103,18 +1145,18 @@ export default function DocsPage() {
                       </li>
                       <li>
                         <strong className="text-white">6.</strong> Silence
-                        energy gate per band — no beats when the band itself
-                        is quiet
+                        energy gate per band, so no beats fire when the band
+                        itself is quiet
                       </li>
                       <li>
                         <strong className="text-white">7.</strong> 50 ms minimum
-                        inter-onset time — supports up to ~1200 BPM / 32nd
+                        inter-onset time, which supports up to ~1200 BPM / 32nd
                         notes
                       </li>
                     </ul>
                     <p className="mt-3 text-zinc-500">
                       Drum channels are{" "}
-                      <strong className="text-white">binary (0 or 1)</strong> —
+                      <strong className="text-white">binary (0 or 1)</strong>,
                       trivial to route into a TouchDesigner{" "}
                       <Kbd>Trigger CHOP</Kbd> or <Kbd>Logic CHOP</Kbd> without
                       thresholding.
@@ -1138,8 +1180,8 @@ export default function DocsPage() {
                         Music, YouTube) because iOS sandboxing doesn&apos;t
                         expose system audio to third-party apps. To analyze
                         music playing on the iPhone, play it through the
-                        speakers — LOTA&apos;s mic picks it up naturally. For
-                        high-fidelity analysis, play audio from a separate
+                        speakers and LOTA&apos;s mic picks it up naturally.
+                        For high-fidelity analysis, play audio from a separate
                         source into the iPhone&apos;s mic.
                       </p>
                     </>
@@ -1149,16 +1191,16 @@ export default function DocsPage() {
                 <div className="mt-4">
                   <Card title="TouchDesigner pattern">
                     <>
-                      Drop an <Kbd>OSC In CHOP</Kbd>, point it at the
-                      phone&apos;s IP + port 9000. Enable Levels (default).
-                      Channels <Kbd>bass</Kbd>, <Kbd>mid</Kbd>, <Kbd>high</Kbd>{" "}
-                      appear and start pulsing. Toggle Beat Detection on →{" "}
-                      <Kbd>drums_low</Kbd>, <Kbd>drums_mid</Kbd>,{" "}
-                      <Kbd>drums_high</Kbd> appear as clean 0/1 signals you
-                      can route into a Trigger CHOP for beat-synced effects.
-                      FFT bands render with a red → blue color gradient (F0 =
-                      lowest, F19 = highest) so you can see where energy is on
-                      the spectrum at a glance.
+                      Drop an <Kbd>OSC In CHOP</Kbd> and point it at the
+                      phone&apos;s IP on port 9000. Enable Levels (default)
+                      and channels <Kbd>bass</Kbd>, <Kbd>mid</Kbd>,{" "}
+                      <Kbd>high</Kbd> appear and start pulsing. Toggle Beat
+                      Detection on and <Kbd>drums_low</Kbd>,{" "}
+                      <Kbd>drums_mid</Kbd>, <Kbd>drums_high</Kbd> appear as
+                      clean 0/1 signals you can route into a Trigger CHOP for
+                      beat-synced effects. FFT bands render with a red-to-blue
+                      color gradient (F0 = lowest, F19 = highest) so you can
+                      see where energy is on the spectrum at a glance.
                     </>
                   </Card>
                 </div>
@@ -1172,34 +1214,32 @@ export default function DocsPage() {
             >
               <SectionHeading tag="Network" title="Streaming and local recording">
                 The middle page has an iOS Camera-style{" "}
-                <strong className="text-white">shutter button</strong> at the
+                <strong className="text-white">shutter button</strong> at
                 bottom-center with a{" "}
                 <strong className="text-white">STREAM | RECORD</strong>{" "}
-                segmented control directly below it that picks which paradigm
-                the shutter triggers. The two are mutually exclusive — while
-                one is running the other is locked, so you can&apos;t
-                accidentally start a recording mid-stream or vice versa.
-                Configure transports by tapping the floating status bar pill
-                at the top — this opens <strong className="text-white">Transmission
-                Settings</strong>, a focused sheet with This Device (your
-                iPhone&apos;s active IPs), Receiver, TCP/UDP, NDI, OSC, Point
-                Cloud Stream, and Protocol Info sections. While streaming,
-                the per-protocol chip in the status bar (OSC, NDI, TCP/UDP,
-                PLY) goes from dim white to red, and a centered dim table at
-                the bottom of the screen lists each active transmission with
-                its <Kbd>&lt;host&gt;:&lt;port&gt;</Kbd> (and the NDI source
-                name <Kbd>LOTA - &lt;deviceLabel&gt;</Kbd>), plus a footer
-                line showing the iPhone&apos;s own active IPs (e.g.{" "}
-                <Kbd>This iPhone: 192.168.1.42 (Wi-Fi)</Kbd>) so you can
-                verify the entire wiring at a glance without opening the
-                sheet.{" "}
+                segmented control below it that picks which paradigm the
+                shutter triggers. The two are mutually exclusive: while one is
+                running the other is locked, so you can&apos;t accidentally
+                start a recording mid-stream or vice versa. Tap the floating
+                status bar pill at the top to open{" "}
+                <strong className="text-white">Transmission Settings</strong>,
+                a focused sheet with This Device (your iPhone&apos;s active
+                IPs), Receiver, TCP/UDP, NDI, OSC, Point Cloud Stream, and
+                Protocol Info sections. While streaming, each per-protocol
+                chip in the status bar (OSC, NDI, TCP/UDP, PLY) goes from dim
+                white to red, and a centered table at the bottom of the
+                screen lists every active transmission with its{" "}
+                <Kbd>&lt;host&gt;:&lt;port&gt;</Kbd> (plus the NDI source name{" "}
+                <Kbd>LOTA - &lt;deviceLabel&gt;</Kbd>) and a footer line with
+                the iPhone&apos;s own active IPs (e.g.{" "}
+                <Kbd>This iPhone: 192.168.1.42 (Wi-Fi)</Kbd>), so you can
+                verify the whole wiring at a glance without opening the sheet.{" "}
                 <strong className="text-white">In landscape</strong>, the
-                shutter + segmented control stay pinned to the device&apos;s{" "}
-                <em>physical</em> bottom edge (where they sit in portrait),
-                matching iOS Camera&apos;s shutter behavior — rotate the
-                phone and the island slides to the screen edge that now
-                corresponds to that physical position. All other UI rotates
-                naturally.
+                shutter and segmented control stay pinned to the
+                device&apos;s <em>physical</em> bottom edge, where they sit in
+                portrait, matching iOS Camera. Rotate the phone and the island
+                slides to the screen edge matching that physical position,
+                while all other UI rotates naturally.
               </SectionHeading>
 
               <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-8">
@@ -1208,22 +1248,23 @@ export default function DocsPage() {
                 </h3>
                 <ul className="text-sm text-zinc-400 space-y-3">
                   <li>
-                    <strong className="text-white">STREAM</strong> — taps the
-                    shutter to start/stop network streaming. All enabled
-                    transports (TCP/UDP, NDI, OSC, PLY) send simultaneously.
+                    <strong className="text-white">STREAM.</strong> Tap the
+                    shutter to start or stop network streaming. All enabled
+                    transports (TCP/UDP, NDI, OSC, PLY) send at once.
                   </li>
                   <li>
-                    <strong className="text-white">RECORD</strong> — taps the
-                    shutter to start/stop a{" "}
+                    <strong className="text-white">RECORD.</strong> Tap the
+                    shutter to start or stop a{" "}
                     <strong className="text-white">local recording</strong>{" "}
-                    of the live composited Metal output. Saved as an H.264{" "}
+                    of the live composited Metal output, saved as an H.264{" "}
                     <Kbd>.mov</Kbd> to your Photos library on stop. Available
                     in every camera-using mode (Color, Mono, Depth, Neural
-                    Depth, Point Cloud, Blob Track); disabled in Transcription /
-                    Motion / Audio because there&apos;s no camera content to
-                    capture. <strong className="text-white">4-hour cap</strong>{" "}
-                    per recording. Uses <Kbd>PHPhotoLibrary</Kbd> add-only
-                    access — LOTA can write videos but never read your
+                    Depth, Point Cloud, Blob Track) and disabled in
+                    Transcription, Motion, and Audio, where there&apos;s no
+                    camera content to capture.{" "}
+                    <strong className="text-white">4-hour cap</strong> per
+                    recording. It uses <Kbd>PHPhotoLibrary</Kbd> add-only
+                    access, so LOTA can write videos but never read your
                     existing photos.
                   </li>
                 </ul>
@@ -1233,17 +1274,18 @@ export default function DocsPage() {
                 <Card title="NDI">
                   <>
                     Industry-standard video-over-IP. LOTA broadcasts as{" "}
-                    <Kbd>LOTA - &lt;Device Label&gt;</Kbd> (random 4-char ID
-                    by default — e.g. <Kbd>LOTA - 7F3A</Kbd> — customizable
-                    in the Receiver section to anything like{" "}
-                    <Kbd>LOTA - Stage Left</Kbd>) and is auto-discovered by
-                    TouchDesigner, OBS, vMix, Resolume, and any other
-                    NDI-compatible receiver. Per-device labels mean multiple
-                    LOTA phones in the same venue show up as distinct
-                    sources. Optional side-by-side mode sends a 2x-wide frame
-                    with camera view on the left and depth colormap on the
-                    right — uses LiDAR depth on Pro phones and{" "}
-                    <strong className="text-white">Depth Anything V2
+                    <Kbd>LOTA - &lt;Device Label&gt;</Kbd>, where the label is
+                    a random 4-char ID by default (e.g.{" "}
+                    <Kbd>LOTA - 7F3A</Kbd>) and can be customized in the
+                    Receiver section to anything like{" "}
+                    <Kbd>LOTA - Stage Left</Kbd>. The stream is
+                    auto-discovered by TouchDesigner, OBS, vMix, Resolume, and
+                    any other NDI-compatible receiver, and per-device labels
+                    mean multiple LOTA phones in the same venue show up as
+                    distinct sources. Optional side-by-side mode sends a
+                    2x-wide frame with the camera view on the left and depth
+                    colormap on the right. It uses LiDAR depth on Pro phones
+                    and <strong className="text-white">Depth Anything V2
                     estimated depth</strong> on non-LiDAR phones, so the
                     side-by-side workflow is no longer LiDAR-only.
                   </>
@@ -1265,11 +1307,11 @@ export default function DocsPage() {
                       to receive:
                     </p>
                     <ul className="space-y-1 text-zinc-500">
-                      <li><Kbd>/lota/camera/position</Kbd> — x, y, z (3 floats)</li>
-                      <li><Kbd>/lota/camera/rotation</Kbd> — quaternion x, y, z, w (4 floats)</li>
-                      <li><Kbd>/lota/camera/euler</Kbd> — pitch, yaw, roll (3 floats)</li>
-                      <li><Kbd>/lota/mode</Kbd> — current capture mode (1&nbsp;Hz)</li>
-                      <li><Kbd>/lota/fps</Kbd> — current frame rate (1&nbsp;Hz)</li>
+                      <li><Kbd>/lota/camera/position</Kbd>: x, y, z (3 floats)</li>
+                      <li><Kbd>/lota/camera/rotation</Kbd>: quaternion x, y, z, w (4 floats)</li>
+                      <li><Kbd>/lota/camera/euler</Kbd>: pitch, yaw, roll (3 floats)</li>
+                      <li><Kbd>/lota/mode</Kbd>: current capture mode (1&nbsp;Hz)</li>
+                      <li><Kbd>/lota/fps</Kbd>: current frame rate (1&nbsp;Hz)</li>
                     </ul>
                   </>
                 </Card>
@@ -1282,8 +1324,8 @@ export default function DocsPage() {
                     <strong className="text-white">15 bytes/point</strong>.
                     Default port <Kbd>9848</Kbd>. Pair with the{" "}
                     <Kbd>LOTABinaryPLYRecieverV2.tox</Kbd> drop-in
-                    TouchDesigner component (section below) — plug-and-play.
-                    The legacy CSV-text variant and its toggle were{" "}
+                    TouchDesigner component (section below) for plug-and-play
+                    setup. The legacy CSV-text variant and its toggle were{" "}
                     <strong className="text-white">removed in v1.2.3</strong>;
                     binary is now the only supported wire format.
                   </>
@@ -1326,7 +1368,10 @@ export default function DocsPage() {
               </SectionHeading>
 
               <div className="space-y-4 mb-8">
-                <Card title="Body Tracking">
+                <Card
+                  title="Body Tracking"
+                  tag={<Tag variant="emerald">No LiDAR required</Tag>}
+                >
                   <>
                     <p className="mb-2">
                       3D skeleton detection via the rear camera. Tracks 91 ARKit
@@ -1334,13 +1379,16 @@ export default function DocsPage() {
                       white bones with green joint dots. Requires A12 chip or later.
                     </p>
                     <ul className="space-y-1 text-zinc-500">
-                      <li><Kbd>/lota/body/skeleton</Kbd> — 18 joint positions</li>
-                      <li><Kbd>/lota/body/root</Kbd> — root transform</li>
-                      <li><Kbd>/lota/body/detected</Kbd> — detection state</li>
+                      <li><Kbd>/lota/body/skeleton</Kbd>: 18 joint positions</li>
+                      <li><Kbd>/lota/body/root</Kbd>: root transform</li>
+                      <li><Kbd>/lota/body/detected</Kbd>: detection state</li>
                     </ul>
                   </>
                 </Card>
-                <Card title="Face Tracking">
+                <Card
+                  title="Face Tracking"
+                  tag={<Tag variant="emerald">No LiDAR required</Tag>}
+                >
                   <>
                     <p className="mb-2">
                       52 facial blend shapes captured via the front-facing TrueDepth
@@ -1355,21 +1403,25 @@ export default function DocsPage() {
                     </p>
                   </>
                 </Card>
-                <Card title="Hand Tracking">
+                <Card
+                  title="Hand Tracking"
+                  tag={<Tag variant="emerald">No LiDAR required</Tag>}
+                >
                   <>
                     <p className="mb-2">
                       Detects up to 2 hands simultaneously via the rear camera
-                      using the Vision framework. 21 landmarks per hand, streamed
-                      over OSC organized by finger. Overlay shows bone chains with
-                      joint dots — teal for left hand, orange for right.
+                      using the Vision framework. 21 landmarks per hand,
+                      streamed over OSC organized by finger. The overlay shows
+                      bone chains with joint dots, teal for the left hand and
+                      orange for the right.
                     </p>
                     <ul className="space-y-1 text-zinc-500">
-                      <li><Kbd>/lota/hand/&#123;left|right&#125;/wrist</Kbd> — 3 floats</li>
-                      <li><Kbd>/lota/hand/&#123;left|right&#125;/thumb</Kbd> — 12 floats</li>
-                      <li><Kbd>/lota/hand/&#123;left|right&#125;/index</Kbd> — 12 floats</li>
-                      <li><Kbd>/lota/hand/&#123;left|right&#125;/middle</Kbd> — 12 floats</li>
-                      <li><Kbd>/lota/hand/&#123;left|right&#125;/ring</Kbd> — 12 floats</li>
-                      <li><Kbd>/lota/hand/&#123;left|right&#125;/pinky</Kbd> — 12 floats</li>
+                      <li><Kbd>/lota/hand/&#123;left|right&#125;/wrist</Kbd>: 3 floats</li>
+                      <li><Kbd>/lota/hand/&#123;left|right&#125;/thumb</Kbd>: 12 floats</li>
+                      <li><Kbd>/lota/hand/&#123;left|right&#125;/index</Kbd>: 12 floats</li>
+                      <li><Kbd>/lota/hand/&#123;left|right&#125;/middle</Kbd>: 12 floats</li>
+                      <li><Kbd>/lota/hand/&#123;left|right&#125;/ring</Kbd>: 12 floats</li>
+                      <li><Kbd>/lota/hand/&#123;left|right&#125;/pinky</Kbd>: 12 floats</li>
                     </ul>
                   </>
                 </Card>
@@ -1380,14 +1432,13 @@ export default function DocsPage() {
                   Hand coordinate modes
                 </h3>
                 <p className="text-sm text-zinc-400 leading-relaxed">
-                  <strong className="text-white">2D (default)</strong> —
-                  normalized screen-space coordinates. Works on all
-                  iPhones. <strong className="text-white">3D
-                  (opt-in)</strong> — world-space coordinates projected via
-                  LiDAR depth. Requires a LiDAR device. Toggle
-                  in Hands Settings &rarr; 3D Hand Coordinates (tap the
-                  <Kbd>Hands Settings</Kbd> button below the status bar on the
-                  ARKit Tracking page).
+                  <strong className="text-white">2D (default).</strong>{" "}
+                  Normalized screen-space coordinates, works on all iPhones.{" "}
+                  <strong className="text-white">3D (opt-in).</strong>{" "}
+                  World-space coordinates projected via LiDAR depth, so it
+                  requires a LiDAR device. Toggle it in Hands Settings &rarr;
+                  3D Hand Coordinates (tap the <Kbd>Hands Settings</Kbd>{" "}
+                  button below the status bar on the ARKit Tracking page).
                 </p>
               </div>
             </section>
@@ -1407,15 +1458,16 @@ export default function DocsPage() {
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div>
                     <h3 className="text-sm font-semibold text-white mb-2">
-                      LOTABinaryPLYRecieverV2.tox — Binary Point Cloud Receiver
+                      LOTABinaryPLYRecieverV2.tox: Binary Point Cloud Receiver
                     </h3>
                     <div className="text-sm text-zinc-400 leading-relaxed">
                       <p>
                         Drop-in TouchDesigner receiver for LOTA&apos;s binary
-                        PLY stream. Auto-detects the binary header — only asks
-                        for the receiver port and a Script TOP target. Uses
-                        numpy bulk parsing and GPU instancing to handle 49K+
-                        points at 60&nbsp;fps. Enable <Kbd>Binary Format</Kbd>{" "}
+                        PLY stream. It auto-detects the binary header and only
+                        asks for the receiver port and a Script TOP target.
+                        Uses numpy bulk parsing and GPU instancing to handle
+                        49K+ points at 60&nbsp;fps. Enable{" "}
+                        <Kbd>Binary Format</Kbd>{" "}
                         in Transmission Settings &rarr; Point Cloud Stream
                         (tap the floating status bar pill) and point this
                         component at the same port.
@@ -1439,7 +1491,7 @@ export default function DocsPage() {
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div>
                     <h3 className="text-sm font-semibold text-white mb-2">
-                      LOTASpeechTCP.tox — Speech TCP Receiver
+                      LOTASpeechTCP.tox: Speech TCP Receiver
                     </h3>
                     <div className="text-sm text-zinc-400 leading-relaxed">
                       <p>
@@ -1447,9 +1499,9 @@ export default function DocsPage() {
                         LOTA&apos;s binary speech frame format and writes
                         recognized words, partials, and finals to
                         a <Kbd>speech_log</Kbd> Table DAT. Handles stream
-                        buffering for frames split across TCP packets. Drop
+                        buffering for frames split across TCP packets. Drop it
                         into your network and recognized speech starts
-                        populating rows — no manual parsing required.
+                        populating rows, with no manual parsing required.
                       </p>
                     </div>
                   </div>
@@ -1470,14 +1522,14 @@ export default function DocsPage() {
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div>
                     <h3 className="text-sm font-semibold text-white mb-2">
-                      LOTASpeechUDP.tox — Speech UDP Receiver
+                      LOTASpeechUDP.tox: Speech UDP Receiver
                     </h3>
                     <div className="text-sm text-zinc-400 leading-relaxed">
                       <p>
                         UDP In DAT configured for &quot;One Per Message&quot;
                         mode with a callback script that parses the same
                         binary speech frame format as the TCP receiver.
-                        Simpler than TCP — each datagram is a complete frame,
+                        Simpler than TCP: each datagram is a complete frame,
                         so no buffering is needed. Use this for low-latency
                         fire-and-forget speech delivery on a local network.
                       </p>
@@ -1521,8 +1573,8 @@ export default function DocsPage() {
                       </li>
                       <li>
                         On the component, set the receiver port to match and
-                        wire its output Script TOP into your render network —
-                        live 3D geometry is ready to instance.
+                        wire its output Script TOP into your render network,
+                        and live 3D geometry is ready to instance.
                       </li>
                     </ol>
                   </>
@@ -1533,10 +1585,10 @@ export default function DocsPage() {
                 <Card title="Camera tracking via OSC">
                   <>
                     <p>
-                      Add an <Kbd>OSC In</Kbd> CHOP. Set the port to match
+                      Add an <Kbd>OSC In</Kbd> CHOP and set the port to match
                       LOTA&apos;s OSC port. You&apos;ll receive camera position
                       (x, y, z), rotation (quaternion), and euler angles
-                      at 30&nbsp;Hz — perfect for driving a virtual camera or
+                      at 30&nbsp;Hz, perfect for driving a virtual camera or
                       triggering effects based on device movement.
                     </p>
                   </>
@@ -1551,12 +1603,15 @@ export default function DocsPage() {
             >
               <SectionHeading tag="3D Export" title="Export & 3D Pipelines">
                 Swipe right to the Gaussian Capture page. Record datasets with
-                ARKit intrinsics, extrinsics, and LiDAR point clouds — ready for
+                ARKit intrinsics, extrinsics, and LiDAR point clouds, ready for
                 training, viewing, or post-production.
               </SectionHeading>
 
               <div className="space-y-4 mb-8">
-                <Card title="COLMAP">
+                <Card
+                  title="COLMAP"
+                  tag={<Tag variant="amber">LiDAR required</Tag>}
+                >
                   <>
                     Exports <Kbd>cameras.bin</Kbd>, <Kbd>images.bin</Kbd>,
                     and <Kbd>points3D.bin</Kbd> in COLMAP binary format.
@@ -1564,29 +1619,44 @@ export default function DocsPage() {
                     training Gaussian Splats directly from your iPhone captures.
                   </>
                 </Card>
-                <Card title="Nerfstudio">
+                <Card
+                  title="Nerfstudio"
+                  tag={<Tag variant="amber">LiDAR required</Tag>}
+                >
                   <>
-                    Exports <Kbd>transforms.json</Kbd> + <Kbd>images/</Kbd> JPEGs
-                    + <Kbd>points3D.ply</Kbd>. Ready for Nerfstudio, splatfacto,
-                    and Instant-NGP training pipelines.
+                    Exports <Kbd>transforms.json</Kbd>, <Kbd>images/</Kbd>{" "}
+                    JPEGs, and <Kbd>points3D.ply</Kbd>. Ready for Nerfstudio,
+                    splatfacto, and Instant-NGP training pipelines.
                   </>
                 </Card>
-                <Card title="Nerfstudio + Depth">
+                <Card
+                  title="Nerfstudio + Depth"
+                  tag={<Tag variant="amber">LiDAR required</Tag>}
+                >
                   <>
                     Same as Nerfstudio, plus 16-bit PNG depth maps in
                     a <Kbd>depth/</Kbd> folder. Best for depth-supervised
-                    training — produces better geometry on flat surfaces and
-                    uniform areas.
+                    training, since it produces better geometry on flat
+                    surfaces and uniform areas.
                   </>
                 </Card>
-                <Card title="Point Cloud (PLY)">
+                <Card
+                  title="Point Cloud (PLY)"
+                  tag={<Tag variant="amber">LiDAR required</Tag>}
+                >
                   <>
                     Standalone <Kbd>points3D.ply</Kbd> file with accumulated
                     points from your session. Open in Blender, CloudCompare,
-                    MeshLab, or any tool that reads PLY.
+                    MeshLab, or any tool that reads PLY. The{" "}
+                    <Kbd>PLY Format</Kbd> toggle in Capture Settings writes
+                    either a compact <Kbd>binary_little_endian</Kbd> file
+                    (default) or a human-readable ASCII text PLY.
                   </>
                 </Card>
-                <Card title="Material (PBR)">
+                <Card
+                  title="Material (PBR)"
+                  tag={<Tag variant="amber">LiDAR required</Tag>}
+                >
                   <>
                     Single-shot capture of a flat surface as a complete PBR
                     material set. ZIP contains <Kbd>basecolor.png</Kbd> (sRGB),{" "}
@@ -1595,10 +1665,13 @@ export default function DocsPage() {
                     <Kbd>preview.png</Kbd>, and a <Kbd>material.json</Kbd>{" "}
                     manifest with patch size and tiling hints. Drop into
                     Substance Designer/Painter, Blender, Unreal, Unity, or
-                    TouchDesigner. Requires LiDAR.
+                    TouchDesigner.
                   </>
                 </Card>
-                <Card title="IMU Trace">
+                <Card
+                  title="IMU Trace"
+                  tag={<Tag variant="emerald">No LiDAR required</Tag>}
+                >
                   <>
                     Records device motion sensors (acceleration, gyroscope,
                     compass heading, barometric pressure / relative altitude)
@@ -1612,30 +1685,40 @@ export default function DocsPage() {
                     statistics table.
                   </>
                 </Card>
-                <Card title="Audio Trace">
+                <Card
+                  title="Audio Trace"
+                  tag={<Tag variant="emerald">No LiDAR required</Tag>}
+                >
                   <>
                     Records audio analysis frames (bass/mid/high levels, drum
                     onsets, dynamics, 20-band FFT spectrum) over time using
                     the same mic engine as Audio mode. Same ZIP shape as IMU
                     Trace; optional PDF report with FFT spectrogram heatmap,
                     levels traces, beat-events timeline, dynamics burst, and
-                    statistics. Works on every iPhone — no LiDAR.
+                    statistics.
                   </>
                 </Card>
                 <Card
                   title="PLY Viewer"
-                  tag={<Tag variant="emerald">New in v1.2.6</Tag>}
+                  tag={
+                    <>
+                      <Tag variant="emerald">No LiDAR required</Tag>
+                      <Tag variant="emerald">New in v1.2.6</Tag>
+                    </>
+                  }
                 >
                   <>
                     Read-only. Inspect any saved <Kbd>.ply</Kbd> point cloud
-                    on the device — LOTA captures or files dragged in via
-                    the Files app — in an interactive 3D viewer. Selecting
+                    on the device, whether a LOTA capture or a file dragged
+                    in via the Files app, in an interactive 3D viewer. Selecting
                     PLY Viewer pauses the ARSession (saves battery and
                     thermals), swaps the page to a dark canvas with orbit
                     controls and a neon axis gizmo, and morphs the shutter
                     into a folder glyph that opens the file picker. Loads
                     are streamed off the main thread; clouds are capped at
-                    5 M points with uniform sub-sampling.
+                    5 M points with uniform sub-sampling. 3D Gaussian Splat{" "}
+                    <Kbd>.ply</Kbd> files are detected automatically and
+                    rendered as splats.
                   </>
                 </Card>
               </div>
@@ -1656,32 +1739,32 @@ export default function DocsPage() {
                 </h3>
                 <ul className="text-sm text-zinc-400 space-y-2">
                   <li>
-                    <strong className="text-white">Mesh overlay</strong> — A
+                    <strong className="text-white">Mesh overlay.</strong> A
                     semi-transparent wireframe shows scanned surfaces building up
                     in real time (cyan near, purple far)
                   </li>
                   <li>
-                    <strong className="text-white">Keyframe selection</strong> —
+                    <strong className="text-white">Keyframe selection.</strong>{" "}
                     Only frames where the camera moved at least 5cm or
                     rotated ~5&deg; are saved, producing a well-distributed set of
                     training views
                   </li>
                   <li>
-                    <strong className="text-white">Blur detection</strong> —
+                    <strong className="text-white">Blur detection.</strong>{" "}
                     Motion-blurred frames are automatically rejected via Laplacian
                     variance analysis
                   </li>
                   <li>
-                    <strong className="text-white">Focus lock</strong> —
+                    <strong className="text-white">Focus lock.</strong>{" "}
                     Autofocus is disabled during recording to keep camera
                     intrinsics consistent across all frames
                   </li>
                   <li>
-                    <strong className="text-white">Haptic feedback</strong> — A
+                    <strong className="text-white">Haptic feedback.</strong> A
                     subtle tap each time a keyframe is captured
                   </li>
                   <li>
-                    <strong className="text-white">Counters</strong> — Elapsed
+                    <strong className="text-white">Counters.</strong> Elapsed
                     time, keyframe count, and total point count shown on screen
                   </li>
                 </ul>
@@ -1712,9 +1795,9 @@ export default function DocsPage() {
                   viewpoints have 70–80% overlap for best reconstruction.
                 </Step>
                 <Step n={3} title="Use good lighting">
-                  Consistent, well-lit environments produce better results. Avoid
-                  reflective and transparent surfaces — LiDAR struggles with
-                  glass and mirrors.
+                  Consistent, well-lit environments produce better results.
+                  Avoid reflective and transparent surfaces, since LiDAR
+                  struggles with glass and mirrors.
                 </Step>
               </div>
 
@@ -1738,20 +1821,48 @@ export default function DocsPage() {
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5">
                   <div className="flex items-baseline gap-2 mb-1">
                     <Kbd>Capture Rate</Kbd>
-                    <span className="text-xs text-zinc-600">— 60 Hz (default) / 30 Hz / 15 Hz</span>
+                    <span className="text-xs text-zinc-600">
+                      <span className="text-emerald-400 font-medium">60 Hz</span> / 30 Hz / 15 Hz
+                    </span>
                   </div>
                   <p className="text-sm text-zinc-500 leading-relaxed">
-                    ARKit delivers depth at ~60 Hz; lowering the rate makes
-                    LOTA drop every Nth ARFrame{" "}
-                    <em>at the source</em> — before per-pixel unprojection
-                    and JPEG encoding run — so both CPU work and encode are
-                    skipped for the dropped frames. 30 Hz roughly halves
-                    captured point count and zip size; 15 Hz quarters them.
-                    The default 60 Hz keeps the densest possible capture
-                    and preserves pre-1.2.6 behavior. Useful when you&apos;re
-                    scanning a small subject for a Gaussian-splat training
-                    set and don&apos;t need every depth sample, or when
-                    throttling a long scan to keep the device cool.
+                    ARKit delivers depth at ~60 Hz. Lowering the rate makes
+                    LOTA drop every Nth ARFrame <em>at the source</em>,
+                    before per-pixel unprojection and JPEG encoding run, so
+                    both CPU work and encode are skipped for the dropped
+                    frames. 30 Hz roughly halves captured point count and zip
+                    size; 15 Hz quarters them. The default 60 Hz keeps the
+                    densest possible capture and preserves pre-1.2.6
+                    behavior. Useful when you&apos;re scanning a small
+                    subject for a Gaussian-splat training set and don&apos;t
+                    need every depth sample, or when throttling a long scan
+                    to keep the device cool.
+                  </p>
+                </div>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mt-4">
+                  <div className="flex items-baseline gap-2 mb-1 flex-wrap">
+                    <Kbd>PLY Format</Kbd>
+                    <span className="text-xs text-zinc-600">
+                      <span className="text-emerald-400 font-medium">Binary</span> / ASCII
+                    </span>
+                    <Tag variant="emerald">New in v1.2.7</Tag>
+                  </div>
+                  <p className="text-sm text-zinc-500 leading-relaxed">
+                    Shown only when the{" "}
+                    <strong className="text-white">Point Cloud</strong>{" "}
+                    format is selected.{" "}
+                    <strong className="text-white">Binary</strong>{" "}
+                    (<Kbd>binary_little_endian</Kbd>) is the default: compact,
+                    fast, and read natively by OpenSplat, COLMAP, MeshLab, and
+                    CloudCompare.{" "}
+                    <strong className="text-white">ASCII</strong> writes a
+                    human-readable text PLY, one <Kbd>x y z r g b</Kbd> line
+                    per point, easier to inspect in an editor or parse in a
+                    custom script but roughly 3× larger before zipping. ASCII
+                    artifacts are named{" "}
+                    <Kbd>LOTA_&lt;timestamp&gt;_PLY_ASCII.zip</Kbd> so the
+                    encoding is obvious from the filename.
                   </p>
                 </div>
               </div>
@@ -1763,7 +1874,7 @@ export default function DocsPage() {
                 </h3>
                 <p className="text-sm text-zinc-400 leading-relaxed mb-6">
                   Select <Kbd>Material</Kbd> from the format picker to swap
-                  the page from a recording flow to a plane-lock + shutter
+                  the page from a recording flow to a plane-lock and shutter
                   flow. One tap, ~½-second bake on iPhone 15/16 Pro at
                   1024², ZIP saved to your iCloud folder. Requires LiDAR.
                 </p>
@@ -1774,14 +1885,14 @@ export default function DocsPage() {
                   </h4>
                   <ul className="text-sm text-zinc-400 space-y-2">
                     <li>
-                      <strong className="text-white">3D scan of an object
-                      or room</strong> you can move around — use COLMAP,
+                      For a <strong className="text-white">3D scan of an
+                      object or room</strong> you can move around, use COLMAP,
                       Nerfstudio, or Point Cloud
                     </li>
                     <li>
-                      <strong className="text-white">Tileable PBR texture
-                      of a flat surface</strong> (floor, wall, table, fabric,
-                      brick…) — use Material
+                      For a <strong className="text-white">tileable PBR
+                      texture of a flat surface</strong> (floor, wall, table,
+                      fabric, brick), use Material
                     </li>
                   </ul>
                 </div>
@@ -1804,9 +1915,9 @@ export default function DocsPage() {
                   <Step n={4} title="Point at a flat surface and tap Lock Plane">
                     ARKit raycast detects horizontal and vertical planes. Lock
                     Plane snaps a 20&nbsp;cm screen-aligned square patch
-                    centered on what you&apos;re pointing at — output{" "}
-                    &quot;top&quot; = away from camera, &quot;right&quot; =
-                    camera&apos;s right.
+                    centered on what you&apos;re pointing at. In the output,
+                    &quot;top&quot; is away from the camera and
+                    &quot;right&quot; is the camera&apos;s right.
                   </Step>
                   <Step n={5} title="Tap the shutter">
                     The torch fires a brief flash-pair sequence (~200&nbsp;ms),
@@ -1844,35 +1955,35 @@ export default function DocsPage() {
                   </h4>
                   <ul className="text-sm text-zinc-400 space-y-2">
                     <li>
-                      <Kbd>basecolor.png</Kbd> — sRGB 8-bit albedo,
+                      <Kbd>basecolor.png</Kbd>: sRGB 8-bit albedo,
                       white-balanced and de-lit via flash-pair specular
                       subtraction
                     </li>
                     <li>
-                      <Kbd>normal.png</Kbd> — linear 8-bit tangent-space
+                      <Kbd>normal.png</Kbd>: linear 8-bit tangent-space
                       normal from the LiDAR depth gradient (OpenGL +Y up by
                       default; DirectX selectable in Material Settings)
                     </li>
                     <li>
-                      <Kbd>height.png</Kbd> — linear{" "}
+                      <Kbd>height.png</Kbd>: linear{" "}
                       <strong className="text-white">16-bit</strong>,
                       plane-relative ±25&nbsp;mm range mapped to UInt16
                     </li>
                     <li>
-                      <Kbd>ao.png</Kbd> — linear 8-bit horizon-based ambient
+                      <Kbd>ao.png</Kbd>: linear 8-bit horizon-based ambient
                       occlusion baked from the height map
                     </li>
                     <li>
-                      <Kbd>roughness.png</Kbd> — linear 8-bit per-texel
+                      <Kbd>roughness.png</Kbd>: linear 8-bit per-texel
                       estimate from flash-pair specular sharpness, multiplied
                       by your roughness scale slider
                     </li>
                     <li>
-                      <Kbd>preview.png</Kbd> — sRGB 8-bit Cook-Torrance BRDF
+                      <Kbd>preview.png</Kbd>: sRGB 8-bit Cook-Torrance BRDF
                       sphere render of the captured material
                     </li>
                     <li>
-                      <Kbd>material.json</Kbd> — manifest with{" "}
+                      <Kbd>material.json</Kbd>: manifest with{" "}
                       <Kbd>planeMeters</Kbd> (physical patch size),{" "}
                       <Kbd>tilingHintFor1mSquare</Kbd>, normal convention,
                       roughness method, metallic value, device hardware
@@ -1887,36 +1998,36 @@ export default function DocsPage() {
                     <ul className="space-y-1.5 mt-1">
                       <li>
                         <strong className="text-white">Substance
-                        Designer</strong> — drop the unzipped folder onto a
+                        Designer.</strong> Drop the unzipped folder onto a
                         new graph; Substance auto-creates a Material node
                         with all six channels wired
                       </li>
                       <li>
                         <strong className="text-white">Substance
-                        Painter</strong> — drag the folder into Shelf →
+                        Painter.</strong> Drag the folder into Shelf →
                         Materials, then apply to a mesh
                       </li>
                       <li>
-                        <strong className="text-white">Blender</strong> — in
+                        <strong className="text-white">Blender.</strong> In
                         the Shading editor, add an Image Texture per file
                         and wire to a Principled BSDF; set non-color spaces
                         on normal, roughness, ao, and height
                       </li>
                       <li>
-                        <strong className="text-white">Unreal Engine</strong>{" "}
-                        — drop the folder into the Content Browser → Unreal
+                        <strong className="text-white">Unreal Engine.</strong>{" "}
+                        Drop the folder into the Content Browser and Unreal
                         auto-creates a Material Instance.{" "}
                         <em>Switch normal convention to DirectX in Material
                         Settings before capture</em> so the green channel
                         reads correctly
                       </li>
                       <li>
-                        <strong className="text-white">Unity</strong> —
-                        standard URP / HDRP Lit shader inputs map 1:1
+                        <strong className="text-white">Unity.</strong>{" "}
+                        Standard URP / HDRP Lit shader inputs map 1:1
                       </li>
                       <li>
-                        <strong className="text-white">TouchDesigner</strong>{" "}
-                        — load each PNG into a Movie File In TOP, wire to a
+                        <strong className="text-white">TouchDesigner.</strong>{" "}
+                        Load each PNG into a Movie File In TOP, wire to a
                         PBR MAT
                       </li>
                     </ul>
@@ -1929,30 +2040,30 @@ export default function DocsPage() {
                       <ul className="space-y-1.5 mt-1">
                         <li>
                           <strong className="text-white">Hold the phone
-                          still</strong> during the shutter tap — the
-                          flash-pair takes ~200&nbsp;ms; the manifest&apos;s{" "}
-                          <Kbd>gyroDriftRadians</Kbd> field surfaces how
-                          much drift the bake saw (below 0.5&deg; / ~0.009 rad
-                          is fine)
+                          still</strong> during the shutter tap. The
+                          flash-pair takes ~200&nbsp;ms, and the
+                          manifest&apos;s <Kbd>gyroDriftRadians</Kbd> field
+                          surfaces how much drift the bake saw (below
+                          0.5&deg; / ~0.009 rad is fine)
                         </li>
                         <li>
                           <strong className="text-white">Capture
-                          distance</strong> — 20–60&nbsp;cm from the surface
+                          distance.</strong> 20–60&nbsp;cm from the surface
                           gives the best detail-to-coverage ratio at the
                           default 20&nbsp;cm patch size
                         </li>
                         <li>
-                          <strong className="text-white">Lighting</strong>{" "}
-                          — ambient + the iPhone torch. Too-bright ambient
-                          washes out the controlled flash signal that drives
-                          the roughness estimate
+                          <strong className="text-white">Lighting.</strong>{" "}
+                          Ambient light plus the iPhone torch. Too-bright
+                          ambient washes out the controlled flash signal that
+                          drives the roughness estimate
                         </li>
                         <li>
                           <strong className="text-white">Best
-                          surfaces</strong> — wood, fabric, leather, brick,
+                          surfaces.</strong> Wood, fabric, leather, brick,
                           concrete, plaster, painted drywall, asphalt,
                           ceramic tile (matte), unpolished plastic, paper,
-                          carpet, bark, stone — anything opaque, dielectric,
+                          carpet, bark, stone: anything opaque, dielectric,
                           and roughly diffuse
                         </li>
                       </ul>
@@ -1988,22 +2099,22 @@ export default function DocsPage() {
                       </p>
                       <ul className="space-y-1 text-zinc-500">
                         <li>
-                          Metallic is a uniform toggle (manifest only) — no
-                          per-texel <Kbd>metallic.png</Kbd>. v1.3 adds
+                          Metallic is a uniform toggle (manifest only), with
+                          no per-texel <Kbd>metallic.png</Kbd>. v1.3 adds
                           CoreML SVBRDF inference
                         </li>
                         <li>
                           Roughness is a heuristic
-                          (<Kbd>flashPairSpecularSharpness</Kbd>) — adjust
+                          (<Kbd>flashPairSpecularSharpness</Kbd>); adjust
                           the roughness scale slider to bias the result
                         </li>
                         <li>
-                          Framing rect is auto-installed at 20&nbsp;cm —
-                          drag handles to resize / reposition land in v1.3
+                          Framing rect is auto-installed at 20&nbsp;cm; drag
+                          handles to resize and reposition land in v1.3
                         </li>
                         <li>
-                          Single-shot only — multi-view capture for cleaner
-                          albedo planned for v1.3
+                          Single-shot only; multi-view capture for cleaner
+                          albedo is planned for v1.3
                         </li>
                       </ul>
                     </>
@@ -2058,12 +2169,12 @@ export default function DocsPage() {
                   </h4>
                   <ul className="text-sm text-zinc-400 space-y-2">
                     <li>
-                      <Kbd>recording.csv</Kbd> or <Kbd>.tsv</Kbd> — one row
-                      per sample. First column is <Kbd>t_seconds</Kbd>; the
-                      rest are described in the manifest
+                      <Kbd>recording.csv</Kbd> or <Kbd>.tsv</Kbd>: one row
+                      per sample. The first column is <Kbd>t_seconds</Kbd>;
+                      the rest are described in the manifest
                     </li>
                     <li>
-                      <Kbd>manifest.json</Kbd> — recording metadata (device,
+                      <Kbd>manifest.json</Kbd>: recording metadata (device,
                       version, timestamps, sample count, sample rate, stop
                       reason) plus a per-column dictionary (name, unit,
                       dtype, description). Device names are mapped from{" "}
@@ -2071,11 +2182,11 @@ export default function DocsPage() {
                       <Kbd>iPhone 17 Pro Max</Kbd>)
                     </li>
                     <li>
-                      <Kbd>README.txt</Kbd> — one-paragraph human description
+                      <Kbd>README.txt</Kbd>: one-paragraph human description
                       of the bundle layout
                     </li>
                     <li>
-                      <Kbd>report.pdf</Kbd> (optional) — multi-page
+                      <Kbd>report.pdf</Kbd> (optional): multi-page
                       dark-theme report with cover, per-channel charts, and
                       a statistics table
                     </li>
@@ -2088,14 +2199,14 @@ export default function DocsPage() {
                   </h4>
                   <ul className="text-sm text-zinc-400 space-y-2">
                     <li>
-                      <strong className="text-white">IMU Trace</strong> —
+                      <strong className="text-white">IMU Trace:</strong>{" "}
                       Cover · Accelerometer X/Y/Z line · |A| magnitude ·
                       Gyroscope X/Y/Z line · Compass heading polar rose (if
                       heading recorded) · Pressure &amp; altitude (if
                       pressure recorded) · Per-channel statistics
                     </li>
                     <li>
-                      <strong className="text-white">Audio Trace</strong> —
+                      <strong className="text-white">Audio Trace:</strong>{" "}
                       Cover · FFT spectrogram (20 bands × time, viridis
                       heatmap) · Bass/Mid/High levels · Beat events timeline
                       (per band) · Dynamics burst trace · Per-channel
@@ -2107,8 +2218,8 @@ export default function DocsPage() {
                     <em>&quot;No data captured&quot;</em> placeholder so the
                     recipient can tell an empty page is intentional, not
                     broken (typical for an Audio Trace recorded in a silent
-                    room — the FFT charts populate, the beat-events page
-                    shows the placeholder).
+                    room, where the FFT charts populate and the beat-events
+                    page shows the placeholder).
                   </p>
                 </div>
 
@@ -2150,8 +2261,12 @@ export default function DocsPage() {
                   folder glyph. Tap the folder to open the file picker
                   (filtered to <Kbd>.ply</Kbd> via the new{" "}
                   <Kbd>dev.lota.ply</Kbd> UTI), choose any PLY on the
-                  device — LOTA captures, iCloud Drive, third-party
-                  sources — and the cloud loads off the main thread.
+                  device (LOTA captures, iCloud Drive, or third-party
+                  sources), and the cloud loads off the main thread.
+                  The viewer handles two kinds of <Kbd>.ply</Kbd>: a
+                  plain point cloud renders as flat points, while a 3D
+                  Gaussian Splat file is detected automatically and
+                  rendered as splats.
                 </p>
 
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
@@ -2160,15 +2275,16 @@ export default function DocsPage() {
                   </h4>
                   <ul className="text-sm text-zinc-400 space-y-2">
                     <li>
-                      <strong className="text-white">Info chip</strong> — a
-                      centered top chip shows point count (thousand-separated),
-                      AABB extents (in metres or centimetres), file size, and
-                      yellow <Kbd>subsampled</Kbd> / <Kbd>no RGB</Kbd> badges
-                      when applicable
+                      <strong className="text-white">Info chip.</strong> A
+                      centered top chip shows point count (thousand-separated,
+                      or a splat count for a Gaussian splat), AABB extents (in
+                      metres or centimetres), file size, and yellow{" "}
+                      <Kbd>subsampled</Kbd> / <Kbd>no RGB</Kbd> badges when
+                      applicable
                     </li>
                     <li>
-                      <strong className="text-white">Neon axis gizmo</strong>{" "}
-                      — six axis caps in the top-trailing corner, projected
+                      <strong className="text-white">Neon axis gizmo.</strong>{" "}
+                      Six axis caps in the top-trailing corner, projected
                       from the live camera basis. Positives carry X/Y/Z
                       letters; negatives are hollow rings (Blender
                       convention). Tap any cap to spring-snap the camera to
@@ -2176,8 +2292,8 @@ export default function DocsPage() {
                       regardless of mirror toggles
                     </li>
                     <li>
-                      <strong className="text-white">Folder button</strong>{" "}
-                      — the bottom shutter becomes a load-new-file button so
+                      <strong className="text-white">Folder button.</strong>{" "}
+                      The bottom shutter becomes a load-new-file button so
                       you can swap clouds without leaving the mode
                     </li>
                   </ul>
@@ -2189,17 +2305,17 @@ export default function DocsPage() {
                   </h4>
                   <ul className="text-sm text-zinc-400 space-y-2">
                     <li>
-                      <Kbd>One-finger drag</Kbd> — orbit yaw / pitch
+                      <Kbd>One-finger drag</Kbd>: orbit yaw / pitch
                     </li>
                     <li>
-                      <Kbd>Two-finger drag</Kbd> — pan the orbit target
+                      <Kbd>Two-finger drag</Kbd>: pan the orbit target
                     </li>
                     <li>
-                      <Kbd>Pinch</Kbd> — zoom (clamped to 0.05× / 8× of
+                      <Kbd>Pinch</Kbd>: zoom (clamped to 0.05× / 8× of
                       fit-bounds distance)
                     </li>
                     <li>
-                      <Kbd>Double-tap</Kbd> — reset to fit-bounds with a
+                      <Kbd>Double-tap</Kbd>: reset to fit-bounds with a
                       15° downward pitch
                     </li>
                   </ul>
@@ -2211,30 +2327,30 @@ export default function DocsPage() {
                   </h4>
                   <ul className="text-sm text-zinc-400 space-y-2">
                     <li>
-                      <strong className="text-white">Original</strong> —
-                      per-point RGB from the file. Falls back to white if
+                      <strong className="text-white">Original.</strong>{" "}
+                      Per-point RGB from the file. Falls back to white if
                       the file has no color
                     </li>
                     <li>
-                      <strong className="text-white">Solid</strong> —
+                      <strong className="text-white">Solid.</strong> A
                       single user-picked color, useful for inspecting
                       shape without color noise
                     </li>
                     <li>
-                      <strong className="text-white">By Height</strong> —
+                      <strong className="text-white">By Height.</strong>{" "}
                       Y coordinate mapped through the selected palette;
                       tall features pop visually
                     </li>
                     <li>
-                      <strong className="text-white">By Distance</strong>{" "}
-                      — distance from the camera to each point, recomputed
+                      <strong className="text-white">By Distance.</strong>{" "}
+                      Distance from the camera to each point, recomputed
                       live as you orbit. Good for spotting depth structure;
                       noisy clouds look like a fog when colored this way
                     </li>
                     <li>
-                      <strong className="text-white">By Axis</strong> —
-                      same as By Height but along any of X / Y / Z. Lets
-                      you find the long axis of an asymmetric scan
+                      <strong className="text-white">By Axis.</strong> Same
+                      as By Height but along any of X / Y / Z. Lets you
+                      find the long axis of an asymmetric scan
                     </li>
                   </ul>
                   <p className="text-sm text-zinc-500 leading-relaxed mt-3">
@@ -2244,28 +2360,82 @@ export default function DocsPage() {
                 </div>
 
                 <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
+                  <div className="flex items-baseline gap-2 mb-3 flex-wrap">
+                    <h4 className="text-sm font-semibold text-white">
+                      Gaussian splats
+                    </h4>
+                    <Tag variant="emerald">New in v1.2.7</Tag>
+                  </div>
+                  <p className="text-sm text-zinc-400 leading-relaxed mb-3">
+                    When the loaded file is a 3D Gaussian Splat (the layout
+                    OpenSplat and other 3DGS trainers write), the viewer
+                    detects it from the header and renders it with proper
+                    splatting: each Gaussian is an oriented, anisotropic,
+                    alpha-blended ellipse rather than a flat dot, depth-sorted
+                    on the GPU so it composites correctly from every angle.
+                  </p>
+                  <ul className="text-sm text-zinc-400 space-y-2">
+                    <li>
+                      The info chip shows a{" "}
+                      <strong className="text-white">splat count</strong>{" "}
+                      instead of a point count
+                    </li>
+                    <li>
+                      The settings sheet replaces the{" "}
+                      <strong className="text-white">Color</strong> section
+                      and <strong className="text-white">Point Size</strong>{" "}
+                      slider with a single{" "}
+                      <strong className="text-white">Splat Size</strong>{" "}
+                      slider (0.25×–3.0×, default 1.0×). Below 1.0× thins the
+                      splat to reveal structure; above 1.0× fills gaps in a
+                      sparse splat. Splats carry their own baked color, so the
+                      point-cloud color modes do not apply
+                    </li>
+                    <li>
+                      <strong className="text-white">Orientation</strong>{" "}
+                      (camera mode, spin, Y-up / Z-up, mirrors, Reset View)
+                      works exactly as it does for a point cloud. OpenSplat
+                      results are not always Y-up, so if a splat loads tipped
+                      on its side, flip <Kbd>Y-up / Z-up</Kbd> first
+                    </li>
+                    <li>
+                      View-dependent shading (specular glints from
+                      higher-order spherical harmonics) is not rendered yet,
+                      so the splat can look slightly flatter than it does in
+                      a desktop viewer
+                    </li>
+                    <li>
+                      Capped at{" "}
+                      <strong className="text-white">2,000,000 Gaussians</strong>.
+                      Larger splats are uniformly sub-sampled and the chip
+                      shows the <Kbd>subsampled</Kbd> badge
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-5 mb-4">
                   <h4 className="text-sm font-semibold text-white mb-3">
                     Limits and behavior
                   </h4>
                   <ul className="text-sm text-zinc-400 space-y-2">
                     <li>
-                      <strong className="text-white">5 M point cap</strong>{" "}
-                      — larger files are uniformly sub-sampled and the chip
+                      <strong className="text-white">5 M point cap.</strong>{" "}
+                      Larger files are uniformly sub-sampled and the chip
                       shows a <Kbd>subsampled</Kbd> badge. Keeps memory
                       predictable; a 5 M-point cloud needs ~120 MB of GPU
                       buffers
                     </li>
                     <li>
                       <strong className="text-white">
-                        Binary little-endian PLY only
+                        Binary little-endian PLY only.
                       </strong>{" "}
-                      — matches what LOTA writes and what most photogrammetry
+                      Matches what LOTA writes and what most photogrammetry
                       / DCC tools export. ASCII and big-endian PLY produce a
                       clear &quot;Unsupported PLY format&quot; error
                     </li>
                     <li>
                       <strong className="text-white">Extra properties</strong>{" "}
-                      (normals, alpha, intensity) are tolerated — the parser
+                      (normals, alpha, intensity) are tolerated. The parser
                       builds an offset map for whatever the file declares, so
                       clouds from Blender, CloudCompare, and Nerfstudio load
                       cleanly as long as <Kbd>x y z</Kbd> (and optionally{" "}
@@ -2273,7 +2443,7 @@ export default function DocsPage() {
                     </li>
                     <li>
                       <strong className="text-white">Mirror toggles</strong>{" "}
-                      apply at draw time (model matrix), not at parse time —
+                      apply at draw time (model matrix), not at parse time, so
                       toggling does not re-read the file
                     </li>
                     <li>
@@ -2296,9 +2466,9 @@ export default function DocsPage() {
                         own captures are Y-up
                       </li>
                       <li>
-                        <strong className="text-white">By Distance</strong>{" "}
+                        The <strong className="text-white">By Distance</strong>{" "}
                         color mode is a quick &quot;is this cloud noisy
-                        from the inside?&quot; inspection — noise looks
+                        from the inside?&quot; inspection, since noise looks
                         like a fog when colored by distance from the orbit
                         center
                       </li>
@@ -2320,44 +2490,50 @@ export default function DocsPage() {
             >
               <SectionHeading tag="Configuration" title="Settings Reference">
                 Settings are split into focused sheets reachable from two
-                places: <strong className="text-white">Transmission
+                places. <strong className="text-white">Transmission
                 Settings</strong> (tap the floating status bar pill at the top
-                of the Camera / Streaming or ARKit Tracking page — Receiver,
-                Transport, NDI, OSC, Point Cloud Stream, Protocol Info, a
-                Help section with <Kbd>Replay Tutorial</Kbd>, and an
-                Acknowledgements section listing third-party SDK notices)
-                and{" "}
-                <strong className="text-white">mode-specific settings</strong>{" "}
+                of the Camera / Streaming or ARKit Tracking page) holds
+                Receiver, Transport, NDI, OSC, Point Cloud Stream, Protocol
+                Info, a Help section with <Kbd>Replay Tutorial</Kbd>, and an
+                Acknowledgements section listing third-party SDK notices.{" "}
+                <strong className="text-white">Mode-specific settings</strong>{" "}
                 (tap the <Kbd>&lt;Mode&gt; Settings</Kbd> button just below
-                the status bar — only the section relevant to the active mode).
-                Color and Mono have no per-mode settings, so no button is shown.
-                The receiver IP is shared across all transports. The reference
-                below documents every setting; the headings indicate which
-                sheet hosts each section.
+                the status bar) show only the section relevant to the active
+                mode. Color and Mono have no per-mode settings, so no button
+                is shown. The receiver IP is shared across all transports.
+                The reference below documents every setting; the headings
+                indicate which sheet hosts each section.
               </SectionHeading>
 
+              <p className="text-sm text-zinc-500 mb-6">
+                Each setting lists its{" "}
+                <span className="text-emerald-400 font-medium">default value</span>{" "}
+                in green next to the name.
+              </p>
+
               <div className="space-y-4">
-                <SettingsGroup title="This Device — Transmission Settings (top of sheet)">
+                <SettingsGroup title="This Device: Transmission Settings (top of sheet)">
                   <Setting name="Active IPv4 addresses" defaultValue="live, read-only">
                     Pinned to the top of Transmission Settings. Lists the
                     iPhone&apos;s currently active IPv4 addresses with
                     friendly interface labels: <strong className="text-white">Wi-Fi</strong>{" "}
                     (joined to a network), <strong className="text-white">USB Hotspot</strong>{" "}
                     (Personal Hotspot enabled while plugged into a Mac via
-                    USB — e.g. <Kbd>172.20.10.1</Kbd>), <strong className="text-white">Ethernet</strong>{" "}
+                    USB, e.g. <Kbd>172.20.10.1</Kbd>), <strong className="text-white">Ethernet</strong>{" "}
                     (USB-Ethernet adapter for multi-device wired rigs).{" "}
                     <strong className="text-white">Tap any row to copy</strong>{" "}
                     the address with a haptic + brief &quot;Copied&quot; chip.
                     The list updates live as you toggle Personal Hotspot,
-                    plug in / unplug USB-Ethernet, or join / leave Wi-Fi —
-                    no need to re-open the sheet. These are the iPhone&apos;s{" "}
+                    plug in / unplug USB-Ethernet, or join / leave Wi-Fi,
+                    with no need to re-open the sheet. These are the
+                    iPhone&apos;s{" "}
                     <em>own</em> addresses, shown to help you set the right
                     Receiver IP <em>on your computer</em>; not values to paste
                     into LOTA&apos;s Receiver IP field.
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Receiver — Transmission Settings">
+                <SettingsGroup title="Receiver: Transmission Settings">
                   <Setting name="Receiver IP" defaultValue="192.168.1.100">
                     IP address of the computer receiving streams. Shared across
                     all transports (TCP, UDP, OSC, PLY).
@@ -2370,12 +2546,12 @@ export default function DocsPage() {
                     <Kbd>FOH</Kbd>, or <Kbd>Front Camera</Kbd>. Persists
                     across launches. Critical for multi-device venues so each
                     LOTA phone is distinguishable in TouchDesigner / OBS /
-                    NDI Studio Monitor. Changes take effect within ~1 s — no
-                    need to stop and restart streaming.
+                    NDI Studio Monitor. Changes take effect within ~1 s, with
+                    no need to stop and restart streaming.
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Transport (TCP/UDP) — Transmission Settings">
+                <SettingsGroup title="Transport (TCP/UDP): Transmission Settings">
                   <Setting name="TCP/UDP Output" defaultValue="On">
                     Enable or disable the video transport.
                   </Setting>
@@ -2389,7 +2565,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="NDI — Transmission Settings">
+                <SettingsGroup title="NDI: Transmission Settings">
                   <Setting name="NDI Video Output" defaultValue="Off">
                     Enable or disable NDI streaming. Auto-broadcasts as{" "}
                     <Kbd>LOTA - &lt;Device Label&gt;</Kbd> (default{" "}
@@ -2411,7 +2587,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="OSC — Transmission Settings">
+                <SettingsGroup title="OSC: Transmission Settings">
                   <Setting name="OSC Output" defaultValue="Off">
                     Enable or disable OSC messages.
                   </Setting>
@@ -2420,7 +2596,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Acknowledgements — Transmission Settings (bottom of sheet)">
+                <SettingsGroup title="Acknowledgements: Transmission Settings (bottom of sheet)">
                   <Setting name="NDI® trademark notice" defaultValue="static">
                     Pinned to the bottom of Transmission Settings, below
                     Help &rarr; Replay Tutorial. Reads{" "}
@@ -2439,7 +2615,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Depth — Depth Settings sheet">
+                <SettingsGroup title="Depth: Depth Settings sheet">
                   <Setting name="Color Map" defaultValue="Visible Spectrum">
                     Colormap for depth visualization. Options: Black &amp; White,
                     Black Aqua White, Blue Red, Deep Sea, Color Spectrum,
@@ -2447,7 +2623,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Neural Depth — Neural Depth Settings sheet">
+                <SettingsGroup title="Neural Depth: Neural Depth Settings sheet">
                   <Setting name="Color Map" defaultValue="Visible Spectrum">
                     Colormap for AI-estimated depth visualization. Same nine
                     options as LiDAR Depth.
@@ -2463,20 +2639,20 @@ export default function DocsPage() {
                   </div>
                 </SettingsGroup>
 
-                <SettingsGroup title="Point Cloud — Point Cloud Settings sheet">
-                  <Setting name="Frame Window" defaultValue="30 (range 5–60)">
+                <SettingsGroup title="Point Cloud: Point Cloud Settings sheet">
+                  <Setting name="Frame Window" defaultValue="30 (range 5–60)" perf>
                     Number of accumulated LiDAR frames in the live point cloud
                     sliding window. Higher values show more spatial coverage but
                     use more GPU memory. Only affects the live view, not Gaussian
                     Capture.
                   </Setting>
-                  <Setting name="Max Depth" defaultValue="5.0m (range 1–10m)">
+                  <Setting name="Max Depth" defaultValue="5.0m (range 1–10m)" perf>
                     Maximum LiDAR range. Points beyond this are discarded. Gen 1
                     LiDAR (iPhone 12–14 Pro) is reliable to ~5m. Gen 2
                     (iPhone 15–16 Pro) can reach ~10m. Affects both live view and
                     Gaussian Capture exports.
                   </Setting>
-                  <Setting name="Compute Quality" defaultValue="Balanced">
+                  <Setting name="Compute Quality" defaultValue="Balanced" perf>
                     GPU compute frame skip for thermal management. Full = every
                     frame, Balanced = every 2nd, Efficient = every 3rd. Only
                     affects live Point Cloud mode.
@@ -2489,8 +2665,8 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Gaussian Capture — Capture Settings sheet">
-                  <Setting name="Capture Rate" defaultValue="60 Hz (60 / 30 / 15)">
+                <SettingsGroup title="Gaussian Capture: Capture Settings sheet">
+                  <Setting name="Capture Rate" defaultValue="60 Hz (60 / 30 / 15)" perf>
                     Max rate at which the recorder appends points from
                     ARFrames. Lowering the rate drops every Nth ARFrame{" "}
                     <em>before</em> point unprojection and JPEG encoding
@@ -2503,9 +2679,20 @@ export default function DocsPage() {
                     Nerfstudio, Nerfstudio + Depth, and Point Cloud PLY
                     formats.
                   </Setting>
+                  <Setting name="PLY Format" defaultValue="Binary (Binary / ASCII)">
+                    Point Cloud export encoding, shown only when the
+                    Point Cloud format is selected. Binary{" "}
+                    (<Kbd>binary_little_endian</Kbd>) is compact and read
+                    natively by OpenSplat, COLMAP, MeshLab, and
+                    CloudCompare. ASCII writes a human-readable text PLY
+                    (one <Kbd>x y z r g b</Kbd> line per point), easier to
+                    inspect or script against but roughly 3× larger before
+                    zipping; ASCII artifacts are named{" "}
+                    <Kbd>LOTA_&lt;timestamp&gt;_PLY_ASCII.zip</Kbd>.
+                  </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="PLY Viewer — PLY Viewer Settings sheet">
+                <SettingsGroup title="PLY Viewer: PLY Viewer Settings sheet">
                   <Setting name="Color Mode" defaultValue="Original">
                     Original (per-point RGB) / Solid (color picker) /
                     By Height (Y coordinate) / By Distance (from camera,
@@ -2540,22 +2727,29 @@ export default function DocsPage() {
                     world axes regardless.
                   </Setting>
                   <Setting name="Reset View" defaultValue="action">
-                    Re-runs fit-bounds with a 15° downward pitch —
+                    Re-runs fit-bounds with a 15° downward pitch, the
                     same result as double-tapping the canvas.
                   </Setting>
                   <Setting name="Point Size" defaultValue="3.0 (range 1.0–12.0)">
                     Per-point screen size. All settings persist
                     between launches.
                   </Setting>
+                  <Setting name="Splat Size" defaultValue="1.0× (range 0.25–3.0×)">
+                    Shown in place of the Color section and Point Size
+                    slider when the loaded file is a Gaussian splat.
+                    Scales every Gaussian: below 1.0× thins the splat
+                    to reveal structure, above 1.0× fills gaps in a
+                    sparse splat.
+                  </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Blob Tracking — Detection (Blob Track Settings sheet)">
+                <SettingsGroup title="Blob Tracking: Detection (Blob Track Settings sheet)">
                   <Setting name="Base Style" defaultValue="Color">
                     What the underlying camera layer looks like behind the
                     rectangle outlines. Color (live RGB), Mono (grayscale),
                     Mask (grayscale subject silhouette on black), or Binary
-                    (white-on-black silhouette — authentic TouchDesigner Blob
-                    Track TOP look).
+                    (white-on-black silhouette, the authentic TouchDesigner
+                    Blob Track TOP look).
                   </Setting>
                   <Setting name="Draw Blob Bounds" defaultValue="On">
                     Draw 1-pixel hairline rectangle outlines around detected
@@ -2570,7 +2764,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Blob Tracking — Depth (Blob Track Settings sheet)">
+                <SettingsGroup title="Blob Tracking: Depth (Blob Track Settings sheet)">
                   <Setting name="Min Depth" defaultValue="0.5 m (range 0.1–5.0 m)">
                     Near edge of the depth slab. Pixels closer than this are
                     excluded from blob detection.
@@ -2586,7 +2780,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Blob Tracking — Constraints (Blob Track Settings sheet)">
+                <SettingsGroup title="Blob Tracking: Constraints (Blob Track Settings sheet)">
                   <Setting name="Min Blob Size" defaultValue="50 px (range 10–500)">
                     Minimum pixel area to count as a blob. Filters out single
                     noise pixels and tiny artifacts.
@@ -2603,7 +2797,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Blob Tracking — Revival (Blob Track Settings sheet)">
+                <SettingsGroup title="Blob Tracking: Revival (Blob Track Settings sheet)">
                   <Setting name="Revive Blobs" defaultValue="On">
                     Re-identify lost blobs with the same ID if they reappear
                     inside the revival window. Mirrors TouchDesigner&apos;s
@@ -2625,7 +2819,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Point Cloud Stream (PLY) — Transmission Settings">
+                <SettingsGroup title="Point Cloud Stream (PLY): Transmission Settings">
                   <Setting name="PLY Streaming" defaultValue="Off">
                     Enable or disable live point cloud TCP stream.
                   </Setting>
@@ -2638,15 +2832,16 @@ export default function DocsPage() {
                     <Kbd>N × (3 Float32 XYZ + 3 UInt8 RGB)</Kbd> = 15 bytes
                     per point. Drop in{" "}
                     <Kbd>LOTABinaryPLYRecieverV2.tox</Kbd> from the
-                    TouchDesigner section above — plug-and-play. The CSV-text
-                    variant and its toggle were removed in v1.2.3; binary is
+                    TouchDesigner section above for plug-and-play setup. The
+                    CSV-text variant and its toggle were removed in v1.2.3;
+                    binary is
                     the only supported wire format. Custom receivers built
                     against the legacy CSV stream will need to switch to the
                     binary parser.
                   </div>
                 </SettingsGroup>
 
-                <SettingsGroup title="Tracking — Body / Face / Hands Settings sheets">
+                <SettingsGroup title="Tracking: Body / Face / Hands Settings sheets">
                   <Setting name="Skeleton Overlay" defaultValue="On">
                     Show or hide body skeleton visualization on the tracking page.
                   </Setting>
@@ -2663,7 +2858,7 @@ export default function DocsPage() {
                   </Setting>
                 </SettingsGroup>
 
-                <SettingsGroup title="Transcription — Transcription Settings sheet">
+                <SettingsGroup title="Transcription: Transcription Settings sheet">
                   <Setting name="Send Per-Word OSC" defaultValue="On">
                     Send each recognized word as it arrives
                     (<Kbd>/lota/speech/word</Kbd> + TCP/UDP word frames).
@@ -2686,7 +2881,7 @@ export default function DocsPage() {
                   </div>
                 </SettingsGroup>
 
-                <SettingsGroup title="Device Motion — Motion Settings sheet">
+                <SettingsGroup title="Device Motion: Motion Settings sheet">
                   <Setting name="Acceleration (X, Y, Z)" defaultValue="On">
                     Gravity-removed acceleration in G-force, sent as three OSC
                     floats per update (<Kbd>/lota/motion/accel/x</Kbd>,{" "}
@@ -2706,7 +2901,7 @@ export default function DocsPage() {
                     meters (<Kbd>/lota/motion/pressure</Kbd>,{" "}
                     <Kbd>/lota/motion/altitude</Kbd>).
                   </Setting>
-                  <Setting name="Update Rate" defaultValue="30 Hz">
+                  <Setting name="Update Rate" defaultValue="30 Hz" perf>
                     30 / 60 / 100 Hz picker. 30 Hz matches ARKit. 100 Hz is
                     useful for latency-critical controllers.
                   </Setting>
@@ -2720,7 +2915,7 @@ export default function DocsPage() {
                   </div>
                 </SettingsGroup>
 
-                <SettingsGroup title="Audio Analysis — Audio Settings sheet">
+                <SettingsGroup title="Audio Analysis: Audio Settings sheet">
                   <Setting name="Levels (Bass / Mid / High)" defaultValue="On">
                     Continuous 0–1 energy per frequency band with rolling
                     auto-gain. <Kbd>/lota/audio/bass</Kbd>,{" "}
@@ -2733,16 +2928,16 @@ export default function DocsPage() {
                     <Kbd>/lota/audio/drums/high</Kbd>.
                   </Setting>
                   <Setting name="Dynamics" defaultValue="Off">
-                    <Kbd>/lota/audio/burst</Kbd> — fast transient detector,
+                    <Kbd>/lota/audio/burst</Kbd>: fast transient detector,
                     pulse-shaped 0–1 (rises instantly, decays over ~200 ms).
                   </Setting>
                   <Setting name="FFT Spectrum (20 bands)" defaultValue="Off">
                     20 log-spaced FFT bands across 20–20,000 Hz, each
                     normalized 0–1. <Kbd>/lota/audio/fft/0</Kbd> through{" "}
-                    <Kbd>/lota/audio/fft/19</Kbd>, rendered with a red → blue
+                    <Kbd>/lota/audio/fft/19</Kbd>, rendered with a red-to-blue
                     color gradient.
                   </Setting>
-                  <Setting name="Update Rate" defaultValue="30 Hz">
+                  <Setting name="Update Rate" defaultValue="30 Hz" perf>
                     30 / 60 Hz picker. Analysis runs internally at ~86 Hz and
                     decimates to the chosen output rate.
                   </Setting>
@@ -2750,8 +2945,9 @@ export default function DocsPage() {
                     Microphone permission is requested upfront when entering
                     Audio mode. Uses the same{" "}
                     <Kbd>NSMicrophoneUsageDescription</Kbd> as Transcription
-                    mode. LOTA can only analyze the microphone input — iOS
-                    sandboxing prevents capturing system audio from other apps.
+                    mode. LOTA can only analyze the microphone input, since
+                    iOS sandboxing prevents capturing system audio from other
+                    apps.
                   </div>
                 </SettingsGroup>
               </div>
@@ -2785,13 +2981,13 @@ export default function DocsPage() {
                 </Card>
                 <Card title="Dark Interface">
                   Designed dark from the start. Every screen, menu, and control
-                  uses a true dark color scheme for comfortable use in any
+                  uses a true dark color scheme, comfortable in any
                   environment.
                 </Card>
                 <Card title="Differentiate Without Color">
-                  Status indicators swap to distinct symbols when this setting is
-                  enabled. Shapes, icons, and text labels replace color as the
-                  sole differentiator.
+                  Status indicators swap to distinct symbols when this setting
+                  is enabled. Shapes, icons, and text labels carry the meaning,
+                  so color is never the only cue.
                 </Card>
                 <Card title="Increase Contrast">
                   Swaps blur materials for solid backgrounds and boosts status
@@ -2818,28 +3014,28 @@ export default function DocsPage() {
                   3D hand coordinates) require iPhone 12 Pro or later. Color,
                   Mono, <strong className="text-white">Neural Depth</strong>{" "}
                   (Depth Anything V2 on the Apple Neural Engine),
-                  Transcription, Motion, and Audio modes, NDI streaming, and
-                  TCP/UDP streaming all work on iPhones without LiDAR — and
-                  Neural Depth doubles as the side-by-side NDI fallback so
-                  multi-pane workflows work on any iPhone. Face tracking
-                  requires TrueDepth camera (iPhone X or later). Body
-                  tracking requires A12 chip or later.{" "}
+                  Transcription, Motion, and Audio modes, plus NDI and
+                  TCP/UDP streaming, all work on iPhones without LiDAR.
+                  Neural Depth also serves as the side-by-side NDI fallback,
+                  so multi-pane workflows run on any iPhone. Face tracking
+                  requires the TrueDepth camera (iPhone X or later); body
+                  tracking requires an A12 chip or later.{" "}
                   <strong className="text-white">LOTA is officially
                   iPhone-only.</strong>{" "}
-                  iPad Pro models with LiDAR have run successfully during
-                  beta testing, but iPad is not an officially supported
-                  target — your mileage may vary.
+                  iPad Pro models with LiDAR have run successfully in beta
+                  testing, but iPad is not an officially supported target,
+                  so your mileage may vary.
                 </Faq>
                 <Faq q="Does Transcription mode need internet access?">
                   No. Transcription uses iOS 26&apos;s on-device
                   {" "}<Kbd>SpeechAnalyzer</Kbd> framework and runs entirely
                   offline. After you grant Speech Recognition permission on
-                  first launch, LOTA prefetches the on-device speech model for
-                  your locale in the background — by the time you open
-                  Transcription mode the model is on disk, so first captions
-                  arrive without a download wait. If the prefetch didn&apos;t
-                  finish, the model installs lazily on first use as a
-                  fallback. Audio never leaves your device.
+                  first launch, LOTA prefetches the speech model for your
+                  locale in the background, so by the time you open
+                  Transcription mode the model is on disk and the first
+                  captions arrive with no download wait. If the prefetch
+                  didn&apos;t finish, the model installs lazily on first use.
+                  Audio never leaves your device.
                 </Faq>
                 <Faq q="Do the receiving machine and iPhone need to be on the same network?">
                   Yes. For TCP, UDP, OSC, and PLY streaming, both devices must be

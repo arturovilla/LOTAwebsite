@@ -1,7 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 
+import { FaApple } from "react-icons/fa";
 import HeroPointCloud from "./HeroPointCloud";
-import BetaButton from "./BetaButton";
+import { APP_STORE_URL } from "../config";
 
 export default function Hero() {
   return (
@@ -44,15 +45,13 @@ export default function Hero() {
         </p>
 
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-10 animate-fade-in-up-delay-3">
-          <BetaButton
-            source="hero"
-            className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-white text-black rounded-full font-semibold text-sm hover:bg-zinc-200 transition-colors"
-          />
-          <span
-            className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-white/10 text-white border border-white/[0.15] rounded-full font-semibold text-sm cursor-default"
+          <a
+            href={APP_STORE_URL}
+            className="inline-flex items-center gap-2.5 px-7 py-3.5 bg-white/10 backdrop-blur-sm text-white border border-white/[0.18] rounded-full font-semibold text-sm hover:bg-white/20 transition-colors"
           >
-            Coming Soon on the App Store
-          </span>
+            <FaApple size={18} />
+            Download on the App Store
+          </a>
           <a
             href="#features"
             className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full border border-white/[0.12] text-zinc-300 text-sm font-medium hover:bg-white/[0.06] transition-colors"
