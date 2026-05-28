@@ -76,7 +76,7 @@ AI-estimated depth from the regular camera feed. Runs **Depth Anything V2 Small*
 
 ### Point Cloud
 
-Real-time 3D point cloud rendered with true RGB colors sampled from the camera. Configurable frame window (5–60 frames), Max Depth (1–10 m), and Compute Quality (Full / Balanced / Efficient). GPU-accelerated via Metal compute shaders — every pixel of the LiDAR depth map is unprojected in parallel. Requires LiDAR.
+Streams the LiDAR point cloud over PLY. Every pixel of the LiDAR depth map is unprojected into 3D in parallel via Metal compute shaders and sent over the network; the on-device view shows the live RGB camera, so the geometry is visualized receiver-side. Configurable Max Depth (1–10 m) and Compute Quality (Full / Balanced / Efficient, where the rate strides on unique LiDAR scans). Requires LiDAR.
 
 ### Blob Track
 
@@ -379,7 +379,7 @@ Every export ZIP is named `LOTA_<timestamp>_<MODE>.zip` (e.g. `LOTA_2026-04-30_1
 
 The 3D-scene recording formats (COLMAP, Nerfstudio, Nerfstudio + Depth, Point Cloud PLY) share a **Capture Settings** sheet, opened via the settings pill below the format picker:
 
-- **Capture Rate** (60 Hz default / 30 Hz / 15 Hz) — ARKit delivers depth at ~60 Hz; lowering the rate drops every Nth ARFrame *at the source*, before per-pixel unprojection and JPEG encoding run. 30 Hz roughly halves the captured point count and zip size; 15 Hz quarters them. Useful for scanning a small subject without needing every depth sample, or for throttling a long scan to keep the device cool
+- **Capture Rate** (30 Hz default / 15 Hz / ~7 Hz) — iPhone LiDAR runs at 30 Hz. LOTA filters duplicate-buffer ARFrames first (ARKit hands back the same depth buffer on every other 60 Hz callback), then strides on the unique scans, so the picker reflects real LiDAR scans per second. 30 Hz keeps every scan, 15 Hz every other, ~7 Hz every fourth. Lower rates skip per-pixel unprojection and JPEG encoding for the dropped scans, roughly halving or quartering the captured point count and zip size. Useful for scanning a small subject without needing every scan, or for throttling a long scan to keep the device cool
 - **PLY Format** (Binary default / ASCII; new in v1.2.7) — shown only when the Point Cloud format is selected. Binary (`binary_little_endian`) is compact and read natively by OpenSplat, COLMAP, MeshLab, and CloudCompare. ASCII writes a human-readable text PLY (one `x y z r g b` line per point), easier to inspect or script against but roughly 3× larger before zipping; ASCII artifacts are named `LOTA_<timestamp>_PLY_ASCII.zip`
 
 ### Material Capture

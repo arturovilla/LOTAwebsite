@@ -498,10 +498,11 @@ export default function DocsPage() {
                   tag={<Tag variant="amber">LiDAR required</Tag>}
                 >
                   <>
-                    Real-time 3D point cloud rendered with true RGB colors. Every
-                    pixel of the 256&times;192 depth map is unprojected into 3D
-                    space. Configure frame window, max depth, and compute quality
-                    in Settings.
+                    Streams the LiDAR point cloud over PLY. Every pixel of the
+                    256&times;192 depth map is unprojected into 3D and sent over
+                    the network. The on-device view shows the live RGB camera, so
+                    geometry is visualized receiver-side. Configure max depth and
+                    compute quality in Settings.
                   </>
                 </Card>
                 <Card
@@ -1822,20 +1823,21 @@ export default function DocsPage() {
                   <div className="flex items-baseline gap-2 mb-1">
                     <Kbd>Capture Rate</Kbd>
                     <span className="text-xs text-zinc-600">
-                      <span className="text-emerald-400 font-medium">60 Hz</span> / 30 Hz / 15 Hz
+                      <span className="text-emerald-400 font-medium">30 Hz</span> / 15 Hz / ~7 Hz
                     </span>
                   </div>
                   <p className="text-sm text-zinc-500 leading-relaxed">
-                    ARKit delivers depth at ~60 Hz. Lowering the rate makes
-                    LOTA drop every Nth ARFrame <em>at the source</em>,
-                    before per-pixel unprojection and JPEG encoding run, so
-                    both CPU work and encode are skipped for the dropped
-                    frames. 30 Hz roughly halves captured point count and zip
-                    size; 15 Hz quarters them. The default 60 Hz keeps the
-                    densest possible capture and preserves pre-1.2.6
-                    behavior. Useful when you&apos;re scanning a small
-                    subject for a Gaussian-splat training set and don&apos;t
-                    need every depth sample, or when throttling a long scan
+                    iPhone LiDAR runs at 30 Hz. LOTA filters out
+                    duplicate-buffer ARFrames first (ARKit hands back the same
+                    depth buffer on every other 60 Hz callback), then strides
+                    on the unique scans, so the picker reflects real LiDAR
+                    scans per second. 30 Hz keeps every scan (densest), 15 Hz
+                    takes every other, ~7 Hz every fourth. Lower rates skip
+                    per-pixel unprojection and JPEG encoding for the dropped
+                    scans, roughly halving or quartering the captured point
+                    count and zip size. Useful when you&apos;re scanning a
+                    small subject for a Gaussian-splat training set and
+                    don&apos;t need every scan, or when throttling a long scan
                     to keep the device cool.
                   </p>
                 </div>
@@ -2640,22 +2642,19 @@ export default function DocsPage() {
                 </SettingsGroup>
 
                 <SettingsGroup title="Point Cloud: Point Cloud Settings sheet">
-                  <Setting name="Frame Window" defaultValue="30 (range 5–60)" perf>
-                    Number of accumulated LiDAR frames in the live point cloud
-                    sliding window. Higher values show more spatial coverage but
-                    use more GPU memory. Only affects the live view, not Gaussian
-                    Capture.
-                  </Setting>
                   <Setting name="Max Depth" defaultValue="5.0m (range 1–10m)" perf>
                     Maximum LiDAR range. Points beyond this are discarded. Gen 1
                     LiDAR (iPhone 12–14 Pro) is reliable to ~5m. Gen 2
-                    (iPhone 15–16 Pro) can reach ~10m. Affects both live view and
-                    Gaussian Capture exports.
+                    (iPhone 15–16 Pro) can reach ~10m. Affects both the PLY
+                    stream and Gaussian Capture exports.
                   </Setting>
                   <Setting name="Compute Quality" defaultValue="Balanced" perf>
-                    GPU compute frame skip for thermal management. Full = every
-                    frame, Balanced = every 2nd, Efficient = every 3rd. Only
-                    affects live Point Cloud mode.
+                    Rate at which unique LiDAR scans are processed and streamed
+                    over PLY (the sensor runs at 30 Hz). Full processes every
+                    scan (~30 Hz), Balanced every other (~15 Hz), Efficient every
+                    third (~10 Hz). Lower rates reduce GPU work and heat on long
+                    sessions. Affects the live PLY stream only; Gaussian Capture
+                    has its own rate dial.
                   </Setting>
                   <Setting name="Min Confidence" defaultValue="Medium+">
                     LiDAR depth confidence filter. All = no filtering, maximum
@@ -2666,16 +2665,16 @@ export default function DocsPage() {
                 </SettingsGroup>
 
                 <SettingsGroup title="Gaussian Capture: Capture Settings sheet">
-                  <Setting name="Capture Rate" defaultValue="60 Hz (60 / 30 / 15)" perf>
-                    Max rate at which the recorder appends points from
-                    ARFrames. Lowering the rate drops every Nth ARFrame{" "}
-                    <em>before</em> point unprojection and JPEG encoding
-                    run, so both per-pixel CPU work and the encode for
-                    that frame are skipped. 30 Hz roughly halves point
-                    count and zip size; 15 Hz quarters them. Default
-                    60 Hz keeps the densest possible capture. Useful for
-                    trading density for cost on long static holds or
-                    thermally constrained sessions. Applies to COLMAP,
+                  <Setting name="Capture Rate" defaultValue="30 Hz (30 / 15 / ~7)" perf>
+                    Rate at which unique LiDAR scans are appended to the
+                    dataset. iPhone LiDAR runs at 30 Hz; LOTA filters
+                    duplicate-buffer ARFrames first, then strides on the
+                    unique scans. 30 Hz keeps every scan (densest), 15 Hz
+                    takes every other, ~7 Hz every fourth. Lower rates skip
+                    unprojection and JPEG encoding for the dropped scans,
+                    roughly halving or quartering point count and zip size.
+                    Useful for trading density for cost on long static holds
+                    or thermally constrained sessions. Applies to COLMAP,
                     Nerfstudio, Nerfstudio + Depth, and Point Cloud PLY
                     formats.
                   </Setting>

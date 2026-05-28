@@ -4,6 +4,26 @@ All notable changes to the LOTA project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [1.2.8] - 2026-05-27
+
+### Changed
+
+- **Middle-page Point Cloud mode shows the live RGB camera** — no on-screen point overlay. The LiDAR compute kernel still runs and PLY streaming is unchanged; geometry is meant to be visualized receiver-side. The 60-slot ring buffer (~70 MB GPU memory) is gone
+- **Gaussian Capture Rate picker is now 30 / 15 / ~7 Hz** (was 60 / 30 / 15). iPhone LiDAR runs at 30 Hz; the old "60 Hz" option processed duplicate ARFrames for no extra coverage. `GaussianRecorder.recordFrame` filters duplicate-buffer ARFrames before striding, so the picker now reflects unique LiDAR scans/sec. Stored 60 values migrate to 30 on load
+- **Backpressure on the PLY TCP transport** — `TCPTransport.sendRaw` (PLY only) gates on a ~1.5 MB inflight-bytes counter and drops new frames when the receiver lags rather than queueing them. Phone-side memory and CPU stay flat under a stall; the receiver gets fresh frames when it recovers instead of a backlog. Also enables `noDelay` on the PLY socket. Video TCP transport unaffected
+
+### Removed
+
+- **Frame Window slider in Point Cloud Settings** — drove the now-deleted ring buffer; nothing downstream consumed it after the camera-only middle page change. Setting + `UserDefaults` key + UI row + renderer wiring all deleted
+- **Dead GPU point-accumulation API in `MetalRenderer`** — `startAccumulation` / `stopAccumulation` / `appendAccumulationPoints` and the matching `GaussianRecorder.onPointsExtracted` callback had no callers anywhere; ~100 lines of unreachable code removed. CPU-side accumulation in `GaussianRecorder.allPositions` (the actual driver of Gaussian / COLMAP / Nerfstudio / PLY exports) is untouched
+
+### Fixed
+
+- **Compute Quality's Balanced and Efficient options were silently dropping all or most PLY frames** — `drawPointCloud` incremented its frame counter on every ARFrame but gated compute on `depthChanged && (counter % skip == 0)`. At skip=2 (Balanced, the default), the `% 2 == 0` phase landed on duplicate-buffer ARFrames where `depthChanged` was false, so the two filters never both passed and compute never ran. Full worked by luck (`% 1` is always true). Fixed by moving the counter increment inside the `if depthChanged` branch so the stride counts unique LiDAR scans. Users on Balanced (the default) were effectively getting no PLY stream
+- **Receiver IP field accepts commas as periods** — locales that use comma as the decimal separator (de_DE, fr_FR, es_ES, most of continental Europe) show a comma key on iOS's `.decimalPad` where US users see a period. The field now intercepts the comma via `onChange` and replaces it before it lands in `receiverHost`. Invisible to US users; immediate fix for users on comma-locale keyboards who were silently getting bogus IPs. Also handles paste-from-clipboard with comma-separated addresses
+
+---
+
 ## [1.2.7] - 2026-05-16
 
 ### Added
