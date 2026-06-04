@@ -28,20 +28,20 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/LOTA-dark.jpg",
-        width: 512,
-        height: 512,
-        alt: "LOTA — LiDAR Over the Air",
+        url: "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/LOTA-og-pointcloud.png",
+        width: 1200,
+        height: 627,
+        alt: "LOTA point cloud capture in the iOS PLY viewer",
       },
     ],
   },
   twitter: {
-    card: "summary",
+    card: "summary_large_image",
     title: "LOTA: LiDAR Over the Air",
     description:
       "Turn your iPhone into a professional spatial capture tool. Stream real-time LiDAR data via NDI, TCP/UDP, OSC, and PLY.",
     images: [
-      "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/LOTA-dark.jpg",
+      "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/LOTA-og-pointcloud.png",
     ],
   },
 };
