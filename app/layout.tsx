@@ -28,10 +28,10 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/LOTA-og-pointcloud.png",
-        width: 1200,
-        height: 627,
-        alt: "LOTA point cloud capture in the iOS PLY viewer",
+        url: "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/opengraphLOTA.png",
+        width: 3600,
+        height: 1881,
+        alt: "LOTA iOS app showing point cloud, depth, and live data streaming views",
       },
     ],
   },
@@ -41,7 +41,7 @@ export const metadata: Metadata = {
     description:
       "Turn your iPhone into a professional spatial capture tool. Stream real-time LiDAR data via NDI, TCP/UDP, OSC, and PLY.",
     images: [
-      "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/LOTA-og-pointcloud.png",
+      "https://pub-42e3bdd794c24301bd74d193c44417c6.r2.dev/opengraphLOTA.png",
     ],
   },
 };
